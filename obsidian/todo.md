@@ -17,5 +17,5 @@
 - [ ] Login screen design
 - [ ] Teacher dashboard design
 - [ ] Admin dashboard design
-
 # Back-end
+- [ ] Create database structure

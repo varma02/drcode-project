@@ -1,0 +1,22 @@
+{
+	"nodes":[
+		{"id":"0eebea6618e3ff59","type":"text","text":"Teacher dashboard\n- Next/current lesson\n- Notice board / notifications\n- Estimated salary","x":380,"y":200,"width":280,"height":260},
+		{"id":"6ac5a337c71ac6da","type":"text","text":"Admin dashboard\n","x":380,"y":-340,"width":280,"height":100},
+		{"id":"9a5efe329e724139","type":"text","text":"User goes on the website","x":-460,"y":-40,"width":260,"height":60},
+		{"id":"a2be63b49cd96abb","type":"text","text":"Login screen","x":-100,"y":-40,"width":250,"height":60},
+		{"id":"e9b6fe342a924444","type":"text","text":"My profile page\n- Option to log out\n- Light/Dark mode toggle\n- Personal details listed\n- Profile picture and an option to change it\n- Sessions from other devices listed\n- Authentication settings","x":1000,"y":-140,"width":280,"height":300},
+		{"id":"5a9ec76f692b9a55","type":"text","text":"Teacher timetable view\n- List of classes that the teacher is assigned to","x":1000,"y":250,"width":280,"height":160},
+		{"id":"ed76dc9db2a87273","type":"text","text":"Teacher knowledge base view\n- Useful documents\n- Guide on how to teach\n- Detailed guide for each lesson","x":1000,"y":500,"width":282,"height":230},
+		{"id":"f315e8aced4f6d72","type":"text","text":"Teacher class view\n- Info about the class\n- Previous lessons\n- Students in the class","x":1520,"y":250,"width":250,"height":151}
+	],
+	"edges":[
+		{"id":"e331821549209cc7","fromNode":"9a5efe329e724139","fromSide":"right","toNode":"a2be63b49cd96abb","toSide":"left"},
+		{"id":"0b3a886f42e9932a","fromNode":"a2be63b49cd96abb","fromSide":"right","toNode":"0eebea6618e3ff59","toSide":"left","label":"Logs in \nas a teacher"},
+		{"id":"19a56ce626ad5d8e","fromNode":"0eebea6618e3ff59","fromSide":"right","toNode":"e9b6fe342a924444","toSide":"left","label":"Clicks on\ntheir profile"},
+		{"id":"9cb1f6218544b073","fromNode":"0eebea6618e3ff59","fromSide":"right","toNode":"5a9ec76f692b9a55","toSide":"left","label":"Clicks on\ntimetable"},
+		{"id":"28ac72e2090b689a","fromNode":"a2be63b49cd96abb","fromSide":"right","toNode":"6ac5a337c71ac6da","toSide":"left","label":"Logs in\nas an admin"},
+		{"id":"8ddac1263d4f894b","fromNode":"6ac5a337c71ac6da","fromSide":"right","toNode":"e9b6fe342a924444","toSide":"left","label":"Clicks on\ntheir profile"},
+		{"id":"ca2a1305b56f0a5a","fromNode":"0eebea6618e3ff59","fromSide":"right","toNode":"ed76dc9db2a87273","toSide":"left","label":"Clicks on\nknowledge base"},
+		{"id":"06b54c6ee06146a6","fromNode":"5a9ec76f692b9a55","fromSide":"right","toNode":"f315e8aced4f6d72","toSide":"left","label":"Selects\na class"}
+	]
+}

@@ -63,9 +63,9 @@ export default function Login() {
 				<form onSubmit={formSubmit}>
 					<CardBody className="gap-4">
 						<Input isInvalid={errors.includes("no_email")} errorMessage="Az email cím megadása kötelező!" onFocus={()=>setErrors(errors.filter(e=>e!="no_email"))}
-						 name="email" type="email" label="Email" placeholder="email@example.com" />
+						 name="email" type="email" label="Email cím"  />
 						<Input isInvalid={errors.includes("no_password")} errorMessage="A jelszó megadása kötelező!" onFocus={()=>setErrors(errors.filter(e=>e!="no_password"))}
-						 name="password" type="password" label="Jelszó" placeholder="123456" />
+						 name="password" type="password" label="Jelszó"  />
 						<div className="flex justify-between">
 							<Checkbox name="remember">Emlékezzen rám</Checkbox>
 							<Link to={'/login/forgot-password'} className="text-primary">Elfelejtett jelszó</Link>

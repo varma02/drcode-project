@@ -1,8 +1,8 @@
-import { Button, Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Code } from "@nextui-org/react";
 import { useRouteError } from "react-router-dom";
 
 export default function Error() {
-  const error = useRouteError() as any;
+  const error: any = useRouteError();
 
   return (
   <div className="min-h-screen flex justify-center items-center">
@@ -18,8 +18,9 @@ export default function Error() {
         <CardHeader className="text-2xl font-bold justify-center">
           {error.status && `${error.status} -`} Hiba
         </CardHeader>
-        <CardBody className="text-xl">
-          Váratlan hiba lépett fel.
+        <CardBody className="text-xl gap-4">
+          <p className="text-center">Váratlan hiba lépett fel.</p>
+          <Code className="text-wrap">{`${error}`}</Code>
         </CardBody>
       </>)}
       <CardFooter className="gap-4 flex">

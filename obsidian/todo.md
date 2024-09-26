@@ -2,7 +2,8 @@
 - [ ] Create a user flow document
 - [x] Select front-end utilities
 	React, React Router, Tailwind, NextUI
-- [ ] Choose a database and backend language
+- [ ] Choose a database and tooling
+	SurrealDB, expressJS
 - [ ] How are users and their roles managed 
 	- [ ] Data structure
 	- [ ] Permissions

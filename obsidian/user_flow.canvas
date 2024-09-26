@@ -1,7 +1,7 @@
 {
 	"nodes":[
-		{"id":"0eebea6618e3ff59","type":"text","text":"Teacher dashboard\n- Next/current lesson\n- Notice board / notifications\n- Estimated salary","x":380,"y":200,"width":280,"height":260},
-		{"id":"6ac5a337c71ac6da","type":"text","text":"Admin dashboard\n","x":380,"y":-340,"width":280,"height":100},
+		{"id":"0eebea6618e3ff59","type":"text","text":"Teacher dashboard\n- Next/current lesson\n- Useful documents for next lesson\n- Notice board / notifications\n- Estimated salary","x":380,"y":200,"width":280,"height":260},
+		{"id":"6ac5a337c71ac6da","type":"text","text":"Admin dashboard\n- Today's lessons\n- Notice board / notifications\n- ","x":380,"y":-340,"width":280,"height":240},
 		{"id":"9a5efe329e724139","type":"text","text":"User goes on the website","x":-460,"y":-40,"width":260,"height":60},
 		{"id":"a2be63b49cd96abb","type":"text","text":"Login screen","x":-100,"y":-40,"width":250,"height":60},
 		{"id":"e9b6fe342a924444","type":"text","text":"My profile page\n- Option to log out\n- Light/Dark mode toggle\n- Personal details listed\n- Profile picture and an option to change it\n- Sessions from other devices listed\n- Authentication settings","x":1000,"y":-140,"width":280,"height":300},

@@ -1,50 +1,53 @@
-# React + TypeScript + Vite
+# DR.CODE Kecskemét - Management App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DR.CODE Kecskemét provides interactive, hands-on programming courses for kids. Our primary focus is to make this company's day-to-day operations simpler. This application will them assist employees in more effectively managing their classes, students and lessons, organizing the learning environment, looking up study material and much more.
 
-Currently, two official plugins are available:
+### Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. **Employee management**  
+	With a two role system (admin and teacher) the company can track everyone's working hours and therefore their salary
+2. **Classes and lessons**  
+	Admins create classes, enrol students, assign them teachers, and see lessons that those teachers gave
+3. **Asset management**  
+	Admins can manage the company's assets such as Laptops, PCs, lego sets and more
+4. **Knowledge base**  
+	Important documents can be stored in the app for easy access to all employees
+5. **And much more**
 
-## Expanding the ESLint configuration
+### Installation Instructions
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+This guide assumes that you have `git` and `Docker` on your system.
 
-- Configure the top-level `parserOptions` property like this:
+1. **Clone the repository:**
+	```bash
+	git clone https://github.com/varma02/drcode-project
+	```
+	 
+2. **Navigate to the project directory:**
+	```bash
+	cd drcode-project
+	```
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+3. **Make the necessary configurations**  
+	Edit the `docker-compose.yml` file
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+4. **Run docker-compose:**
+	```bash
+	docker-compose up -d
+	```
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Developer Documentation
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+For more detailed information about the architecture, API endpoints, and how to contribute to the development of this project, please refer to the [Developer Documentation](https://github.com/varma02/drcode-project/blob/main/docs/dev.md).
+
+### Authors
+
+- **Kovács Tamás** – Front-end developer  
+	[MaalnaKeX@GitHub](https://github.com/MaalnaKeX)
+	
+- **Váradi Marcell** – Back-end developer  
+	[varma02@GitHub](https://github.com/varma02)
+
+---
+
+This project is under the MIT License - see the [LICENSE](https://github.com/varma02/drcode-project/blob/main/LICENSE.md) for more details.

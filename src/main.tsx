@@ -23,12 +23,12 @@ const router = createBrowserRouter([
     path: '/',
     element: <Dashboard />,
     errorElement: <Error />,
-    loader: async () => {
-      // TODO: check if user is logged in
-      if (true) {
-        return redirect('/login')
-      }
-    },
+    // loader: async () => {
+    //   // TODO: check if user is logged in
+    //   if (true) {
+    //     return redirect('/login')
+    //   }
+    // },
   },
 ])
 

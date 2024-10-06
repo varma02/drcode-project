@@ -13,13 +13,19 @@ export default {
       themes: {
         light: {
           colors: {
-            primary: "#99cc33",
+            primary: {
+              DEFAULT: "#99cc33",
+              foreground: "#ffffff"
+            },
             secondary: "#e4e4e7",
           }
         },
         dark: {
           colors: {
-            primary: "#99cc33",
+            primary: {
+              DEFAULT: "#99cc33",
+              foreground: "#27272A"
+            },
             secondary: "#27272A",
           }
         },

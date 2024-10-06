@@ -75,7 +75,7 @@ export default function Login() {
 				</form>
 				<div className="relative py-4">
 					<Divider />
-					<span className="bg-background px-4 small-caps font-semibold absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">vagy</span>
+					<span className="bg-content1 px-4 small-caps font-semibold absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 ">vagy</span>
 				</div>
 				<CardBody>
 					<Button color="secondary"><img src="google_logo.svg" alt="Google logo" /> Folytatás Google-el</Button>

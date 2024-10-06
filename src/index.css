@@ -7,3 +7,9 @@
     font-variant: small-caps;
   }
 }
+
+@layer base {
+  #root {
+    @apply text-foreground bg-background min-h-screen;
+  }
+}

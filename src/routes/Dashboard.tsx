@@ -2,7 +2,6 @@ import { Card, CardBody, Tab, Tabs, Image, ScrollShadow, Table, TableHeader, Tab
 import MessageGroup from "../components/MessageGroup";
 import Message from "../components/Message";
 import CheckButton from "../components/CheckButton";
-import { HiOutlineInformationCircle } from "react-icons/hi2"
 
 export default function Dashboard() {
   return (
@@ -48,50 +47,42 @@ export default function Dashboard() {
             <TableColumn>NÉV</TableColumn>
             <TableColumn>OSZTÁLY</TableColumn>
             <TableColumn>JELENLÉT</TableColumn>
-            <TableColumn> </TableColumn>
           </TableHeader>
           <TableBody>
             <TableRow key="1">
               <TableCell>Tony Reichert</TableCell>
               <TableCell>1/a</TableCell>
-              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik"/></TableCell>
-              <TableCell><HiOutlineInformationCircle /></TableCell>
+              <TableCell className=""><CheckButton onText="Jelen" offText="Hiányzik" width="w-24"/></TableCell>
             </TableRow>
             <TableRow key="2">
               <TableCell>Zoey Lang</TableCell>
               <TableCell>3/b</TableCell>
-              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik"/></TableCell>
-              <TableCell><HiOutlineInformationCircle /></TableCell>
+              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik" width="w-24"/></TableCell>
             </TableRow>
             <TableRow key="3">
               <TableCell>Jane Fisher</TableCell>
               <TableCell>2/d</TableCell>
-              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik"/></TableCell>
-              <TableCell><HiOutlineInformationCircle /></TableCell>
+              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik" width="w-24"/></TableCell>
             </TableRow>
             <TableRow key="4">
               <TableCell>William Howard</TableCell>
               <TableCell>1/a</TableCell>
-              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik"/></TableCell>
-              <TableCell><HiOutlineInformationCircle /></TableCell>
+              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik" width="w-24"/></TableCell>
             </TableRow>
             <TableRow key="5">
               <TableCell>William Howard</TableCell>
               <TableCell>1/a</TableCell>
-              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik"/></TableCell>
-              <TableCell><HiOutlineInformationCircle /></TableCell>
+              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik" width="w-24"/></TableCell>
             </TableRow>
             <TableRow key="6">
               <TableCell>William Howard</TableCell>
               <TableCell>1/a</TableCell>
-              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik"/></TableCell>
-              <TableCell><HiOutlineInformationCircle /></TableCell>
+              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik" width="w-24"/></TableCell>
             </TableRow>
             <TableRow key="7">
               <TableCell>William Howard</TableCell>
               <TableCell>1/a</TableCell>
-              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik"/></TableCell>
-              <TableCell><HiOutlineInformationCircle /></TableCell>
+              <TableCell className="min-w-28"><CheckButton onText="Jelen" offText="Hiányzik" width="w-24"/></TableCell>
             </TableRow>
           </TableBody>
         </Table>

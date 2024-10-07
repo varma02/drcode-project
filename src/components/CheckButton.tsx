@@ -8,7 +8,7 @@ const checkbox = tv({
   variants: {
     isSelected: {
       true: {
-        base: "border-primary bg-primary hover:bg-primary-500 hover:border-primary-500",
+        base: "border-primary bg-primary hover:bg-primary",
         content: "text-primary-foreground pl-1"
       }
     },
@@ -20,7 +20,7 @@ const checkbox = tv({
   }
 })
 
-export default function CheckButton({onText, offText}: {onText: string, offText: string}) {
+export default function CheckButton({onText, offText, width}: {onText: string, offText: string, width?: string}) {
   const {
     children,
     isSelected,
@@ -42,10 +42,9 @@ export default function CheckButton({onText, offText}: {onText: string, offText:
       <Chip
         classNames={{
           base: styles.base(),
-          content: styles.content(),
+          content: `${styles.content()} ${width} text-center`,
         }}
         color="primary"
-        startContent={isSelected ? null : null}
         variant="faded"
         {...getLabelProps() as any}
       >

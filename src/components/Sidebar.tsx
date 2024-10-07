@@ -11,7 +11,7 @@ export default function Sidebar () {
         <div className='flex flex-col gap-6 p-2'>
           <Image width={"100%"} classNames={{img:"rounded-none"}} alt="Dr. Code" src="/logo.png" />
           <Tabs selectedKey={pathname} isVertical={true}
-          aria-label="Tabs" classNames={{tabList: "w-full bg-transparent", base: "w-full font-bold", wrapper:"w-full"}} color='primary'>
+          aria-label="Tabs" classNames={{tabList: "w-full", base: "w-full font-bold", wrapper:"w-full"}} color='primary'>
             <Tab as={Link} key="/" href='/' title="Irányítópult" />
             <Tab as={Link} key="/calendar" href='/calendar' title="Naptár" />
           </Tabs>

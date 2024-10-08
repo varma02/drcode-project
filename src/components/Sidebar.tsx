@@ -20,8 +20,8 @@ export default function Sidebar () {
         classNames={{base:"p-2 flex flex-row gap-2 items-center justify-between"}}>
           <User
             name="Váradi Marcell" 
-            avatarProps={{src: "https://avatars.githubusercontent.com/u/30373425?v=4"}}
             description="Tanár"
+            avatarProps={{src: "https://avatars.githubusercontent.com/u/30373425?v=4"}}
           />
           <Button variant='light' color='danger' className='h-full' isIconOnly>
             <HiArrowRightOnRectangle/>

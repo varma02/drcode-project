@@ -1,7 +1,6 @@
-import { Card, CardBody, Tab, Tabs, Image, ScrollShadow, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Divider } from "@nextui-org/react";
-import MessageGroup from "../components/MessageGroup";
-import Message from "../components/Message";
+import { Card, CardBody, Tab, Tabs, Image, ScrollShadow, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Divider, CardHeader, Button, CardFooter, Avatar, Popover, PopoverTrigger, PopoverContent, User, Link } from "@nextui-org/react";
 import CheckButton from "../components/CheckButton";
+import { HiOutlineCalendarDays } from "react-icons/hi2";
 
 export default function Dashboard() {
   return (
@@ -27,7 +26,7 @@ export default function Dashboard() {
             </h4>
             <h4 className="font-semibold text-foreground/90 text-xl">
               <span className="pr-2 text-foreground/70 font-medium">Időpont:</span>
-              09.27. 14:00 -15:00
+              10.14. 16:10 -17:10
             </h4>
             <h4 className="font-semibold text-foreground/90 text-xl">
               <span className="pr-2 text-foreground/70 font-medium">Diákok száma:</span>
@@ -92,32 +91,55 @@ export default function Dashboard() {
         <h2 className="text-center text-3xl font-bold">Üzenetek</h2>
         <Tabs className="self-center" color="primary">
           <Tab title={"Mind"} key={"Mind"}/>
-          <Tab title={"Szülők"} key={"Szülők"}/>
-          <Tab title={"Központ"} key={"Központ"}/>
+          <Tab title={"Üzenet"} key={"Üzenet"}/>
+          <Tab title={"Helyettesítés"} key={"Szülők"}/>
         </Tabs>
-        <ScrollShadow className="h-full">
-          <MessageGroup date="2024/09/27">
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-          </MessageGroup>
-          <MessageGroup date="2024/09/28">
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-          </MessageGroup>
-          <MessageGroup date="2024/09/29">
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-            <Message name="Szülő" message="lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum lorem Ipsum" />
-          </MessageGroup>
+        <ScrollShadow className="h-full p-2 gap-4 flex flex-col">
+        <Card shadow="none">
+          <CardHeader className="justify-between">
+            <div className="flex gap-2 items-center ">
+              <HiOutlineCalendarDays size={"2rem"} />
+              <h4 className="text-lg font-semibold leading-none text-default-600">Helyettesítés</h4>
+            </div>
+          </CardHeader>
+          <CardBody className="px-3 py-0 text-normal overflow-visible">
+            <p>
+            <Popover showArrow placement="bottom">
+              <PopoverTrigger className="text-blue-500 w-max inline pr-2 cursor-pointer">
+                @Váradi Marcell
+              </PopoverTrigger>
+              <PopoverContent className="p-2">
+              <User
+                name="Váradi Marcell" 
+                description="Tanár"
+                avatarProps={{src: "https://avatars.githubusercontent.com/u/30373425?v=4"}}
+              />
+              </PopoverContent>
+            </Popover>
+             Hétfői Scratch/Wedo 2.0 órámra keresünk helyettesítőt, <br/>
+             a Kodály Iskolában 10.14-én 16:10-től 17:10-ig.
+            </p>
+          </CardBody>
+          <CardFooter className="gap-3 justify-between">
+            <Button color="primary" className="font-bold">Elvállalom</Button>
+            <p className="text-default-400 text-right">
+              <Popover showArrow placement="bottom">
+                <PopoverTrigger className="cursor-pointer">
+                  @Ivett Virág
+                </PopoverTrigger>
+                <PopoverContent className="p-2">
+                <User
+                  name="Ivett Virág" 
+                  description="Adminisztrátor"
+                  avatarProps={{src: "https://avatars.githubusercontent.com/u/30373425?v=4"}}
+                />
+                </PopoverContent>
+              </Popover>
+              2024.10.09
+            </p>
+          </CardFooter>
+        </Card>
+        <Divider/>
         </ScrollShadow>
       </div>
       <div className="rounded-xl p-2 shadow-lg shadow-black/25 dark:bg-content1 flex flex-col justify-center items-center">

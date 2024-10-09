@@ -8,21 +8,16 @@
 	React, React Router, Tailwind, NextUI
 - [x] Choose a database and back-end tooling
 	SurrealDB, expressJS
-- [ ] How are users and their roles managed 
-	- [ ] Data structure
-	- [ ] Permissions
-- [ ] How do new users get added
-	One time use invite links
-- [ ] How is the timetable managed
-	- [ ] Data structure
-	- [ ] Assigned teacher, Substitutions
-	- [ ] Missed classes, Student presence
-- [ ] How is everyone's salary tracked
-- [ ] How does the knowledge base work
+- [ ] 
 # Front-end
-- [ ] Login screen design
+- [x] Login screen design
 - [ ] Register page design
-- [ ] Teacher dashboard design
+- [x] Teacher dashboard design
+	- [x] Next lesson card
+	- [x] Knowledge base card
+	- [x] Notice board card
+- [x] Sidebar design
+- [ ] Calendar / schedule page design
 - [ ] Admin dashboard design
 # Back-end
 - [ ] Create database structure

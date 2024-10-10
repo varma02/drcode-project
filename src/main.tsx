@@ -26,21 +26,19 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    errorElement: <Error />,
     children: [
       { 
         path: '/login', 
         element: <Login />,
-        errorElement: <Error />,
       },
       { 
         path: '/login/forgot-password', 
         element: <ForgotPass />,
-        errorElement: <Error />,
       },
       { 
         path: '/',
         element: <Sidebar />,
-        errorElement: <Error />,
         loader: async () => {
           // TODO: check if user is logged in
           if (true) {

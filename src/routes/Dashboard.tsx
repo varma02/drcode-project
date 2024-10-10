@@ -5,7 +5,7 @@ import UserPopover from "../components/UserPopover";
 
 export default function Dashboard() {
   return (
-  <div className="grid grid-cols-2 grid-rows-2 gap-5 h-screen w-full p-5">
+  <div className="lg:grid lg:grid-cols-2 lg:grid-rows-2 gap-5 lg:h-screen w-full p-5">
     <Card className="p-4">
       <CardHeader className="flex gap-6 md:gap-4 items-center justify-between">
         <div className="flex flex-col pl-2">
@@ -92,8 +92,8 @@ export default function Dashboard() {
       <CardHeader className="flex-col px-6 pt-4 gap-4">
         <h2 className="text-center text-3xl font-bold">Üzenetek</h2>
         <Tabs className="self-center" color="primary">
-          <Tab title={"Mind"} key={"Mind"}/>
-          <Tab title={"Üzenet"} key={"Üzenet"}/>
+          <Tab title={"Összes"} key={"Összes"}/>
+          <Tab title={"Nekem"} key={"Nekem"}/>
           <Tab title={"Helyettesítés"} key={"Szülők"}/>
         </Tabs>
       </CardHeader>
@@ -107,7 +107,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardBody className="px-3 py-0 text-normal overflow-visible">
             <p>
-            <UserPopover user={{name: "Váradi Marcell", role: {name: "Tanár"}, avatar: "https://avatars.githubusercontent.com/u/30373425?v=4"}} />
+              <UserPopover user={{name: "Váradi Marcell", role: {name: "Tanár"}, avatar: "https://avatars.githubusercontent.com/u/30373425?v=4"}} />
               Hétfői Scratch/Wedo 2.0 órámra keresünk helyettesítőt, <br/>
               a Kodály Iskolában 10.14-én 16:10-től 17:10-ig.
             </p>

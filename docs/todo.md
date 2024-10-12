@@ -19,5 +19,10 @@
 - [x] Sidebar design
 - [ ] Calendar / schedule page design
 - [ ] Admin dashboard design
+- [ ] Route transitions
+- [ ] Add Poppins font
 # Back-end
 - [ ] Create database structure
+- [ ] Create models for javascript
+- [ ] Create base express.js app
+- [ ] /login route

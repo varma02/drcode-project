@@ -3,12 +3,12 @@
 - [x] Add license
 - [ ] Write front-end docs
 - [ ] Write API docs
-- [ ] Create a user flow document ~60% done
+- [ ] Create a user flow document ~50% done
 - [x] Select front-end utilities
 	React, React Router, Tailwind, NextUI
 - [x] Choose a database and back-end tooling
 	SurrealDB, expressJS
-- [ ] 
+
 # Front-end
 - [x] Login screen design
 - [ ] Register page design
@@ -21,8 +21,13 @@
 - [ ] Admin dashboard design
 - [ ] Route transitions
 - [ ] Add Poppins font
+
 # Back-end
 - [ ] Create database structure
 - [ ] Create models for javascript
-- [ ] Create base express.js app
-- [ ] /login route
+- [x] Create base express.js app
+- [ ] Authentication routes
+	- [x] Login
+	- [x] Clear sessions
+	- [ ] Update user
+	- [ ] Change password

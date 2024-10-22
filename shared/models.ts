@@ -1,40 +1,27 @@
-import Bitfield from "./Bitfield";
 
-export interface User {
-  id: string,
-  email: string,
-  name: string,
-  created: Date,
-  role: number,
-}
-
-export interface Session {
-  id: string,
-  user: User,
-  created: Date,
-  expires: Date,
-  ip_address: string,
+export interface JWTData {
+  user: string,
+  session_key: string,
   user_agent: string,
 }
 
-export enum PermissionBits {
-  teacher_dashboard = 1 << 0,
-  admin_dashboard = 1 << 1,
-  manage_users = 1 << 2,
-  manage_roles = 1 << 3,
+export interface User {
+  id: string,
+  name: string,
+  email: string,
+  created: Date,
+  role: Role,
+  session_key: string,
 }
 
 export interface Role {
   id: string,
-  name: string,
-  created: Date,
-  permissions: Bitfield,
-}
-
-export interface Message {
-  id: string,
-  author: User,
-  created: Date,
-  content: string,
-  type: number,
+	name: string,
+	teacher: boolean,
+	view_knowledge: boolean,
+	view_timetable: boolean,
+	manage_knowledge: boolean,
+	manage_roles: boolean,
+	manage_timetable: boolean,
+	manage_users: boolean,
 }

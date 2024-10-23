@@ -1,7 +1,7 @@
 import express from 'express';
 import db from './lib/db';
 
-import authRouter from './routes/auth';
+import userRouter from './routes/user';
 
 console.log("\nStarting server...");
 
@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/auth', authRouter);
+app.use('/user', userRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({

@@ -13,14 +13,17 @@ export interface User {
   role: Role,
 }
 
+export type Permission = 
+  "teacher" |
+  "view_knowledge" |
+  "view_timetable" |
+  "manage_knowledge" |
+  "manage_roles" |
+  "manage_timetable" |
+  "manage_users";
+
 export interface Role {
   id: string,
 	name: string,
-	teacher: boolean,
-	view_knowledge: boolean,
-	view_timetable: boolean,
-	manage_knowledge: boolean,
-	manage_roles: boolean,
-	manage_timetable: boolean,
-	manage_users: boolean,
+	permissions?: Permission[],
 }

@@ -19,6 +19,7 @@
 - [x] Sidebar design
 - [ ] Calendar / schedule page design
 - [ ] Admin dashboard design
+- [ ] Profile page design
 - [ ] Route transitions
 - [ ] Add Poppins font
 

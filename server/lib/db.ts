@@ -3,7 +3,7 @@ import Surreal from "surrealdb";
 const db = new Surreal();
 
 db.connect(process.env.DB_URL ?? "http://localhost:8000/rpc", {
-  namespace: "DrCode",
+  namespace: "DRCODE",
   database: "main",
   auth: {
     username: process.env.DB_USERNAME ?? "root",

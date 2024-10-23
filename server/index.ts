@@ -22,14 +22,14 @@ app.get('/', (req, res) => {
   });
 });
 
+app.use('/auth', authRouter);
+
 app.use((req, res, next) => {
   res.status(404).json({
     code: "not_found",
     message: 'Not Found',
   });
 });
-
-app.use("/auth", authRouter)
 
 app.listen(
   process.env.PORT ?? 3000, 

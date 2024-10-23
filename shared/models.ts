@@ -11,7 +11,6 @@ export interface User {
   email: string,
   created: Date,
   role: Role,
-  session_key: string,
 }
 
 export interface Role {

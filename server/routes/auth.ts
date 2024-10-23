@@ -17,9 +17,11 @@ authRouter.post('/login', async (req, res) => {
     return;
   }
 
-  const user = (await db.query<User[]>("SELECT * OMIT password FROM user WHERE email = $email", { email }))[0];
+  const user = (await db.query<(User & {password?:string, session_key?:string})[]>(
+    "SELECT * FROM ONLY user WHERE email = $email AND crypto::argon2::compare(password, $password) LIMIT 1",
+    { email, password }))[0];
 
-  if (!user) {
+  if (!user || !user.name) {
     res.status(401).json({
       code: "invalid_credentials",
       message: 'The email or password is incorrect',
@@ -33,6 +35,8 @@ authRouter.post('/login', async (req, res) => {
     { algorithm: 'HS256', expiresIn: remember ? '1m' : '1d' }
   );
 
+  delete user.password;
+  delete user.session_key;
   res.status(200).json({
     code: "login_success",
     message: 'Login successful',
@@ -43,17 +47,10 @@ authRouter.post('/login', async (req, res) => {
   });
 });
 
-authRouter.post('/clear_sessions', async (req, res) => {
-  const user = await ensureAuth(req.headers.authorization);
-  if (!user) {
-    res.status(401).json({
-      code: "unauthorized",
-      message: 'You are not authorized to perform this action',
-    });
-    return;
-  }
+authRouter.use(ensureAuth);
 
-  const result = await db.query("UPDATE $user SET session_key = rand::string(32);", { user: user.id });
+authRouter.post('/clear_sessions', async (req, res) => {
+  const result = await db.query("UPDATE $user SET session_key = rand::string(32);", { user: req.user.id });
 
   if (result.length) {
     res.status(200).json({
@@ -66,7 +63,6 @@ authRouter.post('/clear_sessions', async (req, res) => {
       message: "An unexpected error has occurred",
     });
   }
-
 });
 
 export default authRouter;

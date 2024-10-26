@@ -1,6 +1,6 @@
 import { Button, Divider } from '@nextui-org/react'
 
-export const CalenderItem = ({ time, course, location, students, teacher }: { time: string, course: string, location: string, students: number, teacher?: string }) => {
+export const CalendarItem = ({ time, course, location, students, teacher }: { time: string, course: string, location: string, students: number, teacher?: string }) => {
 
   return (
     <Button variant="ghost" className="p-5 gap-4 h-full">

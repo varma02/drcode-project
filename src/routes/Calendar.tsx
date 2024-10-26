@@ -1,7 +1,7 @@
 import { Divider, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
-import { CalenderItem } from "../components/CalenderItem";
+import { CalendarItem } from "../components/CalendarItem";
 
-export default function name() {
+export default function Calendar() {
   
   interface CalendarItem {
     time: string;
@@ -39,7 +39,7 @@ export default function name() {
                   { Object.keys(r).length == 0 ? (
                     <Divider />
                   ) : (
-                    <CalenderItem 
+                    <CalendarItem 
                       time={(r as CalendarItem).time} 
                       course={(r as CalendarItem).course} 
                       location={(r as CalendarItem).location} 

@@ -17,7 +17,7 @@
 	- [x] Knowledge base card
 	- [x] Notice board card
 - [x] Sidebar design
-- [ ] Calendar / schedule page design
+- [x] Calendar / schedule page design
 - [ ] Admin dashboard design
 - [ ] Profile page design
 - [ ] Route transitions

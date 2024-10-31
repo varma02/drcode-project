@@ -1,15 +1,17 @@
 import { createRoot } from 'react-dom/client'
 import { NextUIProvider } from '@nextui-org/react'
 import { createBrowserRouter, Outlet, RouterProvider, useHref, useNavigate } from 'react-router-dom'
-import './index.css'
+import { lazy } from 'react'
 
-import Login from './routes/Login'
-import Dashboard from './routes/Dashboard'
-import ForgotPass from './routes/ForgotPass'
-import Error from './routes/Error'
+import './index.css'
 import ThemeProvider from './components/ThemeProvider'
-import Calendar from './routes/Calendar'
-import Sidebar from './components/Sidebar'
+
+const Calendar = lazy(() => import('./routes/Calendar'));
+const Sidebar = lazy(() => import('./components/Sidebar'));
+const Login = lazy(() => import('./routes/Login'));
+const ForgotPass = lazy(() => import('./routes/ForgotPass'));
+const Dashboard = lazy(() => import('./routes/Dashboard'));
+const Error = lazy(() => import('./routes/Error'));
 
 function App() {
   const navigate = useNavigate();

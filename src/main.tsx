@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import { NextUIProvider } from '@nextui-org/react'
-import { createBrowserRouter, Outlet, redirect, RouterProvider, useHref, useNavigate } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider, useHref, useNavigate } from 'react-router-dom'
 import './index.css'
 
 import Login from './routes/Login'

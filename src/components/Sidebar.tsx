@@ -1,4 +1,4 @@
-import { Image, User, Tabs, Tab, Link, Card, Button, NavbarMenuToggle, Navbar, NavbarContent, NavbarBrand, NavbarItem, NavbarMenu, NavbarMenuItem, Avatar } from '@nextui-org/react'
+import { Image, User, Tabs, Tab, Link, Card, Button, NavbarMenuToggle, Navbar, NavbarContent, NavbarMenu, NavbarMenuItem, Avatar } from '@nextui-org/react'
 import { useState } from 'react';
 import { HiArrowRightOnRectangle } from 'react-icons/hi2';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';

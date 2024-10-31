@@ -3,6 +3,7 @@ import db from '../lib/db';
 import type { JWTData, User } from '../../shared/models';
 import jwt from 'jsonwebtoken';
 import ensureAuth from '../middleware/ensureauth';
+import { verifyPassword } from '../lib/utils';
 
 const userRouter = express.Router();
 
@@ -117,6 +118,13 @@ userRouter.patch('/update', async (req, res) => {
       res.status(400).json({
         code: "fields_required",
         message: 'At least one field is required',
+      });
+      return;
+    }
+    if (new_password && verifyPassword(new_password)) {
+      res.status(400).json({
+        code: "invalid_password",
+        message: 'The password must contain at least one lowercase letter, uppercase letter, number, special character, and be at least 8 characters long',
       });
       return;
     }

@@ -1,10 +1,11 @@
 import { Button, Popover, PopoverContent, PopoverTrigger, User } from "@nextui-org/react";
+import type { OverlayPlacement } from "@nextui-org/aria-utils";
 import { HiOutlineChatBubbleOvalLeftEllipsis } from "react-icons/hi2";
 
 
-export default function UserPopover({user, className, placement}: {user: any, className?: string, placement?: string}) {
+export default function UserPopover({user, className, placement}: {user: any, className?: string, placement?: OverlayPlacement}) {
   return (
-    <Popover showArrow placement="bottom">
+    <Popover showArrow placement={placement}>
       <PopoverTrigger className={"cursor-pointer w-max inline pr-2 text-primary " + className}>
         {`@${user.name}`}
       </PopoverTrigger>

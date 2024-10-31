@@ -32,7 +32,7 @@ export default function Calendar() {
         </TableHeader>
         <TableBody>
           {
-            calenderLayout.map((e, i) => 
+            calenderLayout.map((_e, i) => 
             <TableRow key={i}>
               {calenderLayout[i].map((r, j) => 
                 <TableCell key={j}>

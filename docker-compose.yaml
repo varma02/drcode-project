@@ -1,0 +1,39 @@
+services:
+  web:
+    build: .
+    ports:
+      - "80:5000"
+      - "443:5001"
+    volumes:
+      - files:/usr/share/nginx/files
+    # depends_on:
+    #   - server
+
+  # db:
+  #   image: surrealdb/surrealdb:latest
+  #   command:
+  #     - start
+  #     - --log=trace
+  #     - --user=root
+  #     - --pass=root
+  #     - /mydata/data.db
+  #   restart: always
+  #   volumes:
+  #     - db-data:/mydata/data.db
+  
+  # server:
+  #   build: ./server
+  #   environment:
+  #     - DB_URL=http://db:8000/rpc
+  #     - DB_USERNAME=root
+  #     - DB_PASSWORD=root
+  #     - PORT=3000
+  #     - JWT_SECRET=verysecure
+  #   volumes:
+  #     - files:/files
+  #   depends_on:
+  #     - db
+
+volumes:
+  db-data:
+  files:

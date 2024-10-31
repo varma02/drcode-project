@@ -1,7 +1,7 @@
 import { Switch } from "@nextui-org/react";
 import { createContext, useEffect, useState } from "react";
 
-export const ThemeContext = createContext({theme:"light", setTheme:(theme: "light" | "dark") => {}});
+export const ThemeContext = createContext({theme:"light", setTheme:(theme: "light" | "dark") => {theme}});
 
 export default function ThemeProvider({ children } : { children: React.ReactNode }) {
   const [theme, setTheme] = useState("light");

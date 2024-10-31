@@ -1,7 +1,8 @@
 import { createRoot } from 'react-dom/client'
-import { NextUIProvider } from '@nextui-org/react'
+import { NextUIProvider, Spinner } from '@nextui-org/react'
 import { createBrowserRouter, Outlet, RouterProvider, useHref, useNavigate } from 'react-router-dom'
-import { lazy } from 'react'
+import { lazy, Suspense } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 
 import './index.css'
 import ThemeProvider from './components/ThemeProvider'
@@ -18,7 +19,9 @@ function App() {
   return (
     <ThemeProvider>
       <NextUIProvider useHref={useHref} navigate={(to:string)=>{console.log("asdf");navigate(to)}}>
-        <Outlet />
+        <Suspense fallback={<Spinner label="Betöltés..." color="primary" />}>
+          <Outlet />
+        </Suspense>
       </NextUIProvider>
     </ThemeProvider>
   )

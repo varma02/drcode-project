@@ -19,6 +19,7 @@ FROM nginx:alpine
 # Copy the built project from the previous stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
+COPY shared/nginx.conf /etc/nginx/nginx.conf
+
 # Expose ports to access the application
 EXPOSE 80
-EXPOSE 443

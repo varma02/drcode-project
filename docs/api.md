@@ -1,5 +1,8 @@
 # API documentation
 
+## Data models
+...
+
 ## REST API
 Handles most of the communication between client and server.
 **All endpoints require authentication except Login and Registration!**

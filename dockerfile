@@ -2,9 +2,12 @@ FROM oven/bun:latest as builder
 
 WORKDIR /app
 
-COPY --exclude=shared --exclude=server . .
+COPY ./package.json ./package.json
+COPY ./server/package.json ./server/package.json
 
 RUN bun install
+
+COPY . .
 
 RUN bun run build
 

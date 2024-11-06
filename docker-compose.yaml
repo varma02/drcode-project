@@ -3,35 +3,33 @@ services:
     build: .
     ports:
       - 5000:80
-    volumes:
-      - files:/usr/share/nginx/files
-    # depends_on:
-    #   - server
+    depends_on:
+      - server
 
-  # db:
-  #   image: surrealdb/surrealdb:latest
-  #   command:
-  #     - start
-  #     - --log=trace
-  #     - --user=root
-  #     - --pass=root
-  #     - /mydata/data.db
-  #   restart: always
-  #   volumes:
-  #     - db-data:/mydata/data.db
-  
-  # server:
-  #   build: ./server
-  #   environment:
-  #     - DB_URL=http://db:8000/rpc
-  #     - DB_USERNAME=root
-  #     - DB_PASSWORD=root
-  #     - PORT=3000
-  #     - JWT_SECRET=verysecure
-  #   volumes:
-  #     - files:/files
-  #   depends_on:
-  #     - db
+  db:
+    image: surrealdb/surrealdb:latest
+    command:
+      - start
+      - --log=warn
+      - --user=root
+      - --pass=root
+      - rocksdb:/mydata/data.db
+    restart: always
+    volumes:
+      - db-data:/mydata
+
+  server:
+    build: ./server
+    environment:
+      - DB_URL=http://db:8000/rpc
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - PORT=3000
+      - JWT_SECRET=verysecure
+    volumes:
+      - files:/files
+    depends_on:
+      - db
 
 volumes:
   db-data:

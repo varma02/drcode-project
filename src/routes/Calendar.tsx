@@ -11,7 +11,7 @@ export default function Calendar() {
   const testClass5 = {id:5, time:"16:10 - 17:10", course:"Scratch", location:"Kodály Iskola", students:7}
   const testClass6 = {id:6, time:"16:10 - 17:10", course:"Scratch", location:"Kodály Iskola", students:8}
 
-  const calendarLayout = {
+  const calendarLayout:any = {
     monday: [testClass0],
     tuesday: [testClass1],
     wednesday: [testClass2],
@@ -21,7 +21,7 @@ export default function Calendar() {
   }
 
   const rows = []
-  for (let i = 0; i < Math.max(...Object.values(calendarLayout).map(e => e.length)); i++) {
+  for (let i = 0; i < Math.max(...Object.values(calendarLayout).map((e:any) => e.length)); i++) {
     rows.push(
       <TableRow key={i}>
         {

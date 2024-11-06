@@ -3,11 +3,13 @@ DEFINE TABLE role SCHEMAFULL CHANGEFEED 2w;
 DEFINE FIELD created ON TABLE role TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE role TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD permissions ON TABLE role TYPE set<
-  "manage_roles" |
-  "manage_users" |
-  "manage_subjects" |
-  "manage_classes" |
-  "manage_events" 
+  "teacher" |
+	"view_knowledge" |
+	"view_timetable" |
+	"manage_knowledge" |
+	"manage_roles" |
+	"manage_timetable" |
+	"manage_users"
 > DEFAULT [];
 
 

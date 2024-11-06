@@ -1,9 +1,33 @@
 # API documentation
 
 ## Data models
-...
+### JWTData
+- `user`: string, the user's ID 
+- `session_key`: string, the user's session key
+- `user_agent`: string, the user agent used to login
+### User
+- `id`: string, the user's ID 
+- `name`: string, the user's name, max 48 characters
+- `email`: string, the user's email
+- `created`: datetime, the time the user was created
+- `role`: Role, the role's id in string or a role object
+*The following are only possible on the server side*
+- `session_key?`: string,
+- `password?`: string,
+### Permission
+	"teacher" OR
+	"view_knowledge" OR
+	"view_timetable" OR
+	"manage_knowledge" OR
+	"manage_roles" OR
+	"manage_timetable" OR
+	"manage_users"
+### Role
+- `id`: string, the role's ID
+- `name`: string, the role's name, max 48 characters
+- `permissions?`: Permission\[], a set of permissions
 
-## REST API
+## REST API `/api`
 Handles most of the communication between client and server.
 **All endpoints require authentication except Login and Registration!**
 The response is always in JSON format with this structure:
@@ -16,8 +40,9 @@ The response is always in JSON format with this structure:
 	}
 }
 ```
-### Authentication & Profile management
-Base path: `/user`
+
+### Authentication & Profile management `/user`
+
 #### Login `POST /login`
 Creates a new token for the user to use for authenticating on other endpoints.
 ##### Request body
@@ -38,13 +63,10 @@ Creates a new token for the user to use for authenticating on other endpoints.
 	}
 }
 ```
-##### Example response on fail
-```
-{
-	code: "invalid_credentials",
-	message: 'The email or password is incorrect'
-}
-```
+##### Error codes
+- `fields_required`: one or more of the required fields was not found in the body
+- `invalid_credentials`: the user does not exist or the password is incorrect
+
 #### Clear sessions `POST /clear_sessions`
 Resets the user's session key thus de-authorizing any previous tokens.
 No request body required.
@@ -55,13 +77,10 @@ No request body required.
 	message: "Logged out of all sessions"
 }
 ```
-##### Example response on fail
-```
-{
-	code: "unauthorized",
-	message: 'You are not authorized to perform this action'
-}
-```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `bad_request`: an unexpected error has occurred
+
 #### Get user `GET /:id?`
 Retrieves a user's data based on their ID. If the ID parameter is not provided then it returns the currently logged in user's data.
 ##### Response on success
@@ -74,13 +93,10 @@ Retrieves a user's data based on their ID. If the ID parameter is not provided t
 	}
 }
 ```
-##### Example response on fail
-```
-{
-	code: "not_found",
-	message: "This user does not exist",
-}
-```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no user with the provided ID
+
 #### Update profile `PATCH /update`
 Updates the authenticated user's data. A password re-prompt is always required.
 ##### Request body
@@ -102,10 +118,9 @@ Updates the authenticated user's data. A password re-prompt is always required.
 	}
 }
 ```
-##### Example response on fail
-```
-{
-	code: "password_required",
-	message: 'The current password is required to complete this action'
-}
-```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `password_required`: the user's current password is required to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `invalid_password`:  the password must contain at least one lowercase letter, uppercase letter, number, special character, and be at least 8 characters long
+- `bad_request`: an unexpected error has occurred

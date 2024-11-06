@@ -11,6 +11,9 @@ export interface User {
   email: string,
   created: Date,
   role: Role,
+  // Only possible on server side
+  session_key?: string,
+  password?: string,
 }
 
 export type Permission = 

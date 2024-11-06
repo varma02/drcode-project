@@ -59,8 +59,8 @@ userRouter.post('/clear_sessions', async (req, res) => {
       message: "Logged out of all sessions",
     });
   } else {
-    res.status(500).json({
-      code: "internal_error",
+    res.status(400).json({
+      code: "bad_request",
       message: "An unexpected error has occurred",
     });
   }
@@ -140,8 +140,8 @@ userRouter.patch('/update', async (req, res) => {
     ))[0];
 
     if (!updatedUser || !updatedUser.name) {
-      res.status(404).json({
-        code: "internal_error",
+      res.status(400).json({
+        code: "bad_request",
         message: "An unexpected error has occurred",
       });
       return;

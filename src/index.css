@@ -13,3 +13,7 @@
     @apply text-foreground bg-background min-h-screen;
   }
 }
+
+* {
+  @apply scrollbar-thin;
+}

@@ -5,6 +5,8 @@ import { LoaderCircle } from 'lucide-react'
 
 import './index.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/AppSidebar'
 
 const LoginPage = lazy(() => import('@/routes/Login'))
 
@@ -22,6 +24,15 @@ function App() {
   )
 }
 
+function SidebarWrapper() {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <Outlet />
+    </SidebarProvider>
+  )
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -30,6 +41,13 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
+      },
+      {
+        path: "/",
+        element: <SidebarWrapper />,
+        children: [
+          // ...
+        ]
       }
     ]
   }

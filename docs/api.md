@@ -1,31 +1,7 @@
 # API documentation
 
 ## Data models
-### JWTData
-- `user`: string, the user's ID 
-- `session_key`: string, the user's session key
-- `user_agent`: string, the user agent used to login
-### User
-- `id`: string, the user's ID 
-- `name`: string, the user's name, max 48 characters
-- `email`: string, the user's email
-- `created`: datetime, the time the user was created
-- `role`: Role, the role's id in string or a role object
-*The following are only possible on the server side*
-- `session_key?`: string,
-- `password?`: string,
-### Permission
-	"teacher" OR
-	"view_knowledge" OR
-	"view_timetable" OR
-	"manage_knowledge" OR
-	"manage_roles" OR
-	"manage_timetable" OR
-	"manage_users"
-### Role
-- `id`: string, the role's ID
-- `name`: string, the role's name, max 48 characters
-- `permissions?`: Permission\[], a set of permissions
+TODO: rewrite this section
 
 ## REST API `/api`
 Handles most of the communication between client and server.

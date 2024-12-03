@@ -1,13 +1,25 @@
-# Planning / Documentation
-- [ ] Create README file ~70% done
+# KKK
+- Életszerű, valódi problémára nyújt megoldást.
+-  Adattárolási és -kezelési funkciókat is megvalósít.
+- RESTful architektúrának megfelelő szerver és kliens oldali komponenseket egyaránt
+tartalmaz.
+- A kliens oldali komponens vagy komponensek egyaránt alkalmasak asztali és mobil
+eszközökön történő használatra. Mobil eszközre kifejlesztett kliens esetén natív mobil
+alkalmazás, vagy azzal hozzávetőlegesen megegyező felhasználói élményt nyújtó
+webes kliens egyaránt alkalmazható. Asztali eszközökre fejlesztett kliens oldali
+komponensnél mindenképpen szükséges webes megvalósítás is, de emellett
+opcionálisan natív, asztali alkalmazás is a csomag része lehet. (pl. A felhasználóknak
+szánt interfész webes megjelenítést használ, míg az adminisztrációs felület natív
+asztali alkalmazásként készül el).
+- A forráskódnak a tiszta kód elveinek megfelelően kell készülnie.
+- A szoftver célját, komponenseinek technikai leírását, működésének műszaki feltételeit
+és használatának rövid bemutatását tartalmazó dokumentáció is része a csomagnak. 
+
+# Documentation
+- [ ] Create README file
 - [x] Add license
 - [ ] Write front-end docs
 - [ ] Write API docs
-- [ ] Create a user flow document ~50% done
-- [x] Select front-end utilities
-	React, React Router, Tailwind, NextUI
-- [x] Choose a database and back-end tooling
-	SurrealDB, expressJS
 
 # Front-end
 - [x] Login screen design
@@ -24,11 +36,28 @@
 - [ ] Add Poppins font
 
 # Back-end
-- [ ] Create database structure
-- [ ] Create models for javascript
+- [x] Create a cli for database management
+- [x] Create initial db migration
 - [x] Create base express.js app
-- [ ] Authentication routes
+- [ ] Write tests
+- Middlewares
+	- [x] ensureauth
+	- [x] ensureadmin
+- Authentication
+	- [x] Register
 	- [x] Login
 	- [x] Clear sessions
-	- [ ] Update user
-	- [ ] Change password
+	- [x] Get logged in user
+	- [x] Update user
+- Employees
+	- [x] Get all
+	- [x] Get one
+	- [x] Invite
+	- [ ] Remove
+	- [ ] Update
+- Classes
+	- [ ] Get all
+	- [ ] Get one
+	- [ ] Create
+	- [ ] Remove
+	- [ ] Update

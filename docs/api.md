@@ -1,12 +1,7 @@
 # API documentation
-
-## Data models
-TODO: rewrite this section
-
-## REST API `/api`
-Handles most of the communication between client and server.
-**All endpoints require authentication except Login and Registration!**
-The response is always in JSON format with this structure:
+Base URL: `/api`
+**All endpoints require authentication except Login and Register!**
+The response is always in JSON format, like this:
 ```
 {
 	code: "hello_world",
@@ -17,9 +12,16 @@ The response is always in JSON format with this structure:
 }
 ```
 
-### Authentication & Profile management `/user`
+# Contents
+[Data Models](#data-models)
 
-#### Login `POST /login`
+
+## Data models
+TODO: rewrite this section
+
+## Authentication & Profile management `/auth`
+
+### Login `POST /login`
 Creates a new token for the user to use for authenticating on other endpoints.
 ##### Request body
 ```
@@ -31,11 +33,11 @@ Creates a new token for the user to use for authenticating on other endpoints.
 ##### Response on success
 ```
 {
-	code: "login_success",
+	code: "success",
 	message: 'Login successful',
 	data: {
 		token: "HS256 JWT",
-		user: { ... }
+		employee: { ... }
 	}
 }
 ```
@@ -43,37 +45,60 @@ Creates a new token for the user to use for authenticating on other endpoints.
 - `fields_required`: one or more of the required fields was not found in the body
 - `invalid_credentials`: the user does not exist or the password is incorrect
 
-#### Clear sessions `POST /clear_sessions`
+### Register `POST /register`
+Creates a new user when provided with a valid invite.
+##### Request body
+```
+{
+	invite_id: "invite:1234",
+	name: "John Doe"
+	email: "john.doe@example.com",
+	password: "verysecure"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: 'Employee registered'
+}
+```
+##### Error codes
+- `fields_required`: one or more of the required fields was not found in the request body
+- `invalid_password`: the password doesn't meet the requirements
+- `invalid_invite`: the invite was not found or has already been used
+
+### Clear sessions `POST /clear_sessions`
 Resets the user's session key thus de-authorizing any previous tokens.
 No request body required.
 ##### Response on success
 ```
 {
-	code: "sessions_cleared",
+	code: "success",
 	message: "Logged out of all sessions"
 }
 ```
 ##### Error codes
-- `unauthorized`: the user is not authorized to complete this action
+- `unauthorized`: the user is not authorized to perform this action
 - `bad_request`: an unexpected error has occurred
 
-#### Get user `GET /:id?`
-Retrieves a user's data based on their ID. If the ID parameter is not provided then it returns the currently logged in user's data.
+### Get logged in user `GET /me`
+Gets the currently logged in user's data.
+No request body required.
 ##### Response on success
 ```
 {
-	code: "user_data",
-	message: "User data retrieved",
+	code: "success",
+	message: "Employee data retrived",
 	data: {
-		user: { ... }
+		employee: { ... }
 	}
 }
 ```
 ##### Error codes
-- `unauthorized`: the user is not authorized to complete this action
-- `not_found`: there is no user with the provided ID
+- `unauthorized`: the user is not authorized to perform this action
 
-#### Update profile `PATCH /update`
+### Update profile `PATCH /update`
 Updates the authenticated user's data. A password re-prompt is always required.
 ##### Request body
 ```
@@ -100,3 +125,21 @@ Updates the authenticated user's data. A password re-prompt is always required.
 - `fields_required`: one or more of the required fields was not found in the body
 - `invalid_password`:  the password must contain at least one lowercase letter, uppercase letter, number, special character, and be at least 8 characters long
 - `bad_request`: an unexpected error has occurred
+
+## Employee management `/employee`
+
+### Get a specific employee `GET /:id`
+Retrives an employee's data.
+##### Response on success
+```
+{
+	code: "success",
+	message: "Employee data retrieved",
+	data: {
+		employee: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no user with the provided ID

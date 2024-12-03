@@ -4,20 +4,24 @@ import db, { db_connect } from './database/connection';
 import authRouter from './routes/auth';
 import employeesRouter from './routes/employees';
 
-export default async function main() {
-  console.log("\nStarting server...");
-  
+export const app = express();
+
+export async function setup(): Promise<string | null> {
   if (!process.env.JWT_SECRET) {
-    console.error("JWT_SECRET environment variable is not set");
-    process.exit(1);
+    return "JWT_SECRET environment variable is not set";
+  }
+
+  if (!process.env.API_PORT) {
+    return "API_PORT environment variable is not set";
   }
   
-  await db_connect();
+  if (!(await db_connect())) {
+    return "Error connecting to database";
+  }
   
-  const app = express();
   app.use(express.json());
   app.disable('x-powered-by');
-  
+
   app.get('/', (req, res) => {
     res.status(200).json({
       code: "hello_world",
@@ -26,7 +30,7 @@ export default async function main() {
   });
   
   app.use('/auth', authRouter);
-  app.use('/employees', employeesRouter);
+  app.use('/employee', employeesRouter);
   
   app.use((req, res, next) => {
     res.status(404).json({
@@ -36,15 +40,27 @@ export default async function main() {
   });
 
   app.use(((err, req, res, next) => {
-    res.status(400).json({
-      code: "bad_request",
+    res.status(500).json({
+      code: "server_error",
       message: err.message || "An unexpected error has occurred",
     });
   }) as ErrorRequestHandler);
 
+  return null;
+}
+
+export async function main() {
+  console.log("\nStarting server...");
+  
+  const setupMessage = await setup();
+  if (setupMessage) {
+    console.error(setupMessage);
+    process.exit(1);
+  }
+
   const server = app.listen(
-    process.env.API_PORT ?? 3000, 
-    () => console.log('Server listening on port', process.env.API_PORT ?? 3000)
+    process.env.API_PORT, 
+    () => console.log('Server listening on port', process.env.API_PORT)
   );
 
   return async () => {
@@ -55,5 +71,10 @@ export default async function main() {
 }
 
 if (require.main === module) {
-  main();
+  main().then((closeApp) => {
+    process.on('SIGINT', async () => {
+      await closeApp();
+      process.exit(0);
+    });
+  });
 }

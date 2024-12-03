@@ -91,7 +91,7 @@ userRouter.post('/register', async (req, res) => {
       COMMIT TRANSACTION;
       `, { name, email, password, invite_id }))[0];
   
-    if (!employee || !employee.name) {
+    if (!employee || !employee.id?.startsWith("employee:")) {
       throw new Error("No employee");
     }
   
@@ -100,9 +100,6 @@ userRouter.post('/register', async (req, res) => {
     res.status(200).json({
       code: "success",
       message: 'Employee registered',
-      data: {
-        employee,
-      }
     });
 
   } catch {

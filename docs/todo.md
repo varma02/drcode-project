@@ -39,7 +39,7 @@ asztali alkalmazásként készül el).
 - [x] Create a cli for database management
 - [x] Create initial db migration
 - [x] Create base express.js app
-- [ ] Write tests
+- [x] Get started with testing
 - Middlewares
 	- [x] ensureauth
 	- [x] ensureadmin
@@ -52,6 +52,8 @@ asztali alkalmazásként készül el).
 - Employees
 	- [x] Get all
 	- [x] Get one
+		- [x] Unpaid work
+		- [x] Classes
 	- [x] Invite
 	- [ ] Remove
 	- [ ] Update

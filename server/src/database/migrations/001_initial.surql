@@ -46,11 +46,14 @@ DEFINE TABLE student SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE student TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE student TYPE string ASSERT string::len($value) <= 48;
-DEFINE FIELD parent_name ON TABLE student TYPE option<string> ASSERT string::len($value) <= 48;
+DEFINE FIELD parent ON TABLE student TYPE option<object>;
+DEFINE FIELD parent.name ON TABLE student TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD parent.email ON TABLE student TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD parent.phone ON TABLE student TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD email ON TABLE student TYPE option<string> ASSERT string::is::email($value);
 DEFINE FIELD phone ON TABLE student TYPE option<string> ASSERT string::len($value) <= 48;
 DEFINE FIELD extra_fields ON TABLE student FLEXIBLE TYPE option<object>;
-DEFINE FIELD notes ON TABLE student TYPE string ASSERT string::len($value) <= 2048;
+DEFINE FIELD notes ON TABLE student TYPE option<string> ASSERT string::len($value) <= 2048;
 
 
 DEFINE TABLE class SCHEMAFULL CHANGEFEED 4w;
@@ -59,6 +62,8 @@ DEFINE FIELD created ON TABLE class TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD location ON TABLE class TYPE object;
 DEFINE FIELD location.name ON TABLE class TYPE string ASSERT string::len($value) <= 256;
 DEFINE FIELD location.address ON TABLE class TYPE string ASSERT string::len($value) <= 256;
+DEFINE FIELD location.contact_email ON TABLE class TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD location.contact_phone ON TABLE class TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD notes ON TABLE class TYPE option<string> ASSERT string::len($value) <= 2048;
 DEFINE FIELD teachers ON TABLE class TYPE set<record<employee>>;
 DEFINE FIELD archived ON TABLE class TYPE bool DEFAULT false;
@@ -89,6 +94,7 @@ DEFINE FIELD created ON TABLE attended TYPE datetime DEFAULT time::now() READONL
 DEFINE TABLE worked_at SCHEMAFULL TYPE RELATION IN employee OUT lesson | event CHANGEFEED 4w;
 DEFINE FIELD created ON TABLE worked_at TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD paid ON TABLE worked_at TYPE bool DEFAULT false;
+DEFINE FIELD notes ON TABLE worked_at TYPE option<string>;
 
 
 -- DEFINE TABLE announcement SCHEMAFULL CHANGEFEED 4w;

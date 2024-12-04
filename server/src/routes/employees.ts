@@ -19,7 +19,18 @@ employeesRouter.get('/all', ensureAdmin, async (req, res) => {
 });
 
 employeesRouter.post('/invite', ensureAdmin, async (req, res) => {
-  const invite = (await db.query<Invite[]>("CREATE invite SET author = $author", { author: req.employee?.id }))[0];
+  const { roles } = req.body;
+
+  if (!roles || !Array.isArray(roles) || !roles.length) {
+    res.status(400).json({
+      code: "fields_required",
+      message: "The roles field is required",
+    });
+  }
+
+  const invite = (await db.query<Invite[]>("CREATE ONLY invite SET author = $author, roles = $roles", 
+    { author: req.employee?.id, roles }))[0];
+
   res.status(200).json({
     code: "success",
     message: "Invite created",
@@ -31,28 +42,26 @@ employeesRouter.get('/:id', async (req, res) => {
   if (!req.params.id || !req.params.id.startsWith("employee:")) {
     res.status(404).json({
       code: "not_found",
-      message: "This employee does not exist",
+      message: "No employee was found with the provided ID",
     });
     return;
   }
   
-  if (isAdmin(req) && req.query.include) {
-    const include = (req.query.include as string).trim().split(",")
-    .filter((incl) => ["unpaid_work", "classes"].includes(incl));
-    const employee = (await db.query<Employee[]>(
-      `SELECT *,
-        ${include.map((incl, index) => {
-          const end = index === include.length-1 ? "" : ",";
-          return incl === "unpaid_work" ? `->worked_at[WHERE ! paid].{where:out.*, time:created} as unpaid_work${end}` : 
-            incl === "classes" ? `(SELECT * FROM class WHERE $employee IN teachers) as classes${end}` : "";
-        }).join("\n")}
-      OMIT password, session_key FROM ONLY type::thing($employee)`,
-      { employee: req.params.id }))[0];
+  if (req.query.include && isAdmin(req)) {
+    const include = new Set((req.query.include as string).trim().split(","));
+    const dbResponse = (await db.query<{employee: Employee, unpaid_work: any, classes: any}[]>(`
+      RETURN {
+        employee: (SELECT * OMIT password, session_key FROM ONLY type::thing($employee)),
+        ${include.has("unpaid_work") ?
+        "unpaid_work: (SELECT ->worked_at[WHERE ! paid].{where:out.*, time:created} as _ FROM ONLY type::thing($employee))._," : ""}
+        ${include.has("classes") ?
+        "classes: (SELECT * FROM class WHERE $employee IN teachers)," : ""}
+      }`, { employee: req.params.id }))[0];
   
-    if (!employee || !employee.name) {
+    if (!dbResponse.employee || !dbResponse.employee.name) {
       res.status(404).json({
         code: "not_found",
-        message: "This employee does not exist",
+        message: "No employee was found with the provided ID",
       });
       return;
     }
@@ -60,7 +69,11 @@ employeesRouter.get('/:id', async (req, res) => {
     res.status(200).json({
       code: "success",
       message: "Employee data retrieved",
-      data: { employee },
+      data: {
+        employee: dbResponse.employee,
+        unpaid_work: dbResponse.unpaid_work,
+        classes: dbResponse.classes,
+      },
     });
 
   } else {
@@ -71,7 +84,7 @@ employeesRouter.get('/:id', async (req, res) => {
     if (!employee || !employee.name) {
       res.status(404).json({
         code: "not_found",
-        message: "This employee does not exist",
+        message: "No employee was found with the provided ID",
       });
       return;
     }

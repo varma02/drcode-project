@@ -1,4 +1,5 @@
 import express, { type ErrorRequestHandler } from 'express';
+import cors from 'cors';
 import db, { db_connect } from './database/connection';
 
 import authRouter from './routes/auth';
@@ -20,6 +21,7 @@ export async function setup(): Promise<string | null> {
   }
   
   app.use(express.json());
+  app.use(cors());
   app.disable('x-powered-by');
 
   app.get('/', (req, res) => {

@@ -128,8 +128,31 @@ Updates the authenticated user's data. A password re-prompt is always required.
 
 ## Employee management `/employee`
 
-### Get a specific employee `GET /:id`
-Retrives an employee's data.
+### Invite `POST /invite`
+Administrators can Invite new users with this endpoint.
+`administrator` role required!
+##### Request body
+```
+{
+	roles: [ ... ]   // a list of roles that the invited employee will have
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Invite created",
+	data: {
+		invite: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+
+### Get a list of all employees `GET /all`
+Gets a list of all employees (without details).
 ##### Response on success
 ```
 {
@@ -137,6 +160,28 @@ Retrives an employee's data.
 	message: "Employee data retrieved",
 	data: {
 		employee: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no user with the provided ID
+
+### Get a specific employee `GET /:id`
+Retrives an employee's data, including the specified details.
+##### Query parameters
+- `include`: Get more details on fields (list separated by commas, ex: field1,field2)
+	- `unpaid_work`: all the logged work for the given employee that hasn't been paid
+	- `classes`: all classes where the employee is the assigned teacher
+##### Response on success
+```
+{
+	code: "success",
+	message: "Employee data retrieved",
+	data: {
+		employee: { ... },
+		unpaid_work?: [ ... ],
+		classes?: [ ... ]
 	}
 }
 ```

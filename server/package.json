@@ -10,12 +10,14 @@
     "db": "bun run src/database/cli.ts "
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "surrealdb": "^1.0.6"
   },
   "devDependencies": {
     "@types/bun": "^1.1.13",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/supertest": "^6.0.2",

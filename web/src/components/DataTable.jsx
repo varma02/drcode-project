@@ -26,7 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-export default function DataTable({ columns, data }) {
+export default function DataTable({ columns, data, hasFooter = false }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState(
     []
@@ -84,6 +84,7 @@ export default function DataTable({ columns, data }) {
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
                     }
+                    onSelect={(e) => {e.preventDefault()}}
                   >
                     {column.columnDef.displayName}
                   </DropdownMenuCheckboxItem>
@@ -135,17 +136,18 @@ export default function DataTable({ columns, data }) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Nincs adat :c
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+      {hasFooter && (
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} / {" "}
+          {table.getFilteredRowModel().rows.length} kiválasztva
         </div>
         <div className="space-x-2">
           <Button
@@ -154,7 +156,7 @@ export default function DataTable({ columns, data }) {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            Előző
           </Button>
           <Button
             variant="outline"
@@ -162,10 +164,11 @@ export default function DataTable({ columns, data }) {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            Következő
           </Button>
         </div>
       </div>
+      )}
     </div>
   )
 }

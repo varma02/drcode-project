@@ -1,0 +1,45 @@
+services:
+  nginx:
+    build: .
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - server
+    volumes:
+      - documents:/app/static
+
+  db:
+    image: surrealdb/surrealdb:latest
+    volumes:
+      - db-data:/mydata:rw
+    restart: 
+      always
+    entrypoint:
+      - /surreal
+      - start
+      - --strict
+      - --user
+      - root
+      - --pass
+      - root
+      - memory
+
+  server:
+    build: ./server
+    environment:
+      - API_PORT="3000"
+      - JWT_SECRET="verysecure"
+      - DB_URL="ws://db:8000/rpc"
+      - DB_NAMESPACE="DRCODE"
+      - DB_DATABASE="main"
+      - DB_USERNAME="root"
+      - DB_PASSWORD="root"
+    volumes:
+      - documents:/app/documents
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+  documents:

@@ -92,7 +92,7 @@ export function AppSidebar() {
               <Settings /> Beállítások
             </DropdownMenuItem>
             <hr />
-            <DropdownMenuItem className="text-red-500" onSelect={() => {auth.logout(); toast("Sikeres kijelentkezés!", {icon: <ShieldX />})}}>
+            <DropdownMenuItem className="text-red-500" onSelect={() => {auth.logout(); toast.success("Sikeres kijelentkezés!")}}>
               <LogOut /> Kijelentkezés
             </DropdownMenuItem>
           </DropdownMenuContent>

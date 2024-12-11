@@ -6,6 +6,10 @@ export interface BaseResponse {
   data?: any;
 }
 
+export interface ErrorResponse extends BaseResponse {
+  data: undefined;
+}
+
 export interface LoginResponse extends BaseResponse {
   data: {
     token: string;

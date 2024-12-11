@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, Outlet, redirect, RouterProvider, useHref, useNavigate } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider, useHref, useNavigate } from 'react-router-dom'
 import { lazy, Suspense, useEffect } from 'react'
 import { LoaderCircle } from 'lucide-react'
 
@@ -70,6 +70,12 @@ createRoot(document.getElementById('root')).render(
         <RouterProvider router={router} future={{v7_startTransition: true}} /* TODO: add fallback */ />
       </Suspense>
     </AuthProvider>
-    <Toaster />
+    <Toaster 
+      expand
+      richColors
+      position="bottom-right"
+      dir="ltr"
+      closeButton
+    />
   </ThemeProvider>
 )

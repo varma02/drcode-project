@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 
-import { LoginResponse, MeResponse } from "./models";
+import { ErrorResponse, LoginResponse, MeResponse } from "./models";
 import { API_URL } from "./constants";
 import axios from "axios";
 
-async function loginEmailPassword(email: string, password: string, remember: boolean): Promise<LoginResponse> {
+async function loginEmailPassword(email: string, password: string, remember: boolean): Promise<LoginResponse | ErrorResponse> {
   return (await axios.post(API_URL + "/auth/login", { email, password, remember }, { timeout: 2000 })).data;
 }
 
-async function getLoggedInUser(token:string): Promise<MeResponse> {
+async function getLoggedInUser(token:string): Promise<MeResponse | ErrorResponse> {
   return (await axios.get(API_URL + "/auth/me", {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
 }
 
@@ -77,11 +77,18 @@ export function AuthProvider({children}) {
     token,
     authState,
     loginEmailPassword: async (email: string, password: string, remember: boolean) => {
-      const { token, employee } = (await loginEmailPassword(email, password, remember)).data
-      localStorage.setItem("drcode-auth-token", token)
-      setUser(employee)
-      setToken(token)
-      setAuthState("yes")
+      try {
+        const response = await loginEmailPassword(email, password, remember)
+        if (response.code !== "success") throw response
+        const { token, employee } = response.data
+        localStorage.setItem("drcode-auth-token", token)
+        setUser(employee)
+        setToken(token)
+        setAuthState("yes")
+      } catch (e) {
+        value.logout()
+        throw e
+      }
     },
     logout: async () => {
       localStorage.removeItem("drcode-auth-token")
@@ -89,6 +96,8 @@ export function AuthProvider({children}) {
       setToken(null)
       setAuthState("no")
     },
+
+    // TODO: REMOVE THIS
     bypassLogin: () => {
       setUser({
         id: "employee:bypassed",

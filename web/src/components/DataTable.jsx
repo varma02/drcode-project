@@ -1,11 +1,5 @@
-"use client"
-
 import * as React from "react"
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -13,10 +7,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -33,108 +26,13 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    grade: 316,
-    status: "success",
-    name: "ken99@yahoo.com",
-  },
-  {
-    id: "3u1reuv4",
-    grade: 242,
-    status: "success",
-    name: "Abe45@gmail.com",
-  },
-  {
-    id: "derv1ws0",
-    grade: 837,
-    status: "processing",
-    name: "Monserrat44@gmail.com",
-  },
-  {
-    id: "5kma53ae",
-    grade: 874,
-    status: "success",
-    name: "Silas22@gmail.com",
-  },
-  {
-    id: "bhqecj4p",
-    grade: 721,
-    status: "failed",
-    name: "carmella@hotmail.com",
-  },
-]
-
-export type Payment = {
-  id: string
-  grade: number
-  status: "pending" | "processing" | "success" | "failed"
-  name: string
-}
-
-export const columns: ColumnDef<Payment>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    id: "asd",
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Név
-          <ArrowUpDown />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "osztály",
-    header: "Osztály",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("grade")}</div>
-    ),
-  },
-]
-
-export function DataTableDemo() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+export default function DataTable({ columns, data }) {
+  const [sorting, setSorting] = React.useState([])
+  const [columnFilters, setColumnFilters] = React.useState(
     []
   )
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
@@ -161,7 +59,7 @@ export function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Szűrés Névre..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("name")?.getFilterValue()) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
@@ -187,7 +85,7 @@ export function DataTableDemo() {
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {column.columnDef.displayName}
                   </DropdownMenuCheckboxItem>
                 )
               })}

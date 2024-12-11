@@ -55,8 +55,8 @@ asztali alkalmazásként készül el).
 		- [x] Unpaid work
 		- [x] Classes
 	- [x] Invite
-	- [ ] Remove
-	- [ ] Update
+	- [x] Remove
+	- [x] Update
 - Classes
 	- [ ] Get all
 	- [ ] Get one

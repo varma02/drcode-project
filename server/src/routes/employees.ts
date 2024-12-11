@@ -97,4 +97,67 @@ employeesRouter.get('/:id', async (req, res) => {
   }
 });
 
+employeesRouter.delete('/remove', async (req, res) => {
+  const { id } = req.body;
+  if (!id || !id.startsWith("employee:")) {
+    res.status(400).json({
+      code: "fields_required",
+      message: "The id field is required",
+    });
+    return;
+  }
+
+  const result = await db.query<Employee[]>("DELETE ONLY type::thing($employee) RETURN BEFORE;", { employee: id });
+
+  if (result?.[0]?.email) {
+    res.status(200).json({
+      code: "success",
+      message: "Employee deleted",
+    });
+  } else {
+    res.status(404).json({
+      code: "not_found",
+      message: "No employee was found with the provided ID",
+    });
+  }
+});
+
+employeesRouter.patch("/update", async (req, res) => {
+  const { id, name, email, roles } = req.body;
+  if (!id || (!name && !email && !roles)) {
+    res.status(400).json({
+      code: "fields_required",
+      message: "The id and at least one updateable fields are required",
+    });
+    return;
+  }
+
+  if (!id.startsWith("employee:") || !Array.isArray(roles) || !roles.every(r => r === "administrator" || r === "teacher")) {
+    res.status(400).json({
+      code: "fields_invalid",
+      message: "One or more fields are invalid",
+    });
+    return;
+  }
+
+  const result = await db.query<Employee[]>(`
+    UPDATE ONLY type::thing($employee) MERGE {
+      ${name ? "name: $name ," : ""}
+      ${email ? "email: $email ," : ""}
+      ${roles ? "roles: $roles ," : ""}
+    };`, { employee: id, name, email, roles });
+
+  if (result?.[0]?.email) {
+    res.status(200).json({
+      code: "success",
+      message: "Employee updated",
+    });
+  } else {
+    res.status(404).json({
+      code: "not_found",
+      message: "No employee was found with the provided ID",
+    });
+  }
+});
+
 export default employeesRouter;

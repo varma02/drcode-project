@@ -5,11 +5,11 @@ import { API_URL } from "./constants";
 import axios from "axios";
 
 async function loginEmailPassword(email: string, password: string, remember: boolean): Promise<LoginResponse> {
-  return (await axios.post(API_URL + "/auth/login", { email, password, remember })).data;
+  return (await axios.post(API_URL + "/auth/login", { email, password, remember }, { timeout: 2000 })).data;
 }
 
 async function getLoggedInUser(token:string): Promise<MeResponse> {
-  return (await axios.get(API_URL + "/auth/me", {headers: {Authorization: `Bearer ${token}`}})).data;
+  return (await axios.get(API_URL + "/auth/me", {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
 }
 
 type AuthState = "loading" | "yes" | "no";
@@ -47,18 +47,28 @@ export function AuthProvider({children}) {
   const [authState, setAuthState] = useState<AuthState>("loading")
 
   useEffect(() => {
+    console.debug("Auth loading")
     const localToken = localStorage.getItem("drcode-auth-token")
     if (localToken) {
       getLoggedInUser(localToken).then((response) => {
         if (response) {
+          console.debug("User logged in")
           setUser(response.data.employee)
           setToken(localToken)
           setAuthState("yes")
         } else {
+          console.warn("Invalid token")
           localStorage.removeItem("drcode-auth-token")
           setAuthState("no")
         }
-      }, () => setAuthState("no"))
+      }).catch(() => {
+        console.warn("Auth error")
+        localStorage.removeItem("drcode-auth-token")
+        setAuthState("no")
+      })
+    } else {
+      console.debug("No token")
+      setAuthState("no")
     }
   }, [])
 

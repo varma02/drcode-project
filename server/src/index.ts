@@ -24,6 +24,11 @@ export async function setup(): Promise<string | null> {
   app.use(cors());
   app.disable('x-powered-by');
 
+  app.use((req, res, next) => {
+    console.log(req.ip, req.method, req.path);
+    next();
+  })
+
   app.get('/', (req, res) => {
     res.status(200).json({
       code: "hello_world",

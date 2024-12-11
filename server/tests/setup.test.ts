@@ -5,10 +5,8 @@ import db from '../src/database/connection';
 describe("Setup", async () => {
   test("Setup function", async (done) => {
     const setupMessage = await setup();
+    if (setupMessage) console.error(setupMessage);
     expect(setupMessage).toBeNull();
-    if (setupMessage) {
-      console.error(setupMessage);
-    }
     done();
   });
 

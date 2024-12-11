@@ -129,8 +129,7 @@ Updates the authenticated user's data. A password re-prompt is always required.
 ## Employee management `/employee`
 
 ### Invite `POST /invite`
-Administrators can Invite new users with this endpoint.
-`administrator` role required!
+Administrators can Invite new users with this endpoint. Admin only.
 ##### Request body
 ```
 {
@@ -152,7 +151,7 @@ Administrators can Invite new users with this endpoint.
 - `fields_required`: one or more of the required fields was not found in the body
 
 ### Get a list of all employees `GET /all`
-Gets a list of all employees (without details).
+Gets a list of all employees (without details). Admin only.
 ##### Response on success
 ```
 {
@@ -165,11 +164,11 @@ Gets a list of all employees (without details).
 ```
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
-- `not_found`: there is no user with the provided ID
+- `not_found`: there is no employee with the provided ID
 
 ### Get a specific employee `GET /:id`
 Retrives an employee's data, including the specified details.
-##### Query parameters
+##### Query parameters (Admin only)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `unpaid_work`: all the logged work for the given employee that hasn't been paid
 	- `classes`: all classes where the employee is the assigned teacher
@@ -187,4 +186,48 @@ Retrives an employee's data, including the specified details.
 ```
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
-- `not_found`: there is no user with the provided ID
+- `not_found`: there is no employee with the provided ID
+
+### Remove an employee `DELETE /remove`
+Removes an employee. Admin only.
+##### Request body
+```
+{
+	id: "employee:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Employee deleted"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no employee with the provided ID
+
+### Update an employee `PATCH /update`
+Updates an employee. Admin only!
+##### Request body
+```
+{
+	id: "employee:123",
+	name: "John Doe",
+	email: "john@example.com",
+	roles: [ ... ]
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Employee updated"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_invalid`: One or more fields are invalid
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no employee with the provided ID

@@ -6,7 +6,7 @@ import { Button } from './ui/button'
 import { MessageSquare } from 'lucide-react'
 import { Textarea } from './ui/textarea'
 
-export const QuestMessage = () => {
+export const AssignmentMessage = () => {
 
   const [showReply, setShowReply] = useState(false)
 
@@ -44,7 +44,7 @@ export const QuestMessage = () => {
   )
 }
 
-export const YappingMessage = () => {
+export const NotificationMessage = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row gap-2 items-center">

@@ -1,12 +1,11 @@
-import { QuestMessage, YappingMessage } from '@/components/Messages'
+import { AssignmentMessage, NotificationMessage } from '@/components/Messages'
 import DataTable from '@/components/DataTable'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Folder, MessageSquare, ArrowUpDown } from 'lucide-react'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Folder, ArrowUpDown, BookOpen, Clock, MapPin, User, User2, ArrowRight } from 'lucide-react'
 import React from 'react'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { ToggleButton } from '@/components/ToggleButton'
 
 export const Home = () => {
 
@@ -34,67 +33,49 @@ export const Home = () => {
   const data = [
     {
       id: "m5gr84i9",
-      grade: 316,
+      grade: 5,
       status: "success",
-      name: "ken99@yahoo.com",
+      name: "UserName1",
     },
     {
       id: "3u1reuv4",
-      grade: 242,
+      grade: 5,
       status: "success",
-      name: "Abe45@gmail.com",
+      name: "UserName2",
     },
     {
       id: "derv1ws0",
-      grade: 837,
+      grade: 5,
       status: "processing",
-      name: "Monserrat44@gmail.com",
+      name: "UserName3",
     },
     {
       id: "5kma53ae",
-      grade: 874,
+      grade: 4,
       status: "success",
-      name: "Silas22@gmail.com",
+      name: "UserName4",
     },
     {
       id: "bhqecj4p",
-      grade: 721,
+      grade: 4,
       status: "failed",
-      name: "carmella@hotmail.com",
+      name: "UserName5",
+    },
+    {
+      id: "bhqecj4p",
+      grade: 4,
+      status: "failed",
+      name: "UserName6",
+    },
+    {
+      id: "bhqecj4p",
+      grade: 4,
+      status: "failed",
+      name: "UserName7",
     },
   ]
   
   const columns = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      displayName: "Státusz",
-      accessorKey: "status",
-      header: "Státusz",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("status")}</div>
-      ),
-    },
     {
       displayName: "Név",
       accessorKey: "name",
@@ -112,11 +93,19 @@ export const Home = () => {
       cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
     },
     {
+      displayName: "Jelenlét",
+      accessorKey: "status",
+      header: "Jelenlét",
+      cell: ({ row }) => (
+        <ToggleButton key={row.id} onText={"Jelen"} offText={"Hiányzik"} />
+      ),
+    },
+    {
       displayName: "Osztály",
       accessorKey: "grade",
       header: "Osztály",
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("grade")}</div>
+        <div className="capitalize text-center">{row.getValue("grade")}</div>
       ),
     },
   ]
@@ -125,15 +114,57 @@ export const Home = () => {
     <div className='flex flex-col md:grid grid-cols-2 h-full grid-rows-2 gap-4'>
       <div className='bg-primary-foreground rounded-xl p-4'>
         <h2 className='text-center mb-4'>Következő óra</h2>
-        <div>
-          <DataTable columns={columns} data={data} />
+        <div className='flex gap-4 w-full flex-col lg:flex-row'>
+          <Card className="max-w-[35rem] min-w-max h-max">
+            <CardHeader>
+              <div className="flex items-center gap-4">
+                <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='max-w-12 object-cover object-center' />
+                <p className='font-bold text-xl'>Scratch, WeDo</p>
+                <span className='flex gap-1 items-center opacity-75 ml-auto'>
+                  <User2 width={20} />
+                  <p className='font-bold'>6</p>
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className='flex justify-between'>
+                <span className='flex gap-1 items-center opacity-75'>
+                  <ArrowRight width={16} />
+                  <p className='font-bold'>Arany Iskola</p>
+                </span>
+                <span className='flex gap-1 items-center opacity-75'>
+                  <Clock width={16} />
+                  <p className='font-bold'>16:00</p>
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          {/* <Card className="w-full h-full">
+            <CardContent className="mt-6">
+              <div className='flex items-center gap-4'>
+                <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='max-w-36 object-cover object-center' />
+                <div className='flex flex-col gap-2'>
+                  <div className='flex gap-2'><BookOpen /> <p>Scratch</p></div>
+                  <div className='flex gap-2'><Clock /> <p>Hétfő 16:00</p></div>
+                  <div className='flex gap-2'><MapPin />  <p>Arany Iskola</p></div>
+                  <div className='flex gap-2'><User2 />  <p>6</p></div>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full font-bold">Segédlet</Button>
+            </CardFooter>
+          </Card> */}
+          <ScrollArea className="h-[23rem] w-full">
+            <DataTable columns={columns} data={data} />
+          </ScrollArea>
         </div>
       </div>
       <div className='bg-primary-foreground row-span-2 rounded-xl p-4'>
         <h2 className='text-center mb-4'>Üzenetek</h2>
         <div className='flex flex-col gap-2'>
-          <QuestMessage />
-          <YappingMessage />
+          <AssignmentMessage />
+          <NotificationMessage />
         </div>
       </div>
       <div className='bg-primary-foreground rounded-xl p-4'>

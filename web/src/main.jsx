@@ -30,7 +30,7 @@ function SidebarWrapper() {
     <SidebarProvider>
       <SidebarTrigger className="absolute p-4" />
       <AppSidebar />
-      <div className='p-4 min-h-screen w-full'>
+      <div className='p-4 max-h-screen h-screen w-full'>
         <Outlet />
       </div>
     </SidebarProvider>

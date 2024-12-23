@@ -97,7 +97,7 @@ export const Home = () => {
       accessorKey: "status",
       header: "Jelenlét",
       cell: ({ row }) => (
-        <ToggleButton key={row.id} onText={"Jelen"} offText={"Hiányzik"} />
+        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} />
       ),
     },
     {
@@ -111,11 +111,11 @@ export const Home = () => {
   ]
 
   return (
-    <div className='flex flex-col md:grid grid-cols-2 h-full grid-rows-2 gap-4'>
-      <div className='bg-primary-foreground rounded-xl p-4'>
+    <div className='flex flex-col md:grid grid-cols-2 h-full grid-rows-2 gap-4 overflow-y-hidden'>
+      <div className='bg-primary-foreground rounded-xl p-4 row-span-2 h-full'>
         <h2 className='text-center mb-4'>Következő óra</h2>
-        <div className='flex gap-4 w-full flex-col lg:flex-row'>
-          <Card className="max-w-[35rem] min-w-max h-max">
+        <div className='flex gap-4 w-full h-full flex-col'>
+          <Card className="max-w-[35rem] w-full h-max">
             <CardHeader>
               <div className="flex items-center gap-4">
                 <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='max-w-12 object-cover object-center' />
@@ -155,17 +155,17 @@ export const Home = () => {
               <Button className="w-full font-bold">Segédlet</Button>
             </CardFooter>
           </Card> */}
-          <ScrollArea className="h-[23rem] w-full">
-            <DataTable columns={columns} data={data} />
+          <ScrollArea className="h-[calc(100%-3rem)] pb-12">
+            <DataTable columns={columns} data={data} className={"w-full h-full"} />
           </ScrollArea>
         </div>
       </div>
-      <div className='bg-primary-foreground row-span-2 rounded-xl p-4'>
+      <div className='bg-primary-foreground rounded-xl p-4 h-full'>
         <h2 className='text-center mb-4'>Üzenetek</h2>
-        <div className='flex flex-col gap-2'>
-          <AssignmentMessage />
-          <NotificationMessage />
-        </div>
+        <ScrollArea className="h-[calc(100%-3rem)]">
+            <AssignmentMessage />
+            <NotificationMessage />
+        </ScrollArea>
       </div>
       <div className='bg-primary-foreground rounded-xl p-4'>
         <h2 className='text-center mb-2'>Segédletek</h2>

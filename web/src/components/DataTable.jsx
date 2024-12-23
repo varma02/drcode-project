@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table"
 import { ScrollArea } from "./ui/scroll-area"
 
-export default function DataTable({ columns, data, hasFooter = false }) {
+export default function DataTable({ columns, data, hasFooter = false, className }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState(
     []
@@ -56,7 +56,7 @@ export default function DataTable({ columns, data, hasFooter = false }) {
   })
 
   return (
-    <div className="w-full">
+    <div className={className}>
       <div className="flex items-center py-4">
         <Input
           placeholder="Szűrés Névre..."

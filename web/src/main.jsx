@@ -8,7 +8,7 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
 import { Home } from './routes/Home'
-import { Calendar } from './routes/Calendar'
+import { CalendarPage } from './routes/CalendarPage'
 import { Search } from './routes/Search'
 import { Settings } from './routes/Settings'
 import { Inbox } from './routes/Inbox'
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
     children: [
       {path: "/", element: <Home />},
       {path: "/inbox", element: <Inbox />},
-      {path: "/calendar", element: <Calendar />},
+      {path: "/calendar", element: <CalendarPage />},
       {path: "/search", element: <Search />},
       {path: "/settings", element: <Settings />}
     ]

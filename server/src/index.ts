@@ -74,14 +74,17 @@ export async function main() {
     console.log("\nShutting down server...");
     await new Promise((r) => server.close((err) => r(err)));
     await db.close();
+    return
   }
 }
 
 if (require.main === module) {
   main().then((closeApp) => {
-    process.on('SIGINT', async () => {
-      await closeApp();
-      process.exit(0);
-    });
+    for (const signal of ['SIGTERM', 'SIGINT', 'SIGKILL']) {
+      process.once(signal, async () => {
+        await closeApp();
+        process.exit(0);
+      });
+    }
   });
 }

@@ -53,7 +53,7 @@ employeesRouter.get('/:id', async (req, res) => {
       RETURN {
         employee: (SELECT * OMIT password, session_key FROM ONLY type::thing($employee)),
         ${include.has("unpaid_work") ?
-        "unpaid_work: (SELECT ->worked_at[WHERE ! paid].{where:out.*, time:created} as _ FROM ONLY type::thing($employee))._," : ""}
+        "unpaid_work: (SELECT ->worked_at[WHERE ! paid].* as _ FROM ONLY type::thing($employee))._," : ""}
         ${include.has("classes") ?
         "classes: (SELECT * FROM class WHERE $employee IN teachers)," : ""}
       }`, { employee: req.params.id }))[0];
@@ -97,7 +97,7 @@ employeesRouter.get('/:id', async (req, res) => {
   }
 });
 
-employeesRouter.delete('/remove', async (req, res) => {
+employeesRouter.post('/remove', async (req, res) => {
   const { id } = req.body;
   if (!id || !id.startsWith("employee:")) {
     res.status(400).json({
@@ -122,7 +122,7 @@ employeesRouter.delete('/remove', async (req, res) => {
   }
 });
 
-employeesRouter.patch("/update", async (req, res) => {
+employeesRouter.post("/update", async (req, res) => {
   const { id, name, email, roles } = req.body;
   if (!id || (!name && !email && !roles)) {
     res.status(400).json({
@@ -151,6 +151,9 @@ employeesRouter.patch("/update", async (req, res) => {
     res.status(200).json({
       code: "success",
       message: "Employee updated",
+      data: {
+        employee: result[0],
+      }
     });
   } else {
     res.status(404).json({

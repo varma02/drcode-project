@@ -98,7 +98,7 @@ No request body required.
 ##### Error codes
 - `unauthorized`: the user is not authorized to perform this action
 
-### Update profile `PATCH /update`
+### Update profile `POST /update`
 Updates the authenticated user's data. A password re-prompt is always required.
 ##### Request body
 ```
@@ -158,7 +158,7 @@ Gets a list of all employees (without details). Admin only.
 	code: "success",
 	message: "Employee data retrieved",
 	data: {
-		employee: { ... }
+		employees: { ... }
 	}
 }
 ```
@@ -188,7 +188,7 @@ Retrives an employee's data, including the specified details.
 - `unauthorized`: the user is not authorized to complete this action
 - `not_found`: there is no employee with the provided ID
 
-### Remove an employee `DELETE /remove`
+### Remove an employee `POST /remove`
 Removes an employee. Admin only.
 ##### Request body
 ```
@@ -208,7 +208,7 @@ Removes an employee. Admin only.
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no employee with the provided ID
 
-### Update an employee `PATCH /update`
+### Update an employee `POST /update`
 Updates an employee. Admin only!
 ##### Request body
 ```
@@ -223,7 +223,10 @@ Updates an employee. Admin only!
 ```
 {
 	code: "success",
-	message: "Employee updated"
+	message: "Employee updated",
+	data: {
+		employee: { ... }
+	}
 }
 ```
 ##### Error codes

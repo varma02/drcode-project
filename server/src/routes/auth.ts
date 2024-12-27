@@ -139,7 +139,7 @@ userRouter.get('/me', async (req, res) => {
   });
 });
 
-userRouter.patch('/update', async (req, res) => {
+userRouter.post('/update', async (req, res) => {
   const { name, email, new_password, old_password } = req.body;
   
     if (!old_password) {

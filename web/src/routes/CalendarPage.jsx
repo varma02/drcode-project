@@ -6,7 +6,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import { BookOpen, CalendarIcon, Clock, MapPin, User2 } from 'lucide-react'
+import { hu } from 'date-fns/locale'
+import { BookOpen, CalendarIcon, Clock, MapPin, Plus, User2 } from 'lucide-react'
 import React, { useState } from 'react'
 
 export const CalendarPage = () => {
@@ -25,7 +26,7 @@ export const CalendarPage = () => {
 
   const rows = []
 
-  for (let i = 0; i < Math.max(...data.map(e => e.length)); i++) {
+  for (let i = 0; i < Math.max(...data.map(e => e.length))+1; i++) {
     rows.push(
       <TableRow key={i}>
         { 
@@ -33,7 +34,10 @@ export const CalendarPage = () => {
           (
             <TableCell key={"day"+idx} className="text-center w-[14.285%]">
               {
-                day[i] ? <LessonCardItem course={day[i].course} teacher={day[i].teacher} /> : <hr />
+                day[i] ? 
+                <LessonCardItem course={day[i].course} teacher={day[i].teacher} /> 
+                : 
+                typeof day[i-1] == Object ? <p>+</p> : <hr />
               }
             </TableCell>)
           )
@@ -45,29 +49,32 @@ export const CalendarPage = () => {
   const [date, setDate] = useState(new Date())
   
   return (
-    <div className='flex items-center flex-col'>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant={"outline"}
-            className={cn(
-              "w-[280px] justify-start text-left font-normal",
-              !date && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? format(date, "PPP") : <span>Pick a date</span>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
+    <div className='flex items-center flex-col gap-2'>
+      <div className='flex gap-2'>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {date ? format(date, "PPP", {locale: hu}) : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+        <Button variant="outline"><Plus /></Button>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>

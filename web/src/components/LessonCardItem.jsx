@@ -1,4 +1,5 @@
 import React from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from './ui/dialog'
 
 export const LessonCardItem = ({course, teacher, location = "Központ", time_start = "16:00", time_end = "17:00"}) => {
   return (
@@ -18,17 +19,27 @@ export const LessonCardItem = ({course, teacher, location = "Központ", time_sta
     //     <Button className="w-full font-bold">Segédlet</Button>
     //   </CardFooter>
     // </Card>
-    <div variant="outline" className='flex gap-2 justify-between items-center font-bold border rounded-lg p-2 cursor-pointer hover:bg-[#2a2a30] transition-all'>
-      <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='max-w-8 object-cover object-center' />
-      <div className='text-left'>
-        <p>{course}</p>
-        <p className='opacity-50'>{teacher}</p>
-      </div>
-      <p className='opacity-50'>{location}</p>
-      <div>
-        <p>{time_start}</p>
-        <p>{time_end}</p>
-      </div>
-    </div>
+    <Dialog>
+      <DialogTrigger>
+        <div variant="outline" className='flex gap-2 justify-between items-center font-bold border rounded-lg p-2 cursor-pointer hover:bg-[#2a2a30] transition-all'>
+          <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='max-w-8 object-cover object-center' />
+          <div className='text-left'>
+            <p>{course}</p>
+            <p className='opacity-50'>{teacher}</p>
+          </div>
+          <p className='opacity-50'>{location}</p>
+          <div>
+            <p>{time_start}</p>
+            <p>{time_end}</p>
+          </div>
+        </div>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle>Test</DialogTitle>
+        <DialogDescription>
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sunt quaerat nulla, illum atque dicta tenetur. Quam et modi possimus sapiente deleniti praesentium doloremque, veniam reiciendis? Temporibus ex earum esse magni?
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -14,6 +14,7 @@ import { Settings } from './routes/Settings'
 import { Inbox } from './routes/Inbox'
 import { AuthProvider, useAuth } from './lib/api/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
+import { Employee } from './routes/Employee'
 
 const LoginPage = lazy(() => import('@/routes/Login'))
 
@@ -50,7 +51,8 @@ const router = createBrowserRouter([
       {path: "/inbox", element: <Inbox />},
       {path: "/calendar", element: <CalendarPage />},
       {path: "/search", element: <Search />},
-      {path: "/settings", element: <Settings />}
+      {path: "/settings", element: <Settings />},
+      {path: "/employee", element: <Employee />}
     ]
   },
   {

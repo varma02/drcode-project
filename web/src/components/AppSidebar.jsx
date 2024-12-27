@@ -1,4 +1,4 @@
-import { Calendar, ChevronsUpDown, Home, Inbox, LogOut, Search, Settings, ShieldX } from "lucide-react"
+import { Calendar, ChevronsUpDown, Home, Inbox, LogOut, Search, Settings, ShieldX, User2, Users } from "lucide-react"
 
 import {
   Sidebar,
@@ -46,6 +46,11 @@ export function AppSidebar() {
       title: "Beállítások",
       url: "/settings",
       icon: Settings,
+    },
+    {
+      title: "Alkalmazottak",
+      url: "/employee",
+      icon: Users,
     },
   ]
 

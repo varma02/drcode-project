@@ -30,7 +30,8 @@ export interface Event {
   created: Date,
   author: string | Employee,
   name: string,
-  signups: Employee[]
+  notes: string,
+  signups: string[] | Employee[],
   signup_limit: number,
   start: Date,
   end: Date,
@@ -41,63 +42,77 @@ export interface Subject {
   created: Date,
   name: string,
   description: string,
-  suggested_lesson_count: number,
 }
 
 export interface Student {
   id: string,
   created: Date,
   name: string,
-  email: string,
-  phone: string,
   parent?: {
     name: string,
     email: string,
     phone: string,
   },
+  email?: string,
+  phone?: string,
   extra_fields: {[key: string]: string},
-  notes?: string,
+  notes: string,
 }
 
-export interface Class {
+export interface Location {
   id: string,
   created: Date,
-  location: {
-    name: string,
-    address: string,
-    contact_email: string,
-    contact_phone: string,
-  },
-  notes?: string,
-  teachers: Employee[],
+  name?: string,
+  notes: string,
+  address: string,
+  contact_email: string,
+  contact_phone: string,
+}
+
+export interface Group {
+  id: string,
+  created: Date,
+  location: Location,
+  notes: string,
+  teachers: string[] | Employee[],
   archived: boolean,
 }
 
 export interface RelationEnroled {
   id: string,
   in: string | Student,
-  out: string | Class,
+  out: string | Group,
   created: Date,
   subject: string | Subject,
   price: number,
-  notes?: string,
+  notes: string,
 }
 
 export interface Lesson {
   id: string,
   created: Date,
-  class: string | Class,
-  notes?: string,
-  teachers?: Employee[],
+  group?: string | Group,
+  notes: string,
+  teachers?: string[] | Employee[],
   start: Date,
   end: Date,
+}
+
+export interface RelationReplaced {
+  id: string,
+  in: string | Student,
+  out: string | Lesson,
+  created: Date,
+  notes: string,
+  replacement: string | Lesson,
 }
 
 export interface RelationAttended {
   id: string,
   in: string | Student,
-  out: string | Lesson,
+  out: string | Lesson | RelationReplaced,
   created: Date,
+  paid: boolean,
 }
 
 export interface RelationWorkedAt {
@@ -106,5 +121,7 @@ export interface RelationWorkedAt {
   out: string | Lesson | Event,
   created: Date,
   paid: boolean,
-  notes?: string,
+  notes: string,
+  start?: Date,
+  end?: Date,
 }

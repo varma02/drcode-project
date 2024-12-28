@@ -40,7 +40,6 @@ DEFINE TABLE subject SCHEMAFULL CHANGEFEED 4w;
 DEFINE FIELD created ON TABLE subject TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE subject TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD description ON TABLE subject TYPE option<string> ASSERT string::len($value) <= 2048;
-DEFINE FIELD suggested_lesson_count ON TABLE subject TYPE int;
 
 
 DEFINE TABLE student SCHEMAFULL CHANGEFEED 4w;
@@ -53,24 +52,30 @@ DEFINE FIELD parent.email ON TABLE student TYPE string ASSERT string::len($value
 DEFINE FIELD parent.phone ON TABLE student TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD email ON TABLE student TYPE option<string> ASSERT string::is::email($value);
 DEFINE FIELD phone ON TABLE student TYPE option<string> ASSERT string::len($value) <= 48;
-DEFINE FIELD extra_fields ON TABLE student FLEXIBLE TYPE option<object>;
+DEFINE FIELD extra_fields ON TABLE student FLEXIBLE TYPE object DEFAULT {};
 DEFINE FIELD notes ON TABLE student TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 
 
-DEFINE TABLE class SCHEMAFULL CHANGEFEED 4w;
+DEFINE TABLE location SCHEMAFULL CHANGEFEED 4w;
 
-DEFINE FIELD created ON TABLE class TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD location ON TABLE class TYPE object;
-DEFINE FIELD location.name ON TABLE class TYPE string ASSERT string::len($value) <= 256;
-DEFINE FIELD location.address ON TABLE class TYPE string ASSERT string::len($value) <= 256;
-DEFINE FIELD location.contact_email ON TABLE class TYPE string ASSERT string::len($value) <= 48;
-DEFINE FIELD location.contact_phone ON TABLE class TYPE string ASSERT string::len($value) <= 48;
-DEFINE FIELD notes ON TABLE class TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
-DEFINE FIELD teachers ON TABLE class TYPE set<record<employee>>;
-DEFINE FIELD archived ON TABLE class TYPE bool DEFAULT false;
+DEFINE FIELD created ON TABLE location TYPE datetime DEFAULT time::now() READONLY;
+DEFINE FIELD name ON TABLE location TYPE option<string> ASSERT string::len($value) <= 256;
+DEFINE FIELD notes ON TABLE location TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
+DEFINE FIELD address ON TABLE location TYPE string ASSERT string::len($value) <= 256;
+DEFINE FIELD contact_email ON TABLE location TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD contact_phone ON TABLE location TYPE string ASSERT string::len($value) <= 48;
 
 
-DEFINE TABLE enroled SCHEMAFULL TYPE RELATION IN student OUT class CHANGEFEED 4w;
+DEFINE TABLE group SCHEMAFULL CHANGEFEED 4w;
+
+DEFINE FIELD created ON TABLE group TYPE datetime DEFAULT time::now() READONLY;
+DEFINE FIELD location ON TABLE group TYPE record<location>;
+DEFINE FIELD notes ON TABLE group TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
+DEFINE FIELD teachers ON TABLE group TYPE set<record<employee>>;
+DEFINE FIELD archived ON TABLE group TYPE bool DEFAULT false;
+
+
+DEFINE TABLE enroled SCHEMAFULL TYPE RELATION IN student OUT group CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE enroled TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD subject ON TABLE enroled TYPE record<subject>;
@@ -81,21 +86,33 @@ DEFINE FIELD notes ON TABLE enroled TYPE string ASSERT string::len($value) <= 20
 DEFINE TABLE lesson SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE lesson TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD classes ON TABLE lesson TYPE set<record<class>>;
+DEFINE FIELD group ON TABLE lesson TYPE option<record<group>>;
 DEFINE FIELD notes ON TABLE lesson TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD teachers ON TABLE lesson TYPE option<set<record<employee>>>;
 DEFINE FIELD start ON TABLE lesson TYPE datetime;
 DEFINE FIELD end ON TABLE lesson TYPE datetime;
 
 
-DEFINE TABLE attended SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 4w;
+DEFINE TABLE replaced SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 4w;
+
+DEFINE FIELD created ON TABLE replaced TYPE datetime DEFAULT time::now() READONLY;
+DEFINE FIELD notes ON TABLE replaced TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
+DEFINE FIELD replacement ON TABLE replaced TYPE record<lesson>;
+
+
+DEFINE TABLE attended SCHEMAFULL TYPE RELATION IN student OUT lesson | replaced CHANGEFEED 4w;
+
 DEFINE FIELD created ON TABLE attended TYPE datetime DEFAULT time::now() READONLY;
+DEFINE FIELD paid ON TABLE attended TYPE bool DEFAULT false;
 
 
 DEFINE TABLE worked_at SCHEMAFULL TYPE RELATION IN employee OUT lesson | event CHANGEFEED 4w;
+
 DEFINE FIELD created ON TABLE worked_at TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD paid ON TABLE worked_at TYPE bool DEFAULT false;
-DEFINE FIELD notes ON TABLE worked_at TYPE string DEFAULT "";
+DEFINE FIELD notes ON TABLE worked_at TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
+DEFINE FIELD start ON TABLE worked_at TYPE option<datetime>;
+DEFINE FIELD end ON TABLE worked_at TYPE option<datetime>;
 
 
 -- DEFINE TABLE announcement SCHEMAFULL CHANGEFEED 4w;

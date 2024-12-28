@@ -4,6 +4,7 @@ import db, { db_connect } from './database/connection';
 
 import authRouter from './routes/auth';
 import employeesRouter from './routes/employees';
+import groupsRouter from './routes/groups';
 
 export const app = express();
 
@@ -38,6 +39,7 @@ export async function setup(): Promise<string | null> {
   
   app.use('/auth', authRouter);
   app.use('/employee', employeesRouter);
+  app.use('/group', groupsRouter);
   
   app.use((req, res, next) => {
     res.status(404).json({

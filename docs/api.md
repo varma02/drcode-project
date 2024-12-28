@@ -234,3 +234,42 @@ Updates an employee. Admin only!
 - `fields_invalid`: One or more fields are invalid
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no employee with the provided ID
+
+## Group management `/group`
+
+### Get a list of all groups `GET /all`
+Gets a list of all groups (without details).
+##### Response on success
+```
+{
+	code: "success",
+	message: "All groups retrieved",
+	data: {
+		groups: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no employee with the provided ID
+
+### Get a specific group `GET /:id`
+Retrives a group's data, including the specified details.
+##### Query parameters
+- `include`: Get more details on fields (list separated by commas, ex: field1,field2)
+	- `teachers`: expand the teachers field to include employee data
+	- `students`: a list of students enroled to the group
+	- `lessons`: all lessons assigned to the selected group
+##### Response on success
+```
+{
+	code: "success",
+	message: "Group retrieved",
+	data: {
+		group: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no employee with the provided ID

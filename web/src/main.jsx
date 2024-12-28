@@ -15,6 +15,8 @@ import { Inbox } from './routes/Inbox'
 import { AuthProvider, useAuth } from './lib/api/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
 import { Employee } from './routes/Employee'
+import { AddCalendarGroup } from './routes/AddCalendarGroup'
+import { AddCalendarEvent } from './routes/AddCalendarEvent'
 
 const LoginPage = lazy(() => import('@/routes/Login'))
 
@@ -52,7 +54,9 @@ const router = createBrowserRouter([
       {path: "/calendar", element: <CalendarPage />},
       {path: "/search", element: <Search />},
       {path: "/settings", element: <Settings />},
-      {path: "/employee", element: <Employee />}
+      {path: "/employee", element: <Employee />},
+      {path: "/calendar/add/group", element: <AddCalendarGroup />},
+      {path: "/calendar/add/event", element: <AddCalendarEvent />},
     ]
   },
   {

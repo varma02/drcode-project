@@ -59,7 +59,7 @@ export const CalendarPage = () => {
             <Button variant="outline"><Plus /></Button>
           </PopoverTrigger>
           <PopoverContent className="flex flex-col w-max p-2">
-            <Link to={"/calendar/add/lesson"}><Button variant="ghost" className="w-full">Óra Hozzáadása</Button></Link>
+            <Link to={"/calendar/add/group"}><Button variant="ghost" className="w-full">Csoport Hozzáadása</Button></Link>
             <Link to={"/calendar/add/event"}><Button variant="ghost" className="w-full">Esemény Hozzáadása</Button></Link>
           </PopoverContent>
         </Popover>

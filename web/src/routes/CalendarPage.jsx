@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/DatePicker'
 import { LessonCardItem } from '@/components/LessonCardItem'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -9,6 +10,7 @@ import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 import { BookOpen, CalendarIcon, Clock, MapPin, Plus, User2 } from 'lucide-react'
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 export const CalendarPage = () => {
 
@@ -51,29 +53,16 @@ export const CalendarPage = () => {
   return (
     <div className='flex items-center flex-col gap-2'>
       <div className='flex gap-2'>
+        <DatePicker date={date} setDate={setDate} />
         <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-[280px] justify-start text-left font-normal",
-                !date && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP", {locale: hu}) : <span>Pick a date</span>}
-            </Button>
+          <PopoverTrigger>
+            <Button variant="outline"><Plus /></Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              initialFocus
-            />
+          <PopoverContent className="flex flex-col w-max p-2">
+            <Link to={"/calendar/add/lesson"}><Button variant="ghost" className="w-full">Óra Hozzáadása</Button></Link>
+            <Link to={"/calendar/add/event"}><Button variant="ghost" className="w-full">Esemény Hozzáadása</Button></Link>
           </PopoverContent>
         </Popover>
-        <Button variant="outline"><Plus /></Button>
       </div>
       <Table>
         <TableHeader>

@@ -1,25 +1,52 @@
 import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, ChevronUp } from "lucide-react"
 import { DayPicker } from "react-day-picker"
 import { hu } from 'date-fns/locale'
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { useState } from "react"
+import { setHours, setMinutes } from "date-fns"
 
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}) {
+function Calendar({ className, classNames, showOutsideDays = true, showTimePicker = false, date, setDate, ...props }) {
+  const [timeValue, setTimeValue] = useState(`${date.toString().split(" ")[4].split(":")[0]}:${date.toString().split(" ")[4].split(":")[1]}`);
+
+  console.log("timeValaue: ", timeValue)
+  console.log("date: ", date)
+
+  const handleTimeChange = (e) => {
+    const time = e.target.value
+    if (!date) {
+      setTimeValue(time)
+      return
+    }
+    const [hours, minutes] = time.split(":").map((str) => parseInt(str, 10))
+    const newSelectedDate = setHours(setMinutes(date, minutes), hours)
+    setDate(newSelectedDate)
+    setTimeValue(time)
+  }
+
+  const handleDaySelect = (date) => {
+    if (!timeValue || !date) {
+      setDate(date)
+      return
+    }
+    const [hours, minutes] = timeValue.split(":").map((str) => parseInt(str, 10))
+    const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes)
+    setDate(newDate)
+  }
+
   return (
-    (<DayPicker
+    (
+      <>
+      <DayPicker
       weekStartsOn={1}
       locale={hu}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
+      onSelect={handleDaySelect}
       classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+        months: "flex flex-col sm:flex-wrap sm:justify-center sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 max-w-[100vw]",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
         caption_label: "text-sm font-medium",
@@ -60,7 +87,12 @@ function Calendar({
           <ChevronRight className={cn("h-4 w-4", className)} {...props} />
         ),
       }}
-      {...props} />)
+      {...props} />
+      { showTimePicker &&
+        <input type="time" className="bg-transparent outline-none w-full text-center pb-2" value={timeValue} onChange={handleTimeChange} />
+      }
+      </>
+    )
   );
 }
 Calendar.displayName = "Calendar"

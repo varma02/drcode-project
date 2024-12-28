@@ -9,7 +9,7 @@ import { useState } from "react"
 import { setHours, setMinutes } from "date-fns"
 
 function Calendar({ className, classNames, showOutsideDays = true, showTimePicker = false, date, setDate, ...props }) {
-  const [timeValue, setTimeValue] = useState(`${date.toString().split(" ")[4].split(":")[0]}:${date.toString().split(" ")[4].split(":")[1]}`);
+  const [timeValue, setTimeValue] = useState(`${date.getHours()}:${date.getMinutes()}`)
 
   console.log("timeValaue: ", timeValue)
   console.log("date: ", date)

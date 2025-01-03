@@ -61,7 +61,12 @@ export default {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+				code: {
+					green: "#99cc33",
+					gray: "#4d4d4d",
+					orange: "#c2500a"
+				}
   		}
   	}
   },

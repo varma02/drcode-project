@@ -86,4 +86,50 @@ groupsRouter.post('/create', ensureAdmin, async (req, res) => {
   }
 });
 
+groupsRouter.post('/update', ensureAdmin, async (req, res) => {
+  const { id, name, location, notes, teachers, archived  } = req.body;
+  if (!id || !id.startsWith("group:")) {
+    res.status(400).json({
+      code: "fields_required",
+      message: "The ID field is required",
+    });
+    return;
+  }
+
+  const group = (await db.query(`
+    UPDATE ONLY type::thing($id) MERGE {
+      ${name ? "name: $name," : ""}
+      ${notes ? "notes: $notes," : ""}
+      ${location ? "location: $location," : ""}
+      ${teachers ? "teachers: $teachers," : ""}
+      ${archived ? "archived: $archived," : ""}
+    };
+  `, { id, name, location, notes, teachers, archived }))[0];
+
+  res.status(200).json({
+    code: "success",
+    message: "Group updated",
+    data: { group },
+  });
+});
+
+groupsRouter.post('/remove', ensureAdmin, async (req, res) => {
+  const { id } = req.body;
+  if (!id || !id.startsWith("group:")) {
+    res.status(400).json({
+      code: "fields_required",
+      message: "The ID field is required",
+    });
+    return;
+  }
+
+  const group = (await db.query(`DELETE ONLY type::thing($id);`, { id }))[0];
+
+  res.status(200).json({
+    code: "success",
+    message: "Group removed",
+    data: { location: group },
+  });
+});
+
 export default groupsRouter;

@@ -5,6 +5,7 @@ import db, { db_connect } from './database/connection';
 import authRouter from './routes/auth';
 import employeesRouter from './routes/employees';
 import groupsRouter from './routes/groups';
+import locationsRouter from './routes/location';
 
 export const app = express();
 
@@ -28,9 +29,9 @@ export async function setup(): Promise<string | null> {
   app.use((req, res, next) => {
     console.log(req.ip, req.method, req.path);
     next();
-  })
+  });
 
-  app.get('/', (req, res) => {
+  app.get('/', async (req, res) => {
     res.status(200).json({
       code: "hello_world",
       message: 'Hello, world!'
@@ -40,6 +41,7 @@ export async function setup(): Promise<string | null> {
   app.use('/auth', authRouter);
   app.use('/employee', employeesRouter);
   app.use('/group', groupsRouter);
+  app.use('/location', locationsRouter);
   
   app.use((req, res, next) => {
     res.status(404).json({
@@ -47,13 +49,6 @@ export async function setup(): Promise<string | null> {
       message: 'Not Found',
     });
   });
-
-  app.use(((err, req, res, next) => {
-    res.status(500).json({
-      code: "server_error",
-      message: err.message || "An unexpected error has occurred",
-    });
-  }) as ErrorRequestHandler);
 
   return null;
 }

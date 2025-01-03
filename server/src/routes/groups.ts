@@ -70,7 +70,7 @@ groupsRouter.post('/create', ensureAdmin, async (req, res) => {
       ${lessons.length > 0 ? `
         FOR $lesson IN $lessons {
           CREATE ONLY lesson CONTENT {
-            group: $group,
+            group: type::thing($group.id),
             start: type::datetime($lesson.start),
             end: type::datetime($lesson.end),
           };

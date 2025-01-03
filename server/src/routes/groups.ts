@@ -21,6 +21,13 @@ groupsRouter.get('/all', async (req, res) => {
 
 groupsRouter.get('/:id', async (req, res) => {
   const { id } = req.params;
+  if (!id || !id.startsWith("group:")) {
+    res.status(400).json({
+      code: "fields_required",
+      message: "Invalid location ID",
+    });
+    return;
+  }
   const selection = [];
   selection.push("*");
   if (req.query.include) {
@@ -56,8 +63,8 @@ groupsRouter.post('/create', ensureAdmin, async (req, res) => {
       BEGIN TRANSACTION;
       $group = CREATE ONLY group CONTENT {
         name: $name,
-        location: $location,
-        teachers: $teachers,
+        location: type::thing($location),
+        teachers: array::map($teachers, |$v| type::thing($v)),
         notes: $notes
       };
       ${lessons.length > 0 ? `
@@ -100,8 +107,8 @@ groupsRouter.post('/update', ensureAdmin, async (req, res) => {
     UPDATE ONLY type::thing($id) MERGE {
       ${name ? "name: $name," : ""}
       ${notes ? "notes: $notes," : ""}
-      ${location ? "location: $location," : ""}
-      ${teachers ? "teachers: $teachers," : ""}
+      ${location ? "location: type::thing($location)," : ""}
+      ${teachers ? "teachers: array::map($teachers, |$v| type::thing($v))," : ""}
       ${archived ? "archived: $archived," : ""}
     };
   `, { id, name, location, notes, teachers, archived }))[0];

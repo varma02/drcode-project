@@ -11,6 +11,7 @@ import { Label } from '@radix-ui/react-dropdown-menu'
 import { ArrowLeft } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 
 export const AddCalendarGroup = () => {
   const auth = useAuth()
@@ -18,21 +19,39 @@ export const AddCalendarGroup = () => {
   const [employees, setEmployees] = useState([])
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date())
-  const [location, setLocation] = useState()
-  const [locations, setLocations] = useState([""])
+  const [location, setLocation] = useState("")
+  const [locations, setLocations] = useState([])
   
   useEffect(() => {
     getAllEmployees(auth.token).then(e => setEmployees(e.data.employees))
     getAllLocations(auth.token).then(data => setLocations(data.data.locations))
   }, [])
 
-  // getAllLocations(auth.token).then(data => console.log(data))
-  // getAllEmployees(auth.token).then(data => console.log(data))
-
-  // createGroup(auth.token, "asd", "location:vjlosg9rix57tqzr051v", ["employee:6d6q2sbrlrxd3ojpr6vx"], "asd2", []).then(data => console.log(data))
+  function handleSubmit(event) {
+    event.preventDefault()
+    const formData = new FormData(event.target)
+    const lessons = []
+    const name = "name"
+    createGroup(auth.token, name, formData.get("location"), formData.get("employees").split(","), formData.get("note"), lessons).then(
+      () => { 
+        toast.success("Csoport sikeresen létrehozva!")
+      },
+      (error) => { 
+        console.error(error)
+        switch (error.response?.data?.code) {
+          case "fields_required":
+            return toast.error("Valamelyik mező üres!")
+          case "unauthorized":
+            return toast.error("Ehhez hincs jogosultsága!")
+          default:
+            return toast.error("Ismeretlen hiba történt!")
+        }
+      }
+    )
+  }
 
   return (
-    <form className='relative flex justify-center' onSubmit={event => {event.preventDefault(); console.log(new FormData(event.target))}}>
+    <form className='relative flex justify-center' onSubmit={handleSubmit}>
       <Link to={"/calendar"} className='absolute top-0 left-0'><Button variant="outline"><ArrowLeft /></Button></Link>
       <div className='max-w-screen-lg w-full flex flex-col justify-center gap-4'>
         <h2 className='text-center mb-4'>Csoport Hozzáadása</h2>

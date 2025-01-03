@@ -259,6 +259,7 @@ Retrives a group's data, including the specified details.
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `teachers`: expand the teachers field to include employee data
 	- `students`: a list of students enroled to the group
+	- `subjects`: the subjects that students are enroled to
 	- `lessons`: all lessons assigned to the selected group
 ##### Response on success
 ```
@@ -273,3 +274,34 @@ Retrives a group's data, including the specified details.
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 - `not_found`: there is no employee with the provided ID
+
+### Create a group `POST /create`
+Creates a group optionally with lessons. Admin only!
+##### Request body
+```
+{
+	name: "Arany Hétfő 17:10",
+	location: "location:123",
+	teachers: ["teacher:123", "teacher:321"],
+	// the last two are optional
+	notes: "",
+	lessons: [
+		{start:"2025-01-03T17:10:00+01:00", end: "2025-01-03T18:10:00+01:00"},
+		...
+	]
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Group created",
+	data: {
+		group: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid

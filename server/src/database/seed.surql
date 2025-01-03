@@ -63,6 +63,15 @@ $joska = CREATE ONLY student CONTENT {
   },
 };
 
+$pisti = CREATE ONLY student CONTENT {
+  name: "Erős Pista",
+  parent: {
+    name: "Univer-Product Zrt.",
+    email: "informacio@univer.hu",
+    phone: "+36 76 518 100"
+  },
+};
+
 $fohadiszallas = CREATE ONLY location CONTENT {
   name: "Főhadiszállás",
   address: "123 Itta Rendőrség",
@@ -95,6 +104,11 @@ RELATE $elek->enroled->$csoport1 CONTENT {
 RELATE $joska->enroled->$csoport1 CONTENT {
   subject: $scratch.id,
   price: 1500,
+};
+
+RELATE $pisti->enroled->$csoport1 CONTENT {
+  subject: $scratch.id,
+  price: 990,
 };
 
 COMMIT TRANSACTION;

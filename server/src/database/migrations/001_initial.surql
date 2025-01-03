@@ -69,6 +69,7 @@ DEFINE FIELD contact_phone ON TABLE location TYPE string ASSERT string::len($val
 DEFINE TABLE group SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE group TYPE datetime DEFAULT time::now() READONLY;
+DEFINE FIELD name ON TABLE group TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD location ON TABLE group TYPE record<location>;
 DEFINE FIELD notes ON TABLE group TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD teachers ON TABLE group TYPE set<record<employee>>;

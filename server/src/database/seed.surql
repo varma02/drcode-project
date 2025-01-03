@@ -80,6 +80,7 @@ $fohadiszallas = CREATE ONLY location CONTENT {
 };
 
 $csoport1 = CREATE ONLY group CONTENT {
+  name: "DOK Hétfő 16:10",
   location: $fohadiszallas.id,
   teachers: [$nepirtas.id],
 };

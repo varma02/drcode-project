@@ -89,6 +89,7 @@ DEFINE TABLE lesson SCHEMAFULL CHANGEFEED 4w;
 DEFINE FIELD created ON TABLE lesson TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD group ON TABLE lesson TYPE option<record<group>>;
 DEFINE FIELD notes ON TABLE lesson TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
+DEFINE FIELD location ON TABLE lesson TYPE option<record<location>>;
 DEFINE FIELD teachers ON TABLE lesson TYPE option<set<record<employee>>>;
 DEFINE FIELD start ON TABLE lesson TYPE datetime;
 DEFINE FIELD end ON TABLE lesson TYPE datetime;

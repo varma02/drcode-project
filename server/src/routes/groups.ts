@@ -21,8 +21,6 @@ groupsRouter.get('/all', async (req, res) => {
 
 groupsRouter.get('/:id', async (req, res) => {
   const { id } = req.params;
-  const include = new Set((req.query.include as string)
-    .trim().split(",")).intersection(new Set(["teachers", "students", "lessons"]));
   const selection = [];
   selection.push("*");
   if (req.query.include) {
@@ -42,6 +40,50 @@ groupsRouter.get('/:id', async (req, res) => {
     message: "Group retrieved",
     data: { group },
   });
+});
+
+groupsRouter.post('/create', ensureAdmin, async (req, res) => {
+  const { name, location, teachers, notes, lessons } = req.body;
+  if (!name || !location || !teachers || !Array.isArray(teachers)) {
+    res.status(400).json({
+      code: "bad_request",
+      message: "One or more fields are missing or invalid",
+    });
+    return;
+  }
+  try {
+    const group = (await db.query(`
+      BEGIN TRANSACTION;
+      $group = CREATE ONLY group CONTENT {
+        name: $name,
+        location: $location,
+        teachers: $teachers,
+        notes: $notes
+      };
+      ${lessons.length > 0 ? `
+        FOR $lesson IN $lessons {
+          CREATE ONLY lesson CONTENT {
+            group: $group,
+            start: $lesson.start,
+            end: $lesson.end,
+          };
+        };
+      ` : ""}
+      RETURN $group;
+      COMMIT TRANSACTION;
+    `, {name, location, teachers, notes, lessons}))[0];
+    res.status(200).json({
+      code: "success",
+      message: "Group created",
+      data: { group },
+    });
+  } catch (e) {
+    console.trace(e);
+    res.status(400).json({
+      code: "bad_request",
+      message: "One or more fields are missing or invalid",
+    });
+  }
 });
 
 export default groupsRouter;

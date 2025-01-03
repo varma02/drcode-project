@@ -56,10 +56,9 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
-        <SidebarGroup>
           {
             Object.keys(items).map(e => 
-              <>
+            <SidebarGroup key={e}>
               <SidebarGroupLabel>{e}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
@@ -75,10 +74,9 @@ export function AppSidebar() {
                   ))}
                 </SidebarMenu>
               </SidebarGroupContent>
-              </>
+            </SidebarGroup>
             )
           }
-        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <DropdownMenu>

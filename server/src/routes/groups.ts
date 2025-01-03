@@ -60,7 +60,7 @@ groupsRouter.post('/create', ensureAdmin, async (req, res) => {
   }
   try {
     const group = (await db.query(`
-      BEGIN TRANSACTION;
+      -- BEGIN TRANSACTION;
       $group = CREATE ONLY group CONTENT {
         name: $name,
         location: type::thing($location),
@@ -71,13 +71,13 @@ groupsRouter.post('/create', ensureAdmin, async (req, res) => {
         FOR $lesson IN $lessons {
           CREATE ONLY lesson CONTENT {
             group: $group,
-            start: $lesson.start,
-            end: $lesson.end,
+            start: type::datetime($lesson.start),
+            end: type::datetime($lesson.end),
           };
         };
       ` : ""}
+      -- COMMIT TRANSACTION;
       RETURN $group;
-      COMMIT TRANSACTION;
     `, {name, location, teachers, notes, lessons}))[0];
     res.status(200).json({
       code: "success",

@@ -25,9 +25,14 @@ groupsRouter.get('/:id', async (req, res) => {
     .trim().split(",")).intersection(new Set(["teachers", "students", "lessons"]));
   const selection = [];
   selection.push("*");
-  if (include.has("teachers")) selection.push("teachers.*.*");
-  if (include.has("students")) selection.push("->enroled->student.* as students");
-  if (include.has("lessons")) selection.push("(SELECT * FROM lesson WHERE $parent.id = group.id) AS lessons");
+  if (req.query.include) {
+    const include = new Set((req.query.include as string)
+      .trim().split(",")).intersection(new Set(["teachers", "students", "lessons", "subjects"]));
+    if (include.has("teachers")) selection.push("teachers.*.*");
+    if (include.has("students")) selection.push("<-enroled<-student.* as students");
+    if (include.has("subjects")) selection.push("array::group(<-enroled.subject.*) as subjects");
+    if (include.has("lessons")) selection.push("(SELECT * FROM lesson WHERE $parent.id = group.id) AS lessons");
+  }
   const group = (await db.query(`
     SELECT ${selection.join(",")} OMIT teachers.*.password, teachers.*.session_key FROM ONLY type::thing($groupid) FETCH location;
   `, {groupid: id}))[0];

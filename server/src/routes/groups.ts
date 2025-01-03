@@ -53,7 +53,7 @@ groupsRouter.post('/create', ensureAdmin, async (req, res) => {
   const { name, location, teachers, notes, lessons } = req.body;
   if (!name || !location || !teachers || !Array.isArray(teachers)) {
     res.status(400).json({
-      code: "bad_request",
+      code: "field_required",
       message: "One or more fields are missing or invalid",
     });
     return;

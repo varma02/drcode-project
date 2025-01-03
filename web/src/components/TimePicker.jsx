@@ -5,7 +5,7 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 
 export const TimePicker = ({date, setDate, className, label, name}) => {
-  const [timeValue, setTimeValue] = useState(`${date.getHours()}:${date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes()}`)
+  const [timeValue, setTimeValue] = useState(`${date.getHours() == 0 ? "00" : date.getHours() }:${date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes()}`)
 
   const handleTimeChange = (e) => {
     const time = e.target.value

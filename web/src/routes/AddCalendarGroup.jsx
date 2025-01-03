@@ -18,7 +18,7 @@ export const AddCalendarGroup = () => {
 
   const [employees, setEmployees] = useState([])
   const [startDate, setStartDate] = useState(new Date())
-  const [endDate, setEndDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date(new Date().setHours(new Date().getHours() + 1)))
   const [location, setLocation] = useState("")
   const [locations, setLocations] = useState([])
   
@@ -27,10 +27,25 @@ export const AddCalendarGroup = () => {
     getAllLocations(auth.token).then(data => setLocations(data.data.locations))
   }, [])
 
+  function generateLessons(startDate, lessonCount, startTime, endTime) {
+    const generated = []
+    for (let index = 0; index < lessonCount; index++) {
+      generated.push(
+        {
+          start: new Date(new Date(`${startDate}T${startTime}`).setDate(new Date(`${startDate}T${startTime}`).getDate() + index * 7)).toISOString(),
+          end: new Date(new Date(`${startDate}T${endTime}`).setDate(new Date(`${startDate}T${endTime}`).getDate() + index * 7)).toISOString(),
+        }
+      )
+    }
+    console.log(generated)
+    return generated
+  }
+
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
-    const lessons = []
+    console.log(formData)
+    const lessons = generateLessons(formData.get("startDate"), formData.get("lessonNum"), formData.get("startTime"), formData.get("endTime"))
     const name = "name"
     createGroup(auth.token, name, formData.get("location"), formData.get("employees").split(","), formData.get("note"), lessons).then(
       () => { 

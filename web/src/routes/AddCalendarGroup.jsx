@@ -1,10 +1,11 @@
+import { Combobox } from '@/components/ComboBox'
 import { DatePicker } from '@/components/DatePicker'
 import { GroupComboBox } from '@/components/GroupComboBox'
 import { TimePicker } from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { getAllEmployees } from '@/lib/api/api'
+import { createGroup, getAllEmployees, getAllLocations } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import { ArrowLeft } from 'lucide-react'
@@ -17,40 +18,44 @@ export const AddCalendarGroup = () => {
   const [employees, setEmployees] = useState([])
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date())
-  const [form, setForm] = useState({})
+  const [location, setLocation] = useState()
+  const [locations, setLocations] = useState([""])
   
   useEffect(() => {
     getAllEmployees(auth.token).then(e => setEmployees(e.data.employees))
+    getAllLocations(auth.token).then(data => setLocations(data.data.locations))
   }, [])
 
+  // getAllLocations(auth.token).then(data => console.log(data))
+  // getAllEmployees(auth.token).then(data => console.log(data))
+
+  // createGroup(auth.token, "asd", "location:vjlosg9rix57tqzr051v", ["employee:6d6q2sbrlrxd3ojpr6vx"], "asd2", []).then(data => console.log(data))
+
   return (
-    <div className='relative flex justify-center'>
+    <form className='relative flex justify-center' onSubmit={event => {event.preventDefault(); console.log(new FormData(event.target))}}>
       <Link to={"/calendar"} className='absolute top-0 left-0'><Button variant="outline"><ArrowLeft /></Button></Link>
       <div className='max-w-screen-lg w-full flex flex-col justify-center gap-4'>
         <h2 className='text-center mb-4'>Csoport Hozzáadása</h2>
-        <GroupComboBox data={employees} displayName={"name"} placeholder='Válassz Kurzust...' title={"Kurzusok"} className={"w-full"} />
-        <GroupComboBox data={employees} displayName={"name"} placeholder='Válassz Tanulót...' title={"Tanulók"} className={"w-full"} />
-        <GroupComboBox data={employees} displayName={"name"} placeholder='Válassz Oktatót...' title={"Oktatók"} className={"w-full"} />
-        <Textarea placeholder="Megjegyzés..." />
+        <Combobox data={locations} displayName={"name"} placeholder='Válassz Lokációt...' value={location} setValue={setLocation} className={"w-full"} name="location" />
+        <GroupComboBox data={employees} displayName={"name"} placeholder='Válassz Oktatót...' title={"Oktatók"} className={"w-full"} name="employees" />
+        <Textarea placeholder="Megjegyzés..." name="note" />
         <div className='flex justify-between'>
           <div className='flex gap-2'>
             <div className="flex flex-col gap-2">
               <p>Kezdés</p>
-              <DatePicker date={startDate} setDate={setStartDate} />
+              <DatePicker date={startDate} setDate={setStartDate} name="startDate" />
             </div>
-            <TimePicker date={startDate} setDate={setStartDate} label={"Időpont"} className={"px-5"} />
+            <TimePicker date={startDate} setDate={setStartDate} name="startTime" label={"Kezdés"} className={"px-5"} />
+            <p className='flex items-end pb-2'>-</p>
+            <TimePicker date={endDate} setDate={setEndDate} name="endTime" label={"Befejezés"} className={"px-5"} />
             <div className="flex flex-col gap-2">
               <Label>Össz. Óraszám</Label>
-              <Input type="text" min={1} placeholder="Óraszám" value={form["lessonNum"]} onChange={(e) => /^\d*$/.test(e.target.value) && setForm({...form, lessonNum : +e.target.value < 1 ? "" : e.target.value})} />
+              <Input type="text" min={1} name="lessonNum" placeholder="Óraszám" />
             </div>
           </div>
-          <div>
-            <p>Befejezés</p>
-            <DatePicker date={endDate} setDate={setEndDate} showTimePicker numberOfMonths={12} />
-          </div>
         </div>
-        <Button variant="outline" className="w-28 mx-auto">Hozzáadás</Button>
+        <Button variant="outline" className="w-28 mx-auto" type="submit">Hozzáadás</Button>
       </div>
-    </div>
+    </form>
   )
 }

@@ -6,11 +6,12 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useState } from "react"
 
-export function Combobox({data, displayName, placeholder = "Válassz...", value, setValue}) {
+export function Combobox({data, displayName, placeholder = "Válassz...", value, setValue, name}) {
   const [open, setOpen] = useState(false)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
+      <input type="text" name={name} defaultValue={value} className="hidden" />
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -18,7 +19,7 @@ export function Combobox({data, displayName, placeholder = "Válassz...", value,
           aria-expanded={open}
           className="w-[200px] justify-between"
         >
-          { value ? data.find(e => e[displayName] === value)?.[displayName] : placeholder }
+          { value ? data.find(e => e.id === value)?.[displayName] : placeholder }
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -28,20 +29,20 @@ export function Combobox({data, displayName, placeholder = "Válassz...", value,
           <CommandList>
             <CommandEmpty>Nincs Találat.</CommandEmpty>
             <CommandGroup>
-              {data.map((e) => (
+              {data.map((e, i) => (
                 <CommandItem
-                  key={e.name}
-                  value={e.name}
+                  key={i}
+                  value={e.id}
                   onSelect={(currentValue) => {
                     console.log(currentValue)
-                    setValue(currentValue === value ? "" : currentValue)
+                    setValue(currentValue == value ? "" : currentValue)
                     setOpen(false)
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === e.name ? "opacity-100" : "opacity-0"
+                      value === e.id ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {e.name}

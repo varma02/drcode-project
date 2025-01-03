@@ -20,7 +20,7 @@ export const LessonCardItem = ({course, teacher, location = "Központ", time_sta
     //   </CardFooter>
     // </Card>
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger className='w-full'>
         <div variant="outline" className='flex gap-2 justify-between items-center font-bold border rounded-lg p-2 cursor-pointer hover:bg-[#2a2a30] transition-all'>
           <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='max-w-8 object-cover object-center' />
           <div className='text-left'>

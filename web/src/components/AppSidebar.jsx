@@ -21,58 +21,63 @@ import { toast } from "sonner"
 export function AppSidebar() {
   const auth = useAuth();
 
-  const items = [
-    {
-      title: "Főoldal",
-      url: "/",
-      icon: Home,
-    },
-    {
-      title: "Üzenetek",
-      url: "/inbox",
-      icon: Inbox,
-    },
-    {
-      title: "Beosztás",
-      url: "/calendar",
-      icon: Calendar,
-    },
-    {
-      title: "Segédletek",
-      url: "/search",
-      icon: Search,
-    },
-    {
-      title: "Beállítások",
-      url: "/settings",
-      icon: Settings,
-    },
-    {
-      title: "Alkalmazottak",
-      url: "/employee",
-      icon: Users,
-    },
-  ]
+  const items = {
+    "Dr Code": [
+      {
+        title: "Főoldal",
+        url: "/",
+        icon: Home,
+      },
+      {
+        title: "Beosztás",
+        url: "/calendar",
+        icon: Calendar,
+      },
+      {
+        title: "Üzenetek",
+        url: "/inbox",
+        icon: Inbox,
+      },
+      {
+        title: "Segédletek",
+        url: "/search",
+        icon: Search,
+      },
+    ],
+    "Admin": [
+      {
+        title: "Alkalmazottak",
+        url: "/employee",
+        icon: Users,
+      },
+    ]
+  }
 
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Dr Code</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
+          {
+            Object.keys(items).map(e => 
+              <>
+              <SidebarGroupLabel>{e}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {items[e].map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <Link to={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+              </>
+            )
+          }
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>

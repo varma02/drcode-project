@@ -251,7 +251,6 @@ Gets a list of all groups (without details).
 ```
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
-- `not_found`: there is no employee with the provided ID
 
 ### Get a specific group `GET /:id`
 Retrives a group's data, including the specified details.
@@ -273,7 +272,7 @@ Retrives a group's data, including the specified details.
 ```
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
-- `not_found`: there is no employee with the provided ID
+- `not_found`: there is no group with the provided ID
 
 ### Create a group `POST /create`
 Creates a group optionally with lessons. Admin only!
@@ -283,7 +282,9 @@ Creates a group optionally with lessons. Admin only!
 	name: "Arany Hétfő 17:10",
 	location: "location:123",
 	teachers: ["teacher:123", "teacher:321"],
+	
 	// the last two are optional
+	
 	notes: "",
 	lessons: [
 		{start:"2025-01-03T17:10:00+01:00", end: "2025-01-03T18:10:00+01:00"},
@@ -305,3 +306,168 @@ Creates a group optionally with lessons. Admin only!
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body
 - `bad_request`: One or more fields are invalid
+
+### Update a group `POST /update`
+Updates a group. Admin only!
+##### Request body
+```
+{
+	id: "group:123"
+	
+	// the following are optional
+	
+	name: "Kodály Hétfő 17:10",
+	location: "location:123",
+	teachers: ["teacher:123", "teacher:321"],
+	notes: "Lorem ipsum dolor...",
+	archived: false
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Group updated",
+	data: {
+		group: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Remove a group `POST /remove`
+Removes a group. Admin only.
+##### Request body
+```
+{
+	id: "group:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Group removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no group with the provided ID
+
+## Location management `/location`
+
+### Get a list of all locations `GET /all`
+Gets a list of all locations.
+##### Response on success
+```
+{
+	code: "success",
+	message: "All locations retrieved",
+	data: {
+		locations: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+
+### Get a specific location `GET /:id`
+Retrives a location's data.
+##### Response on success
+```
+{
+	code: "success",
+	message: "Location retrieved",
+	data: {
+		location: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no location with the provided ID
+
+### Create a location `POST /create`
+Creates a location. Admin only!
+##### Request body
+```
+{
+	name: "Országház",
+	address: "Budapest, Kossuth Lajos tér 1-3, 1055",
+	contact_email: "info@parlament.hu",
+	contact_phone: "+3614414000",
+	
+	//the last one is optional
+	
+	notes: "Lorem ipsum dolor..."
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Location created",
+	data: {
+		group: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Update a location `POST /update`
+Updates a location. Admin only!
+##### Request body
+```
+{
+	id: "location:123"
+	
+	// the following are optional
+	
+	name: "Országház",
+	address: "Budapest, Kossuth Lajos tér 1-3, 1055",
+	contact_email: "info@parlament.hu",
+	contact_phone: "+3614414000",
+	notes: "Lorem ipsum dolor..."
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Location updated",
+	data: {
+		group: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Remove a location `POST /remove`
+Removes a location. Admin only.
+##### Request body
+```
+{
+	id: "location:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Location removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no location with the provided ID

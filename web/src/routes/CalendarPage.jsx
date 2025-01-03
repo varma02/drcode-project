@@ -1,14 +1,9 @@
 import { DatePicker } from '@/components/DatePicker'
 import { LessonCardItem } from '@/components/LessonCardItem'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import { hu } from 'date-fns/locale'
-import { BookOpen, CalendarIcon, Clock, MapPin, Plus, User2 } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -34,7 +29,7 @@ export const CalendarPage = () => {
         { 
           data.map((day, idx) => 
           (
-            <TableCell key={"day"+idx} className="text-center w-[14.285%]">
+            <TableCell key={"day"+idx} className="text-center w-[14.286%]">
               {
                 day[i] ? 
                 <LessonCardItem course={day[i].course} teacher={day[i].teacher} /> 
@@ -55,7 +50,7 @@ export const CalendarPage = () => {
       <div className='flex gap-2'>
         <DatePicker date={date} setDate={setDate} />
         <Popover>
-          <PopoverTrigger>
+          <PopoverTrigger asChild>
             <Button variant="outline"><Plus /></Button>
           </PopoverTrigger>
           <PopoverContent className="flex flex-col w-max p-2">

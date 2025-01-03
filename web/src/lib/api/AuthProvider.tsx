@@ -53,7 +53,7 @@ export function AuthProvider({children}) {
       getLoggedInUser(localToken).then((response) => {
         if (response) {
           console.debug("User logged in")
-          setUser(response.data.employee)
+          setUser((response as MeResponse).data.employee)
           setToken(localToken)
           setAuthState("yes")
         } else {
@@ -80,7 +80,7 @@ export function AuthProvider({children}) {
       try {
         const response = await loginEmailPassword(email, password, remember)
         if (response.code !== "success") throw response
-        const { token, employee } = response.data
+        const { token, employee } = (response as LoginResponse).data
         localStorage.setItem("drcode-auth-token", token)
         setUser(employee)
         setToken(token)

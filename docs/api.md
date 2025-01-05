@@ -494,7 +494,7 @@ Gets a list of all lessons (without details).
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 
-### Get all lessons between two dates `GET /between_detes`
+### Get all lessons between two dates `GET /between_dates`
 Retrieves all lessons between the two dates provided (without details).
 ##### Query parameters
 - `start`: Start ISO8601 datetime
@@ -637,7 +637,7 @@ Gets a list of all event (without details).
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 
-### Get all events between two dates `GET /between_detes`
+### Get all events between two dates `GET /between_dates`
 Retrives all events between the two dates provided (without details).
 ##### Query parameters
 - `start`: Start ISO8601 datetime

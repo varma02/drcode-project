@@ -28,3 +28,17 @@ export async function getAllLocations(token: string) {
 export async function getLocation(token: string, id: string) {
   return (await axios.get(API_URL + "/location/"+id, {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
 }
+
+export async function createInvite(token: string, roles: string[]) {
+  return (await axios.post(API_URL + "/invite/create", { roles }, {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
+}
+
+export async function removeInvite(token: string, id: string) {
+  console.log(id);
+  
+  return (await axios.post(API_URL + "/invite/remove", { id }, {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
+}
+
+export async function getAllInvites(token: string) {
+  return (await axios.get(API_URL + "/invite/all", {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
+}

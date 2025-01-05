@@ -18,26 +18,6 @@ employeesRouter.get('/all', ensureAdmin, async (req, res) => {
   });
 });
 
-employeesRouter.post('/invite', ensureAdmin, async (req, res) => {
-  const { roles } = req.body;
-
-  if (!roles || !Array.isArray(roles) || !roles.length) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "The roles field is required",
-    });
-  }
-
-  const invite = (await db.query<Invite[]>("CREATE ONLY invite SET author = $author, roles = $roles", 
-    { author: req.employee?.id, roles }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Invite created",
-    data: { invite },
-  });
-});
-
 employeesRouter.get('/:id', async (req, res) => {
   if (!req.params.id || !req.params.id.startsWith("employee:")) {
     res.status(404).json({

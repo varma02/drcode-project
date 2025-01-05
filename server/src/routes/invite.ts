@@ -9,7 +9,7 @@ inviteRouter.use(ensureAuth);
 
 inviteRouter.get('/all', async (req, res) => {
   const invites = (await db.query(`
-    SELECT * FROM invite;
+    SELECT * OMIT author.password, author.session_key FROM invite FETCH author;
   `))[0];
 
   res.status(200).json({
@@ -22,7 +22,7 @@ inviteRouter.get('/all', async (req, res) => {
 inviteRouter.post('/create', ensureAdmin, async (req, res) => {
   const roles = new Set(req.body.roles).intersection(new Set(["administrator", "teacher"]));
 
-  if (!roles || !Array.isArray(roles) || !roles.length) {
+  if (!roles || !roles.size) {
     res.status(400).json({
       code: "fields_required",
       message: "The roles field is required",
@@ -30,7 +30,7 @@ inviteRouter.post('/create', ensureAdmin, async (req, res) => {
   }
 
   const invite = (await db.query("CREATE ONLY invite SET author = $author, roles = $roles", 
-    { author: req.employee?.id, roles }))[0];
+    { author: req.employee?.id, roles: [...roles.keys()] }))[0];
 
   res.status(200).json({
     code: "success",
@@ -48,8 +48,9 @@ inviteRouter.post('/remove', ensureAdmin, async (req, res) => {
     });
     return;
   }
-
-  const invite = (await db.query(`DELETE ONLY type::thing($id);`, { id }))[0];
+  console.log(id);
+  
+  const invite = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
 
   res.status(200).json({
     code: "success",

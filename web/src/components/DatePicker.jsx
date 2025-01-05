@@ -20,7 +20,7 @@ export const DatePicker = ({numberOfMonths = 1, date, setDate, dateFormat = "PPP
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, dateFormat, {locale: hu}) : <span>Pick a date</span>}
+          {date ? format(date, dateFormat, {locale: hu}) : <span>Válassz egy dátumot</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

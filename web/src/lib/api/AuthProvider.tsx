@@ -20,18 +20,12 @@ const AuthContext = createContext<{
   authState: AuthState,
   loginEmailPassword: (email: string, password: string, remember: boolean) => Promise<void>,
   logout: () => Promise<void>,
-
-  //TODO: REMOVE THIS
-  bypassLogin: () => void,
 }>({
   user: null,
   token: null,
   authState: "loading",
   loginEmailPassword: async (email: string, password: string, remember: boolean) => {},
   logout: async () => {},
-
-  //TODO: REMOVE THIS
-  bypassLogin: () => {},
 })
 
 export function getTopRole(roles: string[] | Set<string>): string {
@@ -96,19 +90,6 @@ export function AuthProvider({children}) {
       setToken(null)
       setAuthState("no")
     },
-
-    // TODO: REMOVE THIS
-    bypassLogin: () => {
-      setUser({
-        id: "employee:bypassed",
-        created: new Date(),
-        name: "Bypassed User",
-        email: "bypassed@example.com",
-        roles: ["teacher", "administrator"],
-      })
-      setToken("bypassed")
-      setAuthState("yes")
-    }
   }
 
   return (

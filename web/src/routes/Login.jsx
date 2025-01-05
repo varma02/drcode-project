@@ -40,11 +40,6 @@ export default function LoginPage() {
     <form className="flex justify-center items-center min-h-screen"
     onSubmit={handleLogin}>
       <Card>
-
-        {/* TODO: REMOVE THIS */}
-        <input type="button" value="Temporarily bypass login (DEV ONLY)" className="p-2 bg-red-900 m-2 rounded cursor-pointer"
-        onClick={() => {auth.bypassLogin();navigate(redirectTo)}} />
-
         <CardHeader className="font-bold text-xl text-center">Bejelentkezés</CardHeader>
         <CardContent className="flex flex-col gap-4">
           <Input name="email" type="email" placeholder="Email" />

@@ -93,19 +93,19 @@ export const Home = () => {
       cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
     },
     {
-      displayName: "Jelenlét",
-      accessorKey: "status",
-      header: "Jelenlét",
-      cell: ({ row }) => (
-        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} />
-      ),
-    },
-    {
       displayName: "Osztály",
       accessorKey: "grade",
       header: "Osztály",
       cell: ({ row }) => (
         <div className="capitalize text-center">{row.getValue("grade")}</div>
+      ),
+    },
+    {
+      displayName: "Jelenlét",
+      accessorKey: "status",
+      header: "Jelenlét",
+      cell: ({ row }) => (
+        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} />
       ),
     },
   ]

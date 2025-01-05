@@ -471,3 +471,146 @@ Removes a location. Admin only.
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no location with the provided ID
+
+## Lesson management `/lesson`
+
+### Get a list of all lessons `GET /all`
+Gets a list of all lessons (without details).
+##### Response on success
+```
+{
+	code: "success",
+	message: "All lessons retrieved",
+	data: {
+		lessons: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+
+### Get all lessons between two dates `GET /between_detes`
+Retrives all lessons between the two dates provided (without details).
+##### Query parameters
+- `start`: Start ISO8601 datetime
+- `end`: End ISO8601 datetime
+##### Response on success
+```
+{
+	code: "success",
+	message: "Lessons retrieved",
+	data: {
+		lessons: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: At least one query parameter is required
+
+### Get a specific lesson `GET /:id`
+Retrives a lesson's data, including the specified details.
+##### Query parameters
+- `include`: Get more details on fields (list separated by commas, ex: field1,field2)
+	- `teachers`: expand the teachers field to include employee data
+	- `students_attended`: a list of students who attended the lesson
+	- `students_replaced`: a list of students who replaced another lesson with this one
+##### Response on success
+```
+{
+	code: "success",
+	message: "Lesson retrieved",
+	data: {
+		lesson: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no lesson with the provided ID
+
+### Create a lesson `POST /create`
+Creates a lesson. Admin only!
+##### Request body
+```
+{
+	start: "2025-01-01T15:10:00Z",
+	end: "2025-01-01T16:10:00Z",
+	
+	// the following are optional
+	
+	name: "Arany Hétfő 17:10",
+	location: "location:123",
+	teachers: ["teacher:123", "teacher:321"],
+	notes: "",
+	group: "group:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Group created",
+	data: {
+		group: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Update a lesson `POST /update`
+Updates a lesson. Admin only!
+##### Request body
+```
+{
+	id: "lesson:123"
+	
+	// the following are optional
+	
+	start: "2025-01-01T15:10:00Z",
+	end: "2025-01-01T16:10:00Z",
+	name: "Arany Hétfő 17:10",
+	location: "location:123",
+	teachers: ["teacher:123", "teacher:321"],
+	notes: "",
+	group: "group:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Lesson updated",
+	data: {
+		lesson: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+- `not_found`: there is no lesson with the provided ID
+
+### Remove a lesson `POST /remove`
+Removes a lesson. Admin only.
+##### Request body
+```
+{
+	id: "lesson:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Lesson removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no lesson with the provided ID

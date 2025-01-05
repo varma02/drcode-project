@@ -6,6 +6,7 @@ import authRouter from './routes/auth';
 import employeesRouter from './routes/employees';
 import groupsRouter from './routes/groups';
 import locationsRouter from './routes/location';
+import lessonRouter from './routes/lesson';
 
 export const app = express();
 
@@ -42,6 +43,7 @@ export async function setup(): Promise<string | null> {
   app.use('/employee', employeesRouter);
   app.use('/group', groupsRouter);
   app.use('/location', locationsRouter);
+  app.use('/lesson', lessonRouter);
   
   app.use((req, res, next) => {
     res.status(404).json({

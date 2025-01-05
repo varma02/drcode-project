@@ -135,7 +135,7 @@ groupsRouter.post('/remove', ensureAdmin, async (req, res) => {
   res.status(200).json({
     code: "success",
     message: "Group removed",
-    data: { location: group },
+    data: { group },
   });
 });
 

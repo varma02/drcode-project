@@ -62,7 +62,7 @@ DEFINE FIELD created ON TABLE location TYPE datetime DEFAULT time::now() READONL
 DEFINE FIELD name ON TABLE location TYPE option<string> ASSERT string::len($value) <= 256;
 DEFINE FIELD notes ON TABLE location TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD address ON TABLE location TYPE string ASSERT string::len($value) <= 256;
-DEFINE FIELD contact_email ON TABLE location TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD contact_email ON TABLE location TYPE string ASSERT string::is::email($value);
 DEFINE FIELD contact_phone ON TABLE location TYPE string ASSERT string::len($value) <= 48;
 
 
@@ -89,6 +89,7 @@ DEFINE TABLE lesson SCHEMAFULL CHANGEFEED 4w;
 DEFINE FIELD created ON TABLE lesson TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD group ON TABLE lesson TYPE option<record<group>>;
 DEFINE FIELD notes ON TABLE lesson TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
+DEFINE FIELD name ON TABLE lesson TYPE option<string> ASSERT string::len($value) <= 48;
 DEFINE FIELD location ON TABLE lesson TYPE option<record<location>>;
 DEFINE FIELD teachers ON TABLE lesson TYPE option<set<record<employee>>>;
 DEFINE FIELD start ON TABLE lesson TYPE datetime;

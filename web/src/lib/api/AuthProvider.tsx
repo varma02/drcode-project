@@ -28,13 +28,6 @@ const AuthContext = createContext<{
   logout: async () => {},
 })
 
-export function getTopRole(roles: string[] | Set<string>): string {
-  roles = new Set(roles)
-  if (roles.has("administrator")) return "Admin"
-  if (roles.has("teacher")) return "Tanár"
-  return "Unknown Role"
-}
-
 export function AuthProvider({children}) {
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(null)

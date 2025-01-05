@@ -14,8 +14,9 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { Link } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { getTopRole, useAuth } from "@/lib/api/AuthProvider"
+import { useAuth } from "@/lib/api/AuthProvider"
 import { toast } from "sonner"
+import { getMonogram, getTopRole } from "@/lib/utils"
 
 
 export function AppSidebar() {
@@ -85,7 +86,7 @@ export function AppSidebar() {
               <div className="flex justify-center items-center gap-2">
                 <Avatar>
                   <AvatarImage src="https://uploads.dailydot.com/2024/07/wet-owl-1.jpg?auto=compress&fm=pjpg" />
-                  <AvatarFallback>{auth.user.name.split(" ").slice(0, 2).map(v => v[0]).join("")}</AvatarFallback>
+                  <AvatarFallback>{getMonogram(auth.user.name)}</AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-bold text-left">{auth.user.name.length > 14 ? auth.user.name.slice(0, 12) + "..." : auth.user.name}</p>

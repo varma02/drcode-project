@@ -13,8 +13,13 @@ The response is always in JSON format, like this:
 ```
 
 # Contents
-[Data Models](#data-models)
-
+- [Data Models](#data-models)
+- [Authentication & Profile management](#authentication--profile-management-auth)
+- [Employee management](#employee-management-employee)
+- [Group management](#group-management-group)
+- [Location management](#location-management-location)
+- [Lesson management](#lesson-management-lesson)
+- [Event management](#event-management-event)
 
 ## Data models
 TODO: rewrite this section
@@ -167,7 +172,7 @@ Gets a list of all employees (without details). Admin only.
 - `not_found`: there is no employee with the provided ID
 
 ### Get a specific employee `GET /:id`
-Retrives an employee's data, including the specified details.
+Retrieves an employee's data, including the specified details.
 ##### Query parameters (Admin only)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `unpaid_work`: all the logged work for the given employee that hasn't been paid
@@ -253,7 +258,7 @@ Gets a list of all groups (without details).
 - `unauthorized`: the user is not authorized to complete this action
 
 ### Get a specific group `GET /:id`
-Retrives a group's data, including the specified details.
+Retrieves a group's data, including the specified details.
 ##### Query parameters
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `teachers`: expand the teachers field to include employee data
@@ -376,7 +381,7 @@ Gets a list of all locations.
 - `unauthorized`: the user is not authorized to complete this action
 
 ### Get a specific location `GET /:id`
-Retrives a location's data.
+Retrieves a location's data.
 ##### Response on success
 ```
 {
@@ -490,7 +495,7 @@ Gets a list of all lessons (without details).
 - `unauthorized`: the user is not authorized to complete this action
 
 ### Get all lessons between two dates `GET /between_detes`
-Retrives all lessons between the two dates provided (without details).
+Retrieves all lessons between the two dates provided (without details).
 ##### Query parameters
 - `start`: Start ISO8601 datetime
 - `end`: End ISO8601 datetime
@@ -509,7 +514,7 @@ Retrives all lessons between the two dates provided (without details).
 - `fields_required`: At least one query parameter is required
 
 ### Get a specific lesson `GET /:id`
-Retrives a lesson's data, including the specified details.
+Retrieves a lesson's data, including the specified details.
 ##### Query parameters
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `teachers`: expand the teachers field to include employee data
@@ -614,3 +619,143 @@ Removes a lesson. Admin only.
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no lesson with the provided ID
+
+## Event management `/event`
+
+### Get a list of all event `GET /all`
+Gets a list of all event (without details).
+##### Response on success
+```
+{
+	code: "success",
+	message: "All events retrieved",
+	data: {
+		events: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+
+### Get all events between two dates `GET /between_detes`
+Retrives all events between the two dates provided (without details).
+##### Query parameters
+- `start`: Start ISO8601 datetime
+- `end`: End ISO8601 datetime
+##### Response on success
+```
+{
+	code: "success",
+	message: "Lessons retrieved",
+	data: {
+		lessons: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: At least one query parameter is required
+
+### Get a specific event `GET /:id`
+Retrieves a event's data, including the specified details.
+##### Query parameters
+- `include`: Get more details on fields (list separated by commas, ex: field1,field2)
+	- `signups`: all employees that signed up for this event
+	- `author`: the employee that created the event
+##### Response on success
+```
+{
+	code: "success",
+	message: "Event retrieved",
+	data: {
+		Event: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no event with the provided ID
+
+### Create an event `POST /create`
+Creates a event. Admin only!
+##### Request body
+```
+{
+	name: "Nagykőrös toborzás",
+	start: "2025-01-01T10:00:00Z",
+	end: "2025-01-01T15:00:00Z",
+	
+	// the following are optional
+	
+	location: "location:123",
+	signup_limit: 1,
+	notes: "",
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Event created",
+	data: {
+		event: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Update a event `POST /update`
+Updates a event. Admin only!
+##### Request body
+```
+{
+	id: "event:123"
+	
+	// the following are optional
+	
+	start: "2025-01-01T15:10:00Z",
+	end: "2025-01-01T16:10:00Z",
+	name: "Arany Hétfő 17:10",
+	location: "location:123",
+	signup_limit: 1,
+	notes: "Lorem ipsum dolor..."
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Event updated",
+	data: {
+		event: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+- `not_found`: there is no event with the provided ID
+
+### Remove a event `POST /remove`
+Removes a event. Admin only.
+##### Request body
+```
+{
+	id: "event:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Event removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no event with the provided ID

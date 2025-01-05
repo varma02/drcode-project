@@ -27,6 +27,7 @@ DEFINE TABLE event SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE event TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD author ON TABLE event TYPE record<employee> READONLY;
+DEFINE FIELD location ON TABLE event TYPE option<record<location>>;
 DEFINE FIELD name ON TABLE event TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD notes ON TABLE event TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD signups ON TABLE event TYPE set<record<employee>> DEFAULT [] ASSERT array::len($value) <= signup_limit;

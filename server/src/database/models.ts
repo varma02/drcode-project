@@ -29,6 +29,7 @@ export interface Event {
   id: string,
   created: Date,
   author: string | Employee,
+  location?: string | Location,
   name: string,
   notes: string,
   signups: string[] | Employee[],
@@ -91,7 +92,9 @@ export interface RelationEnroled {
 export interface Lesson {
   id: string,
   created: Date,
+  name?: string
   group?: string | Group,
+  location?: string | Location,
   notes: string,
   teachers?: string[] | Employee[],
   start: Date,

@@ -40,7 +40,7 @@ DEFINE TABLE subject SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE subject TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE subject TYPE string ASSERT string::len($value) <= 48;
-DEFINE FIELD description ON TABLE subject TYPE option<string> ASSERT string::len($value) <= 2048;
+DEFINE FIELD notes ON TABLE subject TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 
 
 DEFINE TABLE student SCHEMAFULL CHANGEFEED 4w;

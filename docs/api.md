@@ -20,6 +20,7 @@ The response is always in JSON format, like this:
 - [Location management](#location-management-location)
 - [Lesson management](#lesson-management-lesson)
 - [Event management](#event-management-event)
+- [Subject management](#subject-management-subject)
 
 ## Data models
 TODO: rewrite this section
@@ -759,3 +760,112 @@ Removes a event. Admin only.
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no event with the provided ID
+
+## Subject management `/subject`
+
+### Get a list of all subject `GET /all`
+Gets a list of all subjects.
+##### Response on success
+```
+{
+	code: "success",
+	message: "All subjects retrieved",
+	data: {
+		subjects: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+
+### Get a specific subject `GET /:id`
+Retrieves a subject's data.
+##### Response on success
+```
+{
+	code: "success",
+	message: "Subject retrieved",
+	data: {
+		subject: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no subject with the provided ID
+
+### Create an subject `POST /create`
+Creates a subject. Admin only!
+##### Request body
+```
+{
+	name: "Scratch",
+
+	// the following is optional
+
+	notes: "",
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Subject created",
+	data: {
+		subject: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Update a subject `POST /update`
+Updates a subject. Admin only!
+##### Request body
+```
+{
+	id: "subject:123"
+	
+	// the following are optional
+	
+	name: "Kodular",
+	notes: "Lorem ipsum dolor..."
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Subject updated",
+	data: {
+		subject: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+- `not_found`: there is no subject with the provided ID
+
+### Remove a subject `POST /remove`
+Removes a subject. Admin only.
+##### Request body
+```
+{
+	id: "subject:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Subject removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no subject with the provided ID

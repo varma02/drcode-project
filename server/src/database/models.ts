@@ -42,7 +42,7 @@ export interface Subject {
   id: string,
   created: Date,
   name: string,
-  description: string,
+  notes: string,
 }
 
 export interface Student {

@@ -46,8 +46,7 @@ export const AddCalendarGroup = () => {
     const formData = new FormData(event.target)
     console.log(formData)
     const lessons = generateLessons(formData.get("startDate"), formData.get("lessonNum"), formData.get("startTime"), formData.get("endTime"))
-    const name = "name"
-    createGroup(auth.token, name, formData.get("location"), formData.get("employees").split(","), formData.get("note"), lessons).then(
+    createGroup(auth.token, formData.get("name"), formData.get("location"), formData.get("employees").split(","), formData.get("note"), lessons).then(
       () => { 
         toast.success("Csoport sikeresen létrehozva!")
       },
@@ -70,7 +69,10 @@ export const AddCalendarGroup = () => {
       <Link to={"/calendar"} className='absolute top-0 left-0'><Button variant="outline"><ArrowLeft /></Button></Link>
       <div className='max-w-screen-lg w-full flex flex-col justify-center gap-4'>
         <h2 className='text-center mb-4'>Csoport Hozzáadása</h2>
-        <Combobox data={locations} displayName={"name"} placeholder='Válassz Lokációt...' value={location} setValue={setLocation} className={"w-full"} name="location" />
+        <div className='flex gap-4'>
+          <Input type="text" placeholder="Név" name="name" />
+          <Combobox data={locations} displayName={"name"} placeholder='Válassz Lokációt...' value={location} setValue={setLocation} className={"w-full"} name="location" />
+        </div>
         <GroupComboBox data={employees} displayName={"name"} placeholder='Válassz Oktatót...' title={"Oktatók"} className={"w-full"} name="employees" />
         <Textarea placeholder="Megjegyzés..." name="note" />
         <div className='flex justify-between'>

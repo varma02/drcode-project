@@ -26,6 +26,13 @@ async function _apply_migrations(start: number, force: boolean = false): Promise
   return true;
 }
 
+async function apply_seed() {
+  console.log("Seeding database...");
+  const seed = fs.readFileSync(path.join(__dirname, './seed.surql'), 'utf-8');
+  await db.query(seed);
+  console.log("Seed data applied.");
+}
+
 async function reset() {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -58,13 +65,7 @@ async function reset() {
     return;
   }
 
-  if (await _apply_migrations(0, true)) {
-    
-    console.log("Seeding database...");
-    const seed = fs.readFileSync(path.join(__dirname, './seed.surql'), 'utf-8');
-    await db.query(seed);
-    console.log("Seed data applied.");
-  }
+  return await _apply_migrations(0, true)
 }
 
 async function migrate() {
@@ -115,6 +116,7 @@ async function main() {
   switch (command) {
     case 'reset':
       await reset();
+      if (!args.includes('--no-seed')) await apply_seed();
       break;
     case 'migrate':
       await migrate();

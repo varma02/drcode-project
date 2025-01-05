@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table"
 import { ScrollArea } from "./ui/scroll-area"
 
-export default function DataTable({ columns, data, hasFooter = false, className }) {
+export default function DataTable({ columns, data, hasFooter = false, className, headerAfter }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState(
     []
@@ -93,6 +93,7 @@ export default function DataTable({ columns, data, hasFooter = false, className 
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        {headerAfter}
       </div>
       <div className="rounded-md border">
         <Table>

@@ -4,11 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { getAllEmployees } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, Delete, Plus, Trash } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 
 export const Employee = () => {
@@ -60,7 +61,8 @@ export const Employee = () => {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             {column.columnDef.displayName}
-            <ArrowUpDown />
+            {!column.getIsSorted() ? <ArrowUpDown /> 
+            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
           </Button>
         )
       },
@@ -82,7 +84,8 @@ export const Employee = () => {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             {column.columnDef.displayName}
-            <ArrowUpDown />
+            {!column.getIsSorted() ? <ArrowUpDown /> 
+            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
           </Button>
         )
       },
@@ -107,10 +110,13 @@ export const Employee = () => {
   ]
   
   return (
-    <div>
-      {
-        <DataTable data={employees} columns={columns} />
-      }
+    <div className='max-w-screen-xl mx-auto'>
+      <h1 className='text-4xl py-4'>Alkalmazottak</h1>
+      <DataTable data={employees} columns={columns}
+      headerAfter={<div className='flex gap-4 pl-4'>
+        <Button variant="outline" className="hover:bg-destructive"><Trash /> Törlés</Button>
+        <Button variant="outline"><Plus />Meghívás</Button>
+      </div>} />
     </div>
   )
 }

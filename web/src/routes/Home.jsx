@@ -8,7 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { ToggleButton } from '@/components/ToggleButton'
 import { Textarea } from '@/components/ui/textarea'
 
-export const Home = () => {
+export default function Home() {
 
   const courses = [
     "LEGO WeDo 2.0 két féléves",
@@ -135,20 +135,22 @@ export const Home = () => {
   ]
 
   return (
-    <div className='flex flex-col md:grid grid-cols-2 h-full grid-rows-3 gap-4 overflow-y-hidden'>
+    <div className='flex flex-col md:grid grid-cols-2 grid-rows-3 gap-4 p-4 md:h-screen w-full'>
       <div className='bg-primary-foreground rounded-xl p-4 row-span-3 h-full'>
         <h2 className='md:text-left text-center mb-4'>Következő óra</h2>
         <div className='flex gap-4 w-full h-full flex-col'>
-          <Card className="w-full h-36 flex">
-            <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center w-32 p-4 pr-0' />
+          <Card className="w-full md:h-36 flex md:flex-row flex-col">
+            <div className='p-4 pr-0 md:self-auto self-center md:w-32 w-20'>
+              <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center' />
+            </div>
             <div className='flex flex-col'>
-              <CardHeader className="pb-4">
+              <CardHeader className="pb-4 md:pt-6 pt-0">
                 <div className="flex items-center gap-4">
-                  <p className='font-bold text-xl'>Scratch haladó, Lego WeDo 2.0</p>
+                  <p className='font-bold text-xl text-wrap'>Scratch haladó, Lego WeDo 2.0</p>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className='flex gap-6'>
+                <div className='flex gap-6 flex-wrap'>
                   <span className='flex gap-2 items-center opacity-75'>
                     <MapPin width={22} />
                     <p className='font-bold'>
@@ -168,7 +170,7 @@ export const Home = () => {
                 </div>
               </CardContent>
             </div>
-            <Button className="m-4 ml-auto h-28 aspect-square flex flex-col gap-4" variant="outline">
+            <Button className="m-4 md:ml-auto md:h-28 md:aspect-square flex md:flex-col gap-4" variant="outline">
               <Play />
               Kezdés
             </Button>

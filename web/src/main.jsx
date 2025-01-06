@@ -3,39 +3,39 @@ import { createBrowserRouter, Outlet, RouterProvider, useHref, useNavigate } fro
 import { lazy, Suspense, useEffect } from 'react'
 import { LoaderCircle } from 'lucide-react'
 
-import './index.css'
+import '@/index.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
-import { Home } from './routes/Home'
-import { CalendarPage } from './routes/CalendarPage'
-import { Search } from './routes/Search'
-import { Settings } from './routes/Settings'
-import { Inbox } from './routes/Inbox'
-import { AuthProvider, useAuth } from './lib/api/AuthProvider'
+import { AuthProvider, useAuth } from '@/lib/api/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
-import { Employee } from './routes/Employee'
-import { AddCalendarGroup } from './routes/AddCalendarGroup'
-import { AddCalendarEvent } from './routes/AddCalendarEvent'
 
+const Home = lazy(() => import('@/routes/Home'))
+const Search = lazy(() => import('@/routes/Search'))
+const CalendarPage = lazy(() => import('@/routes/CalendarPage'))
+const Settings = lazy(() => import('@/routes/Settings'))
+const Inbox = lazy(() => import('@/routes/Inbox'))
+const Employee = lazy(() => import('@/routes/Employee'))
+const AddCalendarGroup = lazy(() => import('@/routes/AddCalendarGroup'))
+const AddCalendarEvent = lazy(() => import('@/routes/AddCalendarEvent'))
 const LoginPage = lazy(() => import('@/routes/Login'))
 
 function SidebarWrapper() {
   const navigate = useNavigate();
   const href = useHref();
   const { authState } = useAuth();
+  
   useEffect(() => {
     if (authState === 'no') {
       navigate("/login?redirect=" + encodeURIComponent(href))
     }
   }, [authState])
+
   return authState === 'yes' ? (
     <SidebarProvider>
-      <SidebarTrigger className="absolute p-4" />
+      <SidebarTrigger className="fixed top-0 p-4" />
       <AppSidebar />
-      <div className='p-4 max-h-screen h-screen w-full'>
-        <Outlet />
-      </div>
+      <Outlet />
     </SidebarProvider>
   ) : (
     <div className='fixed left-0 top-0 h-screen w-full bg-background flex items-center justify-center'>
@@ -61,6 +61,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
     element: <LoginPage />,
   }
 ])

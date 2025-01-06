@@ -12,7 +12,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { toast } from "sonner"
@@ -20,6 +20,7 @@ import { getMonogram, getTopRole } from "@/lib/utils"
 
 
 export function AppSidebar() {
+  const navigate = useNavigate();
   const auth = useAuth();
 
   const items = {
@@ -97,7 +98,7 @@ export function AppSidebar() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate("/settings")}>
               <Settings /> Beállítások
             </DropdownMenuItem>
             <hr />

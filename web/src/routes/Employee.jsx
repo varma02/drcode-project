@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
-export const Employee = () => {
+export default function Employee() {
   const auth = useAuth();
 
   const [employees, setEmployees] = useState([])
@@ -154,7 +154,7 @@ export const Employee = () => {
   }
 
   return (
-    <div className='max-w-screen-xl mx-auto'>
+    <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Alkalmazottak</h1>
 
       {invites.length > 0 && (<>

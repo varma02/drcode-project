@@ -13,7 +13,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
-export const AddCalendarGroup = () => {
+export default function AddCalendarGroup() {
   const auth = useAuth()
 
   const [employees, setEmployees] = useState([])

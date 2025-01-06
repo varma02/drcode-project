@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/api/AuthProvider';
 import { Pen } from 'lucide-react'
 import React, { useState } from 'react'
 
-export const Settings = () => {
+export default function Settings() {
   const auth = useAuth()
 
   const [formData, setFormData] = useState({

@@ -7,7 +7,7 @@ import { Plus } from 'lucide-react'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-export const CalendarPage = () => {
+export default function CalendarPage() {
 
   const days = "Hétfő Kedd Szerda Csütörtök Péntek Szombat Vasárnap".split(" ")
 
@@ -46,7 +46,7 @@ export const CalendarPage = () => {
   const [date, setDate] = useState(new Date())
   
   return (
-    <div className='flex items-center flex-col gap-2'>
+    <div className='flex items-center flex-col gap-2 m-4'>
       <div className='flex gap-2'>
         <DatePicker date={date} setDate={setDate} required />
         <Popover>

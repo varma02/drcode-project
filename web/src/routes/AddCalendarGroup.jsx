@@ -65,7 +65,7 @@ export default function AddCalendarGroup() {
   }
 
   return (
-    <form className='relative flex justify-center' onSubmit={handleSubmit}>
+    <form className='relative flex justify-center p-4 w-full' onSubmit={handleSubmit}>
       <Link to={"/calendar"} className='absolute top-0 left-0'><Button variant="outline"><ArrowLeft /></Button></Link>
       <div className='max-w-screen-lg w-full flex flex-col justify-center gap-4'>
         <h2 className='text-center mb-4'>Csoport Hozzáadása</h2>

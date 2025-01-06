@@ -34,11 +34,13 @@ export async function createInvite(token: string, roles: string[]) {
 }
 
 export async function removeInvite(token: string, id: string) {
-  console.log(id);
-  
   return (await axios.post(API_URL + "/invite/remove", { id }, {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
 }
 
 export async function getAllInvites(token: string) {
   return (await axios.get(API_URL + "/invite/all", {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
+}
+
+export async function register(invite_id: string, name: string, email:string, password:string) {
+  return (await axios.post(API_URL + "/auth/register", { invite_id, name, email, password }, {timeout: 2000})).data;
 }

@@ -19,6 +19,7 @@ const Employee = lazy(() => import('@/routes/Employee'))
 const AddCalendarGroup = lazy(() => import('@/routes/AddCalendarGroup'))
 const AddCalendarEvent = lazy(() => import('@/routes/AddCalendarEvent'))
 const LoginPage = lazy(() => import('@/routes/Login'))
+const RegisterPage = lazy(() => import('@/routes/Register'))
 
 function SidebarWrapper() {
   const navigate = useNavigate();
@@ -65,7 +66,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/register",
-    element: <LoginPage />,
+    element: <RegisterPage />,
   }
 ])
 

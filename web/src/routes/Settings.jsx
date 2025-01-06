@@ -32,7 +32,7 @@ export default function Settings() {
   
 
   return (
-    <div className='flex flex-col items-center'>
+    <div className='flex flex-col items-center w-full p-4'>
       <h2 className='text-xl font-bold mb-4'>Beállíások</h2>
       <div className='max-w-[600px] w-[600px] bg-[#18181b] rounded-xl'>
         <div className={`${auth.user.roles.includes("administrator") ? "bg-red-500" : "bg-green-500"} px-4 py-2 rounded-t-xl relative h-20`}></div>

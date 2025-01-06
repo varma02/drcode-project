@@ -90,8 +90,8 @@ userRouter.post('/register', async (req, res) => {
       };
       COMMIT TRANSACTION;
       `, { name, email, password, invite_id }))[0];
-  
-    if (!employee || !employee.id?.startsWith("employee:")) {
+    
+    if (!employee || !employee.id || !employee.name) {
       throw new Error("No employee");
     }
   
@@ -102,7 +102,7 @@ userRouter.post('/register', async (req, res) => {
       message: 'Employee registered',
     });
 
-  } catch {
+  } catch (e) {
     res.status(400).json({
       code: "invalid_invite",
       message: "The invite is invalid or has already been used",

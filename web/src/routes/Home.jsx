@@ -139,7 +139,7 @@ export default function Home() {
       <div className='bg-primary-foreground rounded-xl p-4 row-span-3 h-full'>
         <h2 className='md:text-left text-center mb-4'>Következő óra</h2>
         <div className='flex gap-4 w-full h-full flex-col'>
-          <Card className="w-full md:h-36 flex md:flex-row flex-col">
+          <Card className="w-full  flex md:flex-row flex-col">
             <div className='p-4 pr-0 md:self-auto self-center md:w-32 w-20'>
               <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center' />
             </div>
@@ -160,12 +160,16 @@ export default function Home() {
                     </p>
                   </span>
                   <span className='flex gap-2 items-center opacity-75'>
-                    <User2 width={22} />
-                    <p className='font-bold'>6</p>
+                    <Clock width={22} />
+                    <p className='font-bold'>
+                      16:00 - 17:00
+                      <br />
+                      <span className="opacity-50">2025.01.10.</span>
+                    </p>
                   </span>
                   <span className='flex gap-2 items-center opacity-75'>
-                    <Clock width={22} />
-                    <p className='font-bold'>16:00 - 17:00</p>
+                    <User2 width={22} />
+                    <p className='font-bold'>6</p>
                   </span>
                 </div>
               </CardContent>

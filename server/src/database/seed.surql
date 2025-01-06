@@ -37,12 +37,12 @@ $mano = CREATE ONLY employee CONTENT {
 
 $scratch = CREATE ONLY subject CONTENT {
   name: "Scratch kezdő",
-  description: "Legózás után első lépés a programozás felé"
+  notes: "Legózás után első lépés a programozás felé"
 };
 
 $kodular = CREATE ONLY subject CONTENT {
   name: "Kodular",
-  description: "Scratch-nél nehezebb, telefonos alkalmazás fejlesztés"
+  notes: "Scratch-nél nehezebb, telefonos alkalmazás fejlesztés"
 };
 
 $elek = CREATE ONLY student CONTENT {

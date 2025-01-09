@@ -9,6 +9,8 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
 import { AuthProvider, useAuth } from '@/lib/api/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
+import { CommandMenu } from './components/CommandMenu'
+import { Groups } from './routes/Groups'
 
 const Home = lazy(() => import('@/routes/Home'))
 const Search = lazy(() => import('@/routes/Search'))
@@ -37,6 +39,7 @@ function SidebarWrapper() {
       <SidebarTrigger className="fixed top-0 p-4" />
       <AppSidebar />
       <Outlet />
+      <CommandMenu />
     </SidebarProvider>
   ) : (
     <div className='fixed left-0 top-0 h-screen w-full bg-background flex items-center justify-center'>
@@ -58,6 +61,7 @@ const router = createBrowserRouter([
       {path: "/employee", element: <Employee />},
       {path: "/calendar/add/group", element: <AddCalendarGroup />},
       {path: "/calendar/add/event", element: <AddCalendarEvent />},
+      {path: "/groups", element: <Groups />},
     ]
   },
   {

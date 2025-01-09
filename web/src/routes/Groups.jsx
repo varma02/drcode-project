@@ -22,7 +22,7 @@ export const Groups = () => {
           <Card className="w-full" key={e.id}>
             <CardHeader>{e.name}</CardHeader>
             <CardContent>
-              {e.teachers.map(t => <p>{t}</p>)}
+              {e.teachers.map(t => <p key={t}>{t}</p>)}
             </CardContent>
             <CardFooter>
               {e.created}

@@ -55,6 +55,7 @@ export default function Employee() {
   const columns = [
     {
       id: "select",
+      ignoreClickEvent: true,
       header: ({ table }) => (
         <Checkbox
           checked={

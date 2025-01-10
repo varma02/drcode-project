@@ -138,7 +138,7 @@ export default function Home() {
     <div className='flex flex-col md:grid grid-cols-2 grid-rows-3 gap-4 p-4 md:h-screen w-full'>
       <div className='bg-primary-foreground rounded-xl p-4 row-span-3 h-full'>
         <h2 className='md:text-left text-center mb-4'>Következő óra</h2>
-        <div className='flex gap-4 w-full h-full flex-col'>
+        <div className='flex gap-4 flex-1 flex-col'>
           <Card className="w-full  flex md:flex-row flex-col">
             <div className='p-4 pr-0 md:self-auto self-center md:w-32 w-20'>
               <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center' />

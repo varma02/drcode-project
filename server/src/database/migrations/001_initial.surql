@@ -115,8 +115,8 @@ DEFINE TABLE worked_at SCHEMAFULL TYPE RELATION IN employee OUT lesson | event C
 DEFINE FIELD created ON TABLE worked_at TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD paid ON TABLE worked_at TYPE bool DEFAULT false;
 DEFINE FIELD notes ON TABLE worked_at TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
-DEFINE FIELD start ON TABLE worked_at TYPE option<datetime>;
-DEFINE FIELD end ON TABLE worked_at TYPE option<datetime>;
+DEFINE FIELD start ON TABLE worked_at TYPE datetime DEFAULT out.start;
+DEFINE FIELD end ON TABLE worked_at TYPE datetime DEFAULT out.end;
 
 
 -- DEFINE TABLE announcement SCHEMAFULL CHANGEFEED 4w;

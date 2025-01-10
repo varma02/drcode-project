@@ -33,9 +33,9 @@ employeesRouter.get('/:id', async (req, res) => {
       RETURN {
         employee: (SELECT * OMIT password, session_key FROM ONLY type::thing($employee)),
         ${include.has("unpaid_work") ?
-        "unpaid_work: (SELECT ->worked_at[WHERE ! paid].* as _ FROM ONLY type::thing($employee))._," : ""}
+        "unpaid_work: (SELECT ->worked_at[WHERE ! paid].* as _ FROM ONLY type::thing($employee) FETCH _.out)._," : ""}
         ${include.has("groups") ?
-        "groups: (SELECT * FROM group WHERE $employee IN teachers)," : ""}
+        "groups: (SELECT * FROM group WHERE type::thing($employee) IN teachers)," : ""}
       }`, { employee: req.params.id }))[0];
   
     if (!dbResponse.employee || !dbResponse.employee.name) {

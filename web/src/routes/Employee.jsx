@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { createInvite, getAllEmployees, getAllInvites, removeInvite } from '@/lib/api/api';
+import { createInvite, getAllEmployees, getAllInvites, getEmployeeWithDetails, removeInvite } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { format, set } from 'date-fns';
 import { hu } from 'date-fns/locale';
@@ -18,9 +18,29 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Outlet, useHref, useNavigate, useParams } from 'react-router-dom';
 
 export default function Employee() {
   const auth = useAuth();
+
+  const { id:selectedEmployeeId } = useParams();
+  const navigate = useNavigate();
+  const [outletDialogOpen, setOutletDialogOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  useEffect(() => {
+    if (selectedEmployeeId) {
+      getEmployeeWithDetails(auth.token, "employee:"+selectedEmployeeId, ["unpaid_work", "classes"])
+      .then(v => setSelectedEmployee(v.data.employee))
+      .catch(e => {
+        console.error(e);
+        navigate("/employee");
+        toast.error("Hiba történt az alkalmazott lekérdezése közben");
+      });
+      setOutletDialogOpen(true);
+    } else {
+      setOutletDialogOpen(false);
+    }
+  }, [selectedEmployeeId]);
 
   const [employees, setEmployees] = useState([])
 
@@ -176,7 +196,7 @@ export default function Employee() {
         </ScrollArea>
       </>)}
 
-      <DataTable data={employees} columns={columns}
+      <DataTable data={employees} columns={columns} rowOnClick={(v)=>navigate(`/employee/${v.original.id.replace("employee:", "")}`)}
       headerAfter={<div className='flex gap-4 pl-4'>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -239,6 +259,33 @@ export default function Employee() {
           </DialogContent>
         </Dialog>
       </div>} />
+
+      <Dialog open={outletDialogOpen} onOpenChange={(v) => {setOutletDialogOpen(v); if(!v) navigate("/employee")}}>
+        <DialogContent>
+          {selectedEmployee ? (
+            <DialogHeader>
+              <DialogTitle>Alkalmazott részletei</DialogTitle>
+              <DialogDescription className='flex gap-4 items-center pt-4'>
+                <Avatar>
+                  <AvatarImage src="https://uploads.dailydot.com/2024/07/wet-owl-1.jpg?auto=compress&fm=pjpg" />
+                  <AvatarFallback>{getMonogram(selectedEmployee.name)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className='font-bold'>{selectedEmployee.name}</p>
+                  <p className='text-sm opacity-70'>{getTopRole(selectedEmployee.roles)}</p>
+                </div>
+                <p className='ml-auto text-sm opacity-70 text-center'>
+                  <span>Regisztrált:</span>
+                  <br />
+                  {format(selectedEmployee.created, "P p", {locale: hu})}
+                </p>
+              </DialogDescription>
+            </DialogHeader>
+            // TODO: Add groups and unpaid work
+          ) : <LoaderCircle className='animate-spin ' />}
+        </DialogContent>
+      </Dialog>
+
     </div>
   )
 }

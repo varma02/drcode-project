@@ -9,6 +9,10 @@ export async function getEmployee(token: string, id: string) {
   return (await axios.get(API_URL + "/employee/"+id, {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
 }
 
+export async function getEmployeeWithDetails(token: string, id: string, details: string[]) {
+  return (await axios.get(API_URL + "/employee/"+id+"?include="+details.join(","), {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
+}
+
 export async function getAllGroups(token: string) {
   return (await axios.get(API_URL + "/group/all", {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
 }

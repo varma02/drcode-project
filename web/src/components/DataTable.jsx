@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table"
 import { ScrollArea } from "./ui/scroll-area"
 
-export default function DataTable({ columns, data, hasFooter = false, className, headerAfter }) {
+export default function DataTable({ columns, data, hasFooter = false, className, headerAfter, rowOnClick }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState(
     []
@@ -121,6 +121,7 @@ export default function DataTable({ columns, data, hasFooter = false, className,
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    className={rowOnClick && "cursor-pointer select-none"} onClick={() => rowOnClick(row)}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

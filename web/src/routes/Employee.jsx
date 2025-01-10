@@ -7,7 +7,7 @@ import { createInvite, getAllEmployees, getAllInvites, getEmployeeWithDetails, r
 import { useAuth } from '@/lib/api/AuthProvider';
 import { format, set } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { ArrowDown, ArrowUp, ArrowUpDown, Copy, LoaderCircle, Plus, SquareArrowOutUpRight, Trash } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Copy, ExternalLink, LoaderCircle, Plus, SquareArrowOutUpRight, Trash } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -18,7 +18,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Outlet, useHref, useNavigate, useParams } from 'react-router-dom';
+import { Link, Outlet, useHref, useNavigate, useParams } from 'react-router-dom';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function Employee() {
   const auth = useAuth();
@@ -29,8 +31,8 @@ export default function Employee() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   useEffect(() => {
     if (selectedEmployeeId) {
-      getEmployeeWithDetails(auth.token, "employee:"+selectedEmployeeId, ["unpaid_work", "classes"])
-      .then(v => setSelectedEmployee(v.data.employee))
+      getEmployeeWithDetails(auth.token, "employee:"+selectedEmployeeId, ["unpaid_work", "groups"])
+      .then(v => setSelectedEmployee(v.data))
       .catch(e => {
         console.error(e);
         navigate("/employee");
@@ -262,28 +264,72 @@ export default function Employee() {
       </div>} />
 
       <Dialog open={outletDialogOpen} onOpenChange={(v) => {setOutletDialogOpen(v); if(!v) navigate("/employee")}}>
-        <DialogContent>
-          {selectedEmployee ? (
+        <DialogContent className="flex flex-col gap-4 max-w-xl">
+          {selectedEmployee ? (<>
             <DialogHeader>
               <DialogTitle>Alkalmazott részletei</DialogTitle>
-              <DialogDescription className='flex gap-4 items-center pt-4'>
+              <div className='flex gap-4 items-center pt-4'>
                 <Avatar>
                   <AvatarImage src="https://uploads.dailydot.com/2024/07/wet-owl-1.jpg?auto=compress&fm=pjpg" />
-                  <AvatarFallback>{getMonogram(selectedEmployee.name)}</AvatarFallback>
+                  <AvatarFallback>{getMonogram(selectedEmployee.employee.name)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className='font-bold'>{selectedEmployee.name}</p>
-                  <p className='text-sm opacity-70'>{getTopRole(selectedEmployee.roles)}</p>
+                  <DialogDescription className='font-bold text-foreground'>{selectedEmployee.employee.name}</DialogDescription>
+                  <p className='text-sm opacity-70'>{selectedEmployee.employee.roles.map((v) => role_map[v]).join(", ")}</p>
                 </div>
                 <p className='ml-auto text-sm opacity-70 text-center'>
                   <span>Regisztrált:</span>
                   <br />
-                  {format(selectedEmployee.created, "P p", {locale: hu})}
+                  {format(selectedEmployee.employee.created, "P p", {locale: hu})}
                 </p>
-              </DialogDescription>
+              </div>
             </DialogHeader>
-            // TODO: Add groups and unpaid work
-          ) : <LoaderCircle className='animate-spin ' />}
+            {selectedEmployee.groups.length > 0 && (
+              <div className='flex flex-wrap gap-4'>
+                <Separator />
+                <h4 className="w-full font-bold">Csoportok</h4>
+                {selectedEmployee.groups.map((v) => (
+                  <Button variant="outline" key={v.id} asChild>
+                    <Link to={`/groups/${v.id.replace("group:", "")}`}>{v.name} <SquareArrowOutUpRight /></Link>
+                  </Button>
+                ))}
+              </div>
+            )}
+            {selectedEmployee.unpaid_work.length > 0 && (
+              <div className='flex flex-wrap gap-4'>
+                <Separator />
+                <h4 className="w-full font-bold">Jelenlét</h4>
+                <ScrollArea className="max-h-96">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-background">
+                      <TableRow>
+                        <TableHead>Dátum</TableHead>
+                        <TableHead>Érkezés</TableHead>
+                        <TableHead>Távozás</TableHead>
+                        <TableHead>Munkaidő</TableHead>
+                        <TableHead>Megjegyzés</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedEmployee.unpaid_work.map((v) => (
+                        <TableRow key={v.id}>
+                          <TableCell>{format(new Date(v.start), "PPP", {locale: hu})}</TableCell>
+                          <TableCell>{format(new Date(v.start), "p", {locale: hu})}</TableCell>
+                          <TableCell>{format(new Date(v.end), "p", {locale: hu})}</TableCell>
+                          <TableCell>{(new Date(v.end) - new Date(v.start)) / 1000 / 60 / 60} óra</TableCell>
+                          <TableCell>{v.notes}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              </div>
+            )}
+          </>) : (
+            <DialogTitle>
+              <LoaderCircle className='animate-spin ' />
+            </DialogTitle>
+          )}
         </DialogContent>
       </Dialog>
 

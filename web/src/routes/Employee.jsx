@@ -186,9 +186,9 @@ export default function Employee() {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Biztosan tötölni szeretné?</AlertDialogTitle>
+              <AlertDialogTitle>Biztosan tötölni szeretnéd?</AlertDialogTitle>
               <AlertDialogDescription>
-                Ezzel az alkalmazottal kapcsolatos minden adat törlődik. Ezt a műveletet nem lehet visszavonni.
+                A kiválasztott alkalmazott(ak)kal kapcsolatos minden adat törlődik. Ezt a műveletet nem lehet visszavonni.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -207,7 +207,7 @@ export default function Employee() {
             </DialogHeader>
             {selectedInvite ? (
               <div className='flex flex-col gap-4'>
-                {selectedInvite.author.name && (
+                {selectedInvite.author?.name && (
                   <div className='flex gap-4 items-center'>
                     <Avatar>
                       <AvatarImage src="https://uploads.dailydot.com/2024/07/wet-owl-1.jpg?auto=compress&fm=pjpg" />

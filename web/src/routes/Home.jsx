@@ -136,54 +136,50 @@ export default function Home() {
 
   return (
     <div className='flex flex-col md:grid grid-cols-2 grid-rows-3 gap-4 p-4 md:h-screen w-full'>
-      <div className='bg-primary-foreground rounded-xl p-4 row-span-3 h-full'>
+      <div className='bg-primary-foreground rounded-xl p-4 row-span-3 h-full flex flex-col overflow-auto'>
         <h2 className='md:text-left text-center mb-4'>Következő óra</h2>
-        <div className='flex gap-4 flex-1 flex-col'>
-          <Card className="w-full  flex md:flex-row flex-col">
-            <div className='p-4 pr-0 md:self-auto self-center md:w-32 w-20'>
-              <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center' />
-            </div>
-            <div className='flex flex-col'>
-              <CardHeader className="pb-4 md:pt-6 pt-0">
-                <div className="flex items-center gap-4">
-                  <p className='font-bold text-xl text-wrap'>Scratch haladó, Lego WeDo 2.0</p>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className='flex gap-6 flex-wrap'>
-                  <span className='flex gap-2 items-center opacity-75'>
-                    <MapPin width={22} />
-                    <p className='font-bold'>
-                      Arany János Általános Iskola
-                      <br />
-                      <span className="opacity-50">6000 Kecskemét, Lunkányi János u.</span>
-                    </p>
-                  </span>
-                  <span className='flex gap-2 items-center opacity-75'>
-                    <Clock width={22} />
-                    <p className='font-bold'>
-                      16:00 - 17:00
-                      <br />
-                      <span className="opacity-50">2025.01.10.</span>
-                    </p>
-                  </span>
-                  <span className='flex gap-2 items-center opacity-75'>
-                    <User2 width={22} />
-                    <p className='font-bold'>6</p>
-                  </span>
-                </div>
-              </CardContent>
-            </div>
-            <Button className="m-4 md:ml-auto md:h-28 md:aspect-square flex md:flex-col gap-4" variant="outline">
-              <Play />
-              Kezdés
-            </Button>
-          </Card>
-          <Textarea placeholder="Jegyzetek" className="h-28 max-h-48" />
-          <ScrollArea className="h-[calc(100%-3rem)] pb-12">
-            <DataTable columns={columns} data={data} className={"w-full h-full"} />
-          </ScrollArea>
-        </div>
+        <Card className="w-full flex md:flex-row flex-col mb-4">
+          <div className='p-4 pr-0 md:self-auto self-center md:w-32 w-20'>
+            <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center' />
+          </div>
+          <div className='flex flex-col'>
+            <CardHeader className="pb-4 md:pt-6 pt-0">
+              <div className="flex items-center gap-4">
+                <p className='font-bold text-xl text-wrap'>Scratch haladó, Lego WeDo 2.0</p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className='flex gap-6 flex-wrap'>
+                <span className='flex gap-2 items-center opacity-75'>
+                  <MapPin width={22} />
+                  <p className='font-bold'>
+                    Arany János Általános Iskola
+                    <br />
+                    <span className="opacity-50">6000 Kecskemét, Lunkányi János u.</span>
+                  </p>
+                </span>
+                <span className='flex gap-2 items-center opacity-75'>
+                  <Clock width={22} />
+                  <p className='font-bold'>
+                    16:00 - 17:00
+                    <br />
+                    <span className="opacity-50">2025.01.10.</span>
+                  </p>
+                </span>
+                <span className='flex gap-2 items-center opacity-75'>
+                  <User2 width={22} />
+                  <p className='font-bold'>6</p>
+                </span>
+              </div>
+            </CardContent>
+          </div>
+          <Button className="m-4 md:ml-auto md:h-28 md:aspect-square flex md:flex-col gap-4" variant="outline">
+            <Play />
+            Kezdés
+          </Button>
+        </Card>
+        <Textarea placeholder="Jegyzetek" className="h-28 max-h-48" />
+        <DataTable columns={columns} data={data} />
       </div>
 
 

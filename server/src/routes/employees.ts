@@ -29,13 +29,13 @@ employeesRouter.get('/:id', async (req, res) => {
   
   if (req.query.include && isAdmin(req)) {
     const include = new Set((req.query.include as string).trim().split(","));
-    const dbResponse = (await db.query<{employee: Employee, unpaid_work: any, classes: any}[]>(`
+    const dbResponse = (await db.query<{employee: Employee, unpaid_work: any, groups: any}[]>(`
       RETURN {
         employee: (SELECT * OMIT password, session_key FROM ONLY type::thing($employee)),
         ${include.has("unpaid_work") ?
         "unpaid_work: (SELECT ->worked_at[WHERE ! paid].* as _ FROM ONLY type::thing($employee))._," : ""}
-        ${include.has("classes") ?
-        "classes: (SELECT * FROM class WHERE $employee IN teachers)," : ""}
+        ${include.has("groups") ?
+        "groups: (SELECT * FROM group WHERE $employee IN teachers)," : ""}
       }`, { employee: req.params.id }))[0];
   
     if (!dbResponse.employee || !dbResponse.employee.name) {
@@ -52,7 +52,7 @@ employeesRouter.get('/:id', async (req, res) => {
       data: {
         employee: dbResponse.employee,
         unpaid_work: dbResponse.unpaid_work,
-        classes: dbResponse.classes,
+        groups: dbResponse.groups,
       },
     });
 

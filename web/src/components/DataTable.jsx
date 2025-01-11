@@ -124,7 +124,7 @@ export default function DataTable({ columns, data, hasFooter = false, className,
                     className={rowOnClick && "cursor-pointer select-none"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} onClick={() => !cell.column.columnDef.ignoreClickEvent && rowOnClick(row)}>
+                      <TableCell key={cell.id} onClick={() => (!cell.column.columnDef.ignoreClickEvent && rowOnClick) && rowOnClick(row)}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()

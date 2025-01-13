@@ -25,7 +25,7 @@ export interface Invite {
   roles: Role[],
 }
 
-export interface Event {
+export interface DEvent {
   id: string,
   created: Date,
   author: string | Employee,
@@ -121,7 +121,7 @@ export interface RelationAttended {
 export interface RelationWorkedAt {
   id: string,
   in: string | Employee,
-  out: string | Lesson | Event,
+  out: string | Lesson | DEvent,
   created: Date,
   paid: boolean,
   notes: string,

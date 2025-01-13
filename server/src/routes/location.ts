@@ -2,12 +2,15 @@ import express from 'express';
 import db from '../database/connection';
 import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
+import errorHandler from '../lib/errorHandler';
+import { NotFoundError } from '../lib/errors';
+import type { Location } from '../database/models';
 
 const locationsRouter = express.Router();
 
 locationsRouter.use(ensureAuth);
 
-locationsRouter.get('/all', async (req, res) => {
+locationsRouter.get('/all', errorHandler(async (req, res) => {
   const locations = (await db.query(`
     SELECT * FROM location;
   `))[0];
@@ -17,9 +20,9 @@ locationsRouter.get('/all', async (req, res) => {
     message: "All locations retrieved",
     data: { locations },
   });
-});
+}));
 
-locationsRouter.get('/:id', async (req, res) => {
+locationsRouter.get('/:id', errorHandler(async (req, res) => {
   const { id } = req.params;
   if (!id || !id.startsWith("location:")) {
     res.status(400).json({
@@ -28,18 +31,22 @@ locationsRouter.get('/:id', async (req, res) => {
     });
     return;
   }
-  const location = (await db.query(`
+
+  const location = (await db.query<Location[]>(`
     SELECT * FROM ONLY type::thing($id);
   `, {id}))[0];
+
+  if (!location || !location.id)
+    throw new NotFoundError();
 
   res.status(200).json({
     code: "success",
     message: "Location retrieved",
     data: { location },
   });
-});
+}));
 
-locationsRouter.post('/create', ensureAdmin, async (req, res) => {
+locationsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
   const { name, notes, address, contact_email, contact_phone } = req.body;
   if (!name || !address || !contact_email || !contact_phone) {
     res.status(400).json({
@@ -64,9 +71,9 @@ locationsRouter.post('/create', ensureAdmin, async (req, res) => {
     message: "Location created",
     data: { location },
   });
-});
+}));
 
-locationsRouter.post('/update', ensureAdmin, async (req, res) => {
+locationsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   const { id, name, notes, address, contact_email, contact_phone } = req.body;
   if (!id || !id.startsWith("location:")) {
     res.status(400).json({
@@ -91,9 +98,9 @@ locationsRouter.post('/update', ensureAdmin, async (req, res) => {
     message: "Location updated",
     data: { location },
   });
-});
+}));
 
-locationsRouter.post('/remove', ensureAdmin, async (req, res) => {
+locationsRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   const { id } = req.body;
   if (!id || !id.startsWith("location:")) {
     res.status(400).json({
@@ -110,6 +117,6 @@ locationsRouter.post('/remove', ensureAdmin, async (req, res) => {
     message: "Location removed",
     data: { location },
   });
-});
+}));
 
 export default locationsRouter;

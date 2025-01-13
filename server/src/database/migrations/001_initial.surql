@@ -19,18 +19,18 @@ DEFINE INDEX email_unique ON employee FIELDS email UNIQUE;
 DEFINE TABLE invite SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE invite TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD author ON TABLE invite TYPE record<employee> READONLY;
+DEFINE FIELD author ON TABLE invite TYPE record<employee> READONLY ASSERT $value.exists();
 DEFINE FIELD roles ON TABLE invite TYPE set<"teacher" | "administrator"> READONLY;
 
 
 DEFINE TABLE event SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE event TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD author ON TABLE event TYPE record<employee> READONLY;
-DEFINE FIELD location ON TABLE event TYPE option<record<location>>;
+DEFINE FIELD author ON TABLE event TYPE record<employee> READONLY ASSERT $value.exists();
+DEFINE FIELD location ON TABLE event TYPE option<record<location>> ASSERT $value.exists();
 DEFINE FIELD name ON TABLE event TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD notes ON TABLE event TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
-DEFINE FIELD signups ON TABLE event TYPE set<record<employee>> DEFAULT [] ASSERT array::len($value) <= signup_limit;
+DEFINE FIELD signups ON TABLE event TYPE set<record<employee>> DEFAULT [] ASSERT array::len($value) <= signup_limit AND array::all($value, |$v| $v.exists());
 DEFINE FIELD signup_limit ON TABLE event TYPE int DEFAULT 0;
 DEFINE FIELD start ON TABLE event TYPE datetime;
 DEFINE FIELD end ON TABLE event TYPE datetime;
@@ -71,16 +71,16 @@ DEFINE TABLE group SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE group TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE group TYPE string ASSERT string::len($value) <= 48;
-DEFINE FIELD location ON TABLE group TYPE record<location>;
+DEFINE FIELD location ON TABLE group TYPE record<location> ASSERT $value.exists();
 DEFINE FIELD notes ON TABLE group TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
-DEFINE FIELD teachers ON TABLE group TYPE set<record<employee>>;
+DEFINE FIELD teachers ON TABLE group TYPE set<record<employee>> ASSERT array::all($value, |$v| $v.exists());
 DEFINE FIELD archived ON TABLE group TYPE bool DEFAULT false;
 
 
 DEFINE TABLE enroled SCHEMAFULL TYPE RELATION IN student OUT group CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE enroled TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD subject ON TABLE enroled TYPE record<subject>;
+DEFINE FIELD subject ON TABLE enroled TYPE record<subject> ASSERT $value.exists();
 DEFINE FIELD price ON TABLE enroled TYPE int;
 DEFINE FIELD notes ON TABLE enroled TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 
@@ -88,11 +88,11 @@ DEFINE FIELD notes ON TABLE enroled TYPE string ASSERT string::len($value) <= 20
 DEFINE TABLE lesson SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE lesson TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD group ON TABLE lesson TYPE option<record<group>>;
+DEFINE FIELD group ON TABLE lesson TYPE option<record<group>> ASSERT $value.exists();
 DEFINE FIELD notes ON TABLE lesson TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD name ON TABLE lesson TYPE option<string> ASSERT string::len($value) <= 48;
-DEFINE FIELD location ON TABLE lesson TYPE option<record<location>>;
-DEFINE FIELD teachers ON TABLE lesson TYPE option<set<record<employee>>>;
+DEFINE FIELD location ON TABLE lesson TYPE option<record<location>> ASSERT $value.exists();
+DEFINE FIELD teachers ON TABLE lesson TYPE option<set<record<employee>>> ASSERT array::all($value, |$v| $v.exists());
 DEFINE FIELD start ON TABLE lesson TYPE datetime;
 DEFINE FIELD end ON TABLE lesson TYPE datetime;
 
@@ -101,7 +101,7 @@ DEFINE TABLE replaced SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 
 
 DEFINE FIELD created ON TABLE replaced TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD notes ON TABLE replaced TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
-DEFINE FIELD replacement ON TABLE replaced TYPE record<lesson>;
+DEFINE FIELD replacement ON TABLE replaced TYPE record<lesson> ASSERT $value.exists();
 
 
 DEFINE TABLE attended SCHEMAFULL TYPE RELATION IN student OUT lesson | replaced CHANGEFEED 4w;
@@ -124,9 +124,9 @@ DEFINE FIELD end ON TABLE worked_at TYPE datetime DEFAULT out.end;
 -- DEFINE FIELD created ON TABLE announcement TYPE datetime DEFAULT time::now() READONLY;
 -- DEFINE FIELD subject ON TABLE announcement TYPE string ASSERT string::len($value) <= 48;
 -- DEFINE FIELD content ON TABLE announcement TYPE string ASSERT string::len($value) <= 4096;
--- DEFINE FIELD author ON TABLE announcement TYPE record<employee> READONLY;
--- DEFINE FIELD recipients ON TABLE announcement TYPE set<record<employee>> DEFAULT [] READONLY;
--- DEFINE FIELD attachents ON TABLE announcement TYPE set<record<event | knowledge | file>> DEFAULT [];
+-- DEFINE FIELD author ON TABLE announcement TYPE record<employee> READONLY ASSERT $value.exists();
+-- DEFINE FIELD recipients ON TABLE announcement TYPE set<record<employee>> DEFAULT [] READONLY ASSERT $value.exists();
+-- DEFINE FIELD attachents ON TABLE announcement TYPE set<record<event | knowledge | file>> DEFAULT [] ASSERT $value.exists();
 
 
 -- COMMIT TRANSACTION;

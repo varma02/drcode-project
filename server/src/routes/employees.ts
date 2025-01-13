@@ -2,13 +2,15 @@ import express from 'express';
 import db from '../database/connection';
 import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
-import type { Employee, Invite } from '../database/models';
+import type { Employee } from '../database/models';
+import errorHandler from '../lib/errorHandler';
+import { BadRequestError, FieldsInvalidError, FieldsRequiredError } from '../lib/errors';
 
 const employeesRouter = express.Router();
 
 employeesRouter.use(ensureAuth);
 
-employeesRouter.get('/all', ensureAdmin, async (req, res) => {
+employeesRouter.get('/all', ensureAdmin, errorHandler(async (req, res) => {
   const employees = (await db.query<Employee[][]>('SELECT * OMIT password, session_key FROM employee'))[0];
 
   res.status(200).json({
@@ -16,16 +18,13 @@ employeesRouter.get('/all', ensureAdmin, async (req, res) => {
     message: "All employees retrieved",
     data: { employees },
   });
-});
+}));
 
-employeesRouter.get('/:id', async (req, res) => {
-  if (!req.params.id || !req.params.id.startsWith("employee:")) {
-    res.status(404).json({
-      code: "not_found",
-      message: "No employee was found with the provided ID",
-    });
-    return;
-  }
+employeesRouter.get('/:id', errorHandler(async (req, res) => {
+  if (!req.params.id)
+    throw new FieldsRequiredError();
+  if (!req.params.id.startsWith("employee:")) 
+    throw new FieldsInvalidError();
   
   if (req.query.include && isAdmin(req)) {
     const include = new Set((req.query.include as string).trim().split(","));
@@ -38,13 +37,8 @@ employeesRouter.get('/:id', async (req, res) => {
         "groups: (SELECT * FROM group WHERE type::thing($employee) IN teachers)," : ""}
       }`, { employee: req.params.id }))[0];
   
-    if (!dbResponse.employee || !dbResponse.employee.name) {
-      res.status(404).json({
-        code: "not_found",
-        message: "No employee was found with the provided ID",
-      });
-      return;
-    }
+    if (!dbResponse.employee || !dbResponse.employee.name) 
+      throw new BadRequestError();
   
     res.status(200).json({
       code: "success",
@@ -61,13 +55,8 @@ employeesRouter.get('/:id', async (req, res) => {
       "SELECT * OMIT password, session_key FROM ONLY type::thing($employee)",
       { employee: req.params.id }))[0];
   
-    if (!employee || !employee.name) {
-      res.status(404).json({
-        code: "not_found",
-        message: "No employee was found with the provided ID",
-      });
-      return;
-    }
+    if (!employee || !employee.name) 
+      throw new BadRequestError();
   
     res.status(200).json({
       code: "success",
@@ -75,50 +64,33 @@ employeesRouter.get('/:id', async (req, res) => {
       data: { employee },
     });
   }
-});
+}));
 
-employeesRouter.post('/remove', async (req, res) => {
+employeesRouter.post('/remove', errorHandler(async (req, res) => {
   const { id } = req.body;
-  if (!id || !id.startsWith("employee:")) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "The id field is required",
-    });
-    return;
-  }
+  if (!id)
+    throw new FieldsRequiredError();
+  if (!id.startsWith("employee:"))
+    throw new FieldsInvalidError();
 
   const result = await db.query<Employee[]>("DELETE ONLY type::thing($employee) RETURN BEFORE;", { employee: id });
 
-  if (result?.[0]?.email) {
-    res.status(200).json({
-      code: "success",
-      message: "Employee deleted",
-    });
-  } else {
-    res.status(404).json({
-      code: "not_found",
-      message: "No employee was found with the provided ID",
-    });
-  }
-});
+  if (result?.[0]?.email) 
+    throw new BadRequestError();
 
-employeesRouter.post("/update", async (req, res) => {
+  res.status(200).json({
+    code: "success",
+    message: "Employee deleted",
+  });
+}));
+
+employeesRouter.post("/update", errorHandler(async (req, res) => {
   const { id, name, email, roles } = req.body;
-  if (!id || (!name && !email && !roles)) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "The id and at least one updateable fields are required",
-    });
-    return;
-  }
+  if (!id || (!name && !email && !roles)) 
+    throw new FieldsRequiredError();
 
-  if (!id.startsWith("employee:") || !Array.isArray(roles) || !roles.every(r => r === "administrator" || r === "teacher")) {
-    res.status(400).json({
-      code: "fields_invalid",
-      message: "One or more fields are invalid",
-    });
-    return;
-  }
+  if (!id.startsWith("employee:") || !Array.isArray(roles) || !roles.every(r => r === "administrator" || r === "teacher"))
+    throw new FieldsInvalidError();
 
   const result = await db.query<Employee[]>(`
     UPDATE ONLY type::thing($employee) MERGE {
@@ -127,20 +99,16 @@ employeesRouter.post("/update", async (req, res) => {
       ${roles ? "roles: $roles ," : ""}
     };`, { employee: id, name, email, roles });
 
-  if (result?.[0]?.email) {
-    res.status(200).json({
-      code: "success",
-      message: "Employee updated",
-      data: {
-        employee: result[0],
-      }
-    });
-  } else {
-    res.status(404).json({
-      code: "not_found",
-      message: "No employee was found with the provided ID",
-    });
-  }
-});
+  if (!result?.[0]?.email)
+    throw new BadRequestError();
+
+  res.status(200).json({
+    code: "success",
+    message: "Employee updated",
+    data: {
+      employee: result[0],
+    }
+  });
+}));
 
 export default employeesRouter;

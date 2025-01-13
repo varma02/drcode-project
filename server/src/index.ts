@@ -50,9 +50,16 @@ export async function setup(): Promise<string | null> {
   app.use((req, res, next) => {
     res.status(404).json({
       code: "not_found",
-      message: 'Not Found',
+      message: 'The route you requested does not exist or uses a different HTTP method.',
     });
   });
+
+  app.use(function (err, req, res, next) {
+    res.status(404).json({
+      code: "bad_request",
+      message: err.message,
+    });
+  } as express.ErrorRequestHandler);
 
   return null;
 }

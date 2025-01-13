@@ -2,12 +2,15 @@ import express from 'express';
 import db from '../database/connection';
 import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
+import errorHandler from '../lib/errorHandler';
+import { NotFoundError } from '../lib/errors';
+import type { Lesson } from '../database/models';
 
 const lessonRouter = express.Router();
 
 lessonRouter.use(ensureAuth);
 
-lessonRouter.get('/all', async (req, res) => {
+lessonRouter.get('/all', errorHandler(async (req, res) => {
   const lessons = (await db.query(`
     SELECT * FROM lesson;
   `))[0];
@@ -17,9 +20,9 @@ lessonRouter.get('/all', async (req, res) => {
     message: "All lessons retrieved",
     data: { lessons },
   });
-});
+}));
 
-lessonRouter.get('/between_dates', async (req, res) => {
+lessonRouter.get('/between_dates', errorHandler(async (req, res) => {
   const { start, end } = req.query;
   if (!start && !end) {
     res.status(400).json({
@@ -29,21 +32,24 @@ lessonRouter.get('/between_dates', async (req, res) => {
     return;
   }
 
-  const lessons = (await db.query(`
+  const lessons = (await db.query<Lesson[][]>(`
     SELECT * FROM lesson WHERE
     ${start ? "start >= type::datetime($start)" : "true"}
     AND
     ${end ? "end <= type::datetime($end);" : "true"};
   `, { start, end }))[0];
 
+  if (!lessons || !lessons.length)
+    throw new NotFoundError();
+
   res.status(200).json({
     code: "success",
     message: "Lessons retrieved",
     data: { lessons },
   });
-});
+}));
 
-lessonRouter.get('/:id', async (req, res) => {
+lessonRouter.get('/:id', errorHandler(async (req, res) => {
   const { id } = req.params;
   if (!id || !id.startsWith("lesson:")) {
     res.status(400).json({
@@ -61,18 +67,21 @@ lessonRouter.get('/:id', async (req, res) => {
     if (include.has("students_attended")) selection.push("<-attended<-student.* as students_attended");
     if (include.has("students_replaced")) selection.push("<-replaced<-student.* as students_replaced");
   }
-  const lesson = (await db.query(`
+  const lesson = (await db.query<Lesson[]>(`
     SELECT ${selection.join(",")} OMIT teachers.*.password, teachers.*.session_key FROM ONLY type::thing($id) FETCH location;
   `, {id}))[0];
+
+  if (!lesson || !lesson.id)
+    throw new NotFoundError();
 
   res.status(200).json({
     code: "success",
     message: "Lesson retrieved",
     data: { lesson },
   });
-});
+}));
 
-lessonRouter.post('/create', ensureAdmin, async (req, res) => {
+lessonRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
   const { name, group, notes, location, teachers, start, end } = req.body;
   if (!start || !end) {
     res.status(400).json({
@@ -105,9 +114,9 @@ lessonRouter.post('/create', ensureAdmin, async (req, res) => {
       message: "One or more fields are missing or invalid",
     });
   }
-});
+}));
 
-lessonRouter.post('/update', ensureAdmin, async (req, res) => {
+lessonRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   const { id, name, group, notes, location, teachers, start, end } = req.body;
   if (!id || !id.startsWith("lesson:")) {
     res.status(400).json({
@@ -134,9 +143,9 @@ lessonRouter.post('/update', ensureAdmin, async (req, res) => {
     message: "Lesson updated",
     data: { lesson },
   });
-});
+}));
 
-lessonRouter.post('/remove', ensureAdmin, async (req, res) => {
+lessonRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   const { id } = req.body;
   if (!id || !id.startsWith("lesson:")) {
     res.status(400).json({
@@ -153,6 +162,6 @@ lessonRouter.post('/remove', ensureAdmin, async (req, res) => {
     message: "Lesson removed",
     data: { lesson },
   });
-});
+}));
 
 export default lessonRouter;

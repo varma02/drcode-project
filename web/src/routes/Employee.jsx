@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Card} from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import AreYouSureAlert from '@/components/AreYouSureAlert';
 
 export default function Employee() {
   const auth = useAuth();
@@ -178,25 +179,7 @@ export default function Employee() {
 
       <DataTable data={employees} columns={columns} //rowOnClick={(v)=>navigate(`/employee/${v.original.id.replace("employee:", "")}`)}
       headerAfter={<div className='flex gap-4 pl-4'>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="outline" className="hover:bg-destructive">
-              <Trash /> Törlés
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Biztosan tötölni szeretnéd?</AlertDialogTitle>
-              <AlertDialogDescription>
-                A kiválasztott alkalmazott(ak)kal kapcsolatos minden adat törlődik. Ezt a műveletet nem lehet visszavonni.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Mégse</AlertDialogCancel>
-              <AlertDialogAction variant="destructive">Törlés</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <AreYouSureAlert />
         <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
           <DialogTrigger asChild onClick={() => setSelectedInvite(null)}>
             <Button variant="outline"><Plus />Meghívás</Button>

@@ -15,7 +15,14 @@ export const Groups = () => {
   }, [])
 
   useEffect(() => {
-    Array.from(new Set(groups.map(e => e.teachers))).map(e => getEmployee(auth.token, e).then(resp => setTeachers(p => ({...p, [e]:resp.data.employee.name}))))
+    const tids = new Set()
+    groups.forEach(e => e.teachers.forEach(t => tids.add(t)))
+    if (tids.size === 0) return;
+    getEmployee(auth.token, Array.from(tids)).then(data => {
+      const temp = {}
+      data.data.employees.forEach(e => temp[e.id] = e.name)
+      setTeachers(temp)
+    });
   }, [groups])
 
   return (

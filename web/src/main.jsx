@@ -59,7 +59,7 @@ const router = createBrowserRouter([
       {path: "/calendar", element: <CalendarPage />},
       {path: "/search", element: <Search />},
       {path: "/settings", element: <Settings />},
-      {path: "/employee/:id?", element: <Employee />},
+      {path: "/employee/", element: <Employee />},
       {path: "/calendar/add/group", element: <AddCalendarGroup />},
       {path: "/calendar/add/event", element: <AddCalendarEvent />},
       {path: "/groups", element: <Groups />},

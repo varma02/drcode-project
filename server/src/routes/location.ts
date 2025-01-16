@@ -3,7 +3,7 @@ import db from '../database/connection';
 import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
-import { NotFoundError } from '../lib/errors';
+import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Location } from '../database/models';
 
 const locationsRouter = express.Router();
@@ -22,27 +22,30 @@ locationsRouter.get('/all', errorHandler(async (req, res) => {
   });
 }));
 
-locationsRouter.get('/:id', errorHandler(async (req, res) => {
-  const { id } = req.params;
-  if (!id || !id.startsWith("location:")) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "Invalid location ID",
-    });
-    return;
-  }
+locationsRouter.get('/get', errorHandler(async (req, res) => {
+  const ids = (req.query.ids as string).trim().split(",");
+  if (ids.length === 0)
+    throw new FieldsRequiredError();
+  if (ids.every(id => !id.startsWith("location:")))
+    throw new FieldsInvalidError();
 
-  const location = (await db.query<Location[]>(`
-    SELECT * FROM ONLY type::thing($id);
-  `, {id}))[0];
+  const selection = [];
+  selection.push("*");
+  // if (req.query.include) {
+  //   const include = new Set((req.query.include as string).trim().split(","));
+  //   if (include.has("something")) selection.push("some_query");
+  // }
+  const locations = (await db.query<Location[][]>(`
+    SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
+  `, {ids}))[0];
 
-  if (!location || !location.id)
+  if (!locations || !locations.length)
     throw new NotFoundError();
 
   res.status(200).json({
     code: "success",
-    message: "Location retrieved",
-    data: { location },
+    message: "Location(s) retrieved",
+    data: { locations },
   });
 }));
 

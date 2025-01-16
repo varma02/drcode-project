@@ -44,34 +44,30 @@ eventRouter.get('/between_dates', errorHandler(async (req, res) => {
   });
 }));
 
-eventRouter.get('/:id', errorHandler(async (req, res) => {
-  const { id } = req.params;
-  if (!id)
+eventRouter.get('/get', errorHandler(async (req, res) => {
+  const ids = (req.query.ids as string).trim().split(",");
+  if (ids.length === 0)
     throw new FieldsRequiredError();
-  if (!id.startsWith("event:"))
+  if (ids.every(id => !id.startsWith("event:")))
     throw new FieldsInvalidError();
 
   const selection = [];
   selection.push("*");
-  if (req.query.include) {
-    const include = new Set((req.query.include as string)
-      .trim().split(",")).intersection(new Set(["signups", "author"]));
-    if (include.has("signups")) selection.push("signups.*.*");
-    if (include.has("author")) selection.push("author.*");
-  }
-  const event = (await db.query<DEvent[]>(`
-    SELECT ${selection.join(",")}
-    OMIT signups.*.password, signups.*.session_key, author.password, author.session_key
-    FROM ONLY type::thing($id) FETCH location;
-  `, {id}))[0];
+  // if (req.query.include) {
+  //   const include = new Set((req.query.include as string).trim().split(","));
+  //   if (include.has("something")) selection.push("some_query");
+  // }
+  const events = (await db.query<Event[][]>(`
+    SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
+  `, {ids}))[0];
 
-  if (!event || !event.id)
+  if (!events || !events.length)
     throw new NotFoundError();
 
   res.status(200).json({
     code: "success",
-    message: "Event retrieved",
-    data: { event },
+    message: "Event(s) retrieved",
+    data: { events },
   });
 }));
 

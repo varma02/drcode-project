@@ -172,12 +172,13 @@ Gets a list of all employees (without details). Admin only.
 - `unauthorized`: the user is not authorized to complete this action
 - `not_found`: there is no employee with the provided ID
 
-### Get a specific employee `GET /:id`
-Retrieves an employee's data, including the specified details.
-##### Query parameters (Admin only)
+### Get employees by ID `GET /get`
+Retrieves employees' data, including the specified details.
+##### Query parameters
+- `ids`: the IDs of the employees to retrieve (list separated by commas, ex: field1,field2)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `unpaid_work`: all the logged work for the given employee that hasn't been paid
-	- `classes`: all classes where the employee is the assigned teacher
+	- `groups`: all groups where the employee is the assigned teacher
 ##### Response on success
 ```
 {
@@ -186,7 +187,7 @@ Retrieves an employee's data, including the specified details.
 	data: {
 		employee: { ... },
 		unpaid_work?: [ ... ],
-		classes?: [ ... ]
+		groups?: [ ... ]
 	}
 }
 ```
@@ -258,11 +259,11 @@ Gets a list of all groups (without details).
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 
-### Get a specific group `GET /:id`
-Retrieves a group's data, including the specified details.
+### Get groups by ID `GET /get`
+Retrieves groups' data, including the specified details.
 ##### Query parameters
+- `ids`: the IDs of the groups to retrieve (list separated by commas, ex: field1,field2)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
-	- `teachers`: expand the teachers field to include employee data
 	- `students`: a list of students enroled to the group
 	- `subjects`: the subjects that students are enroled to
 	- `lessons`: all lessons assigned to the selected group
@@ -381,8 +382,10 @@ Gets a list of all locations.
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 
-### Get a specific location `GET /:id`
-Retrieves a location's data.
+### Get locations by ID `GET /get`
+Retrieves locations' data.
+##### Query parameters
+- `ids`: the IDs of the locations to retrieve (list separated by commas, ex: field1,field2)
 ##### Response on success
 ```
 {
@@ -514,11 +517,11 @@ Retrieves all lessons between the two dates provided (without details).
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: At least one query parameter is required
 
-### Get a specific lesson `GET /:id`
-Retrieves a lesson's data, including the specified details.
+### Get lessons by ID `GET /get`
+Retrieves lessons' data, including the specified details.
 ##### Query parameters
+- `ids`: the IDs of the lessons to retrieve (list separated by commas, ex: field1,field2)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
-	- `teachers`: expand the teachers field to include employee data
 	- `students_attended`: a list of students who attended the lesson
 	- `students_replaced`: a list of students who replaced another lesson with this one
 ##### Response on success
@@ -657,12 +660,10 @@ Retrives all events between the two dates provided (without details).
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: At least one query parameter is required
 
-### Get a specific event `GET /:id`
-Retrieves a event's data, including the specified details.
+### Get events by ID `GET /get`
+Retrieves events' data, including the specified details.
 ##### Query parameters
-- `include`: Get more details on fields (list separated by commas, ex: field1,field2)
-	- `signups`: all employees that signed up for this event
-	- `author`: the employee that created the event
+- `ids`: the IDs of the events to retrieve (list separated by commas, ex: field1,field2)
 ##### Response on success
 ```
 {
@@ -778,8 +779,10 @@ Gets a list of all subjects.
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 
-### Get a specific subject `GET /:id`
-Retrieves a subject's data.
+### Get subjects by ID `GET /get`
+Retrieves subjects' data.
+##### Query parameters
+- `ids`: the IDs of the subjects to retrieve (list separated by commas, ex: field1,field2)
 ##### Response on success
 ```
 {

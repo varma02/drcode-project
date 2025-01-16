@@ -22,34 +22,32 @@ groupsRouter.get('/all', errorHandler(async (req, res) => {
   });
 }));
 
-groupsRouter.get('/:id', errorHandler(async (req, res) => {
-  const { id } = req.params;
-  if (!id)
+groupsRouter.get('/get', errorHandler(async (req, res) => {
+  const ids = (req.query.ids as string).trim().split(",");
+  if (ids.length === 0)
     throw new FieldsRequiredError();
-  if (!id.startsWith("group:"))
+  if (ids.every(id => !id.startsWith("group:")))
     throw new FieldsInvalidError();
 
   const selection = [];
   selection.push("*");
   if (req.query.include) {
-    const include = new Set((req.query.include as string)
-      .trim().split(",")).intersection(new Set(["teachers", "students", "lessons", "subjects"]));
-    if (include.has("teachers")) selection.push("teachers.*.*");
-    if (include.has("students")) selection.push("<-enroled<-student.* as students");
-    if (include.has("subjects")) selection.push("array::group(<-enroled.subject.*) as subjects");
-    if (include.has("lessons")) selection.push("(SELECT * FROM lesson WHERE $parent.id = group.id) AS lessons");
+    const include = new Set((req.query.include as string).trim().split(","));
+    if (include.has("students")) selection.push("<-enroled<-student as students");
+    if (include.has("subjects")) selection.push("array::group(<-enroled.subject) as subjects");
+    if (include.has("lessons")) selection.push("(SELECT VALUE id FROM lesson WHERE $parent.id = group.id) AS lessons");
   }
-  const group = (await db.query<Group[]>(`
-    SELECT ${selection.join(",")} OMIT teachers.*.password, teachers.*.session_key FROM ONLY type::thing($groupid) FETCH location;
-  `, {groupid: id}))[0];
+  const groups = (await db.query<Group[][]>(`
+    SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
+  `, {ids}))[0];
 
-  if (!group || !group.id)
+  if (!groups || !groups.length)
     throw new NotFoundError();
 
   res.status(200).json({
     code: "success",
-    message: "Group retrieved",
-    data: { group },
+    message: "Group(s) retrieved",
+    data: { groups },
   });
 }));
 

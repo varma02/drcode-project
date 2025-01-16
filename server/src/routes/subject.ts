@@ -3,7 +3,7 @@ import db from '../database/connection';
 import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
-import { FieldsInvalidError, FieldsRequiredError } from '../lib/errors';
+import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Subject } from '../database/models';
 
 const subjectRouter = express.Router();
@@ -22,33 +22,30 @@ subjectRouter.get('/all', errorHandler(async (req, res) => {
   });
 }));
 
-subjectRouter.get('/:id', errorHandler(async (req, res) => {
-  const { id } = req.params;
-  if (!id)
+subjectRouter.get('/get', errorHandler(async (req, res) => {
+  const ids = (req.query.ids as string).trim().split(",");
+  if (ids.length === 0)
     throw new FieldsRequiredError();
-  if (!id.startsWith("subject:"))
+  if (ids.every(id => !id.startsWith("subject:")))
     throw new FieldsInvalidError();
 
   const selection = [];
   selection.push("*");
   // if (req.query.include) {
-  //   const include = new Set((req.query.include as string)
-  //     .trim().split(",")).intersection(new Set([""]));
-  //   if (include.has("")) selection.push("");
+  //   const include = new Set((req.query.include as string).trim().split(","));
+  //   if (include.has("something")) selection.push("some_query");
   // }
-  const subject = (await db.query<Subject[]>(`
-    SELECT ${selection.join(",")}
-    OMIT password, session_key
-    FROM ONLY type::thing($id);
-  `, {id}))[0];
+  const subjects = (await db.query<Subject[][]>(`
+    SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
+  `, {ids}))[0];
 
-  if (!subject || !subject.id)
-    throw new FieldsInvalidError();
+  if (!subjects || !subjects.length)
+    throw new NotFoundError();
 
   res.status(200).json({
     code: "success",
-    message: "Subject retrieved",
-    data: { subject },
+    message: "Subject(s) retrieved",
+    data: { subjects },
   });
 }));
 

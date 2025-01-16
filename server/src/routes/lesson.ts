@@ -3,7 +3,7 @@ import db from '../database/connection';
 import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
-import { NotFoundError } from '../lib/errors';
+import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Lesson } from '../database/models';
 
 const lessonRouter = express.Router();
@@ -24,13 +24,8 @@ lessonRouter.get('/all', errorHandler(async (req, res) => {
 
 lessonRouter.get('/between_dates', errorHandler(async (req, res) => {
   const { start, end } = req.query;
-  if (!start && !end) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "One or more fields are missing or invalid",
-    });
-    return;
-  }
+  if (!start && !end) 
+    throw new FieldsRequiredError();
 
   const lessons = (await db.query<Lesson[][]>(`
     SELECT * FROM lesson WHERE
@@ -49,82 +44,63 @@ lessonRouter.get('/between_dates', errorHandler(async (req, res) => {
   });
 }));
 
-lessonRouter.get('/:id', errorHandler(async (req, res) => {
-  const { id } = req.params;
-  if (!id || !id.startsWith("lesson:")) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "Invalid lesson ID",
-    });
-    return;
-  }
+lessonRouter.get('/get', errorHandler(async (req, res) => {
+  const ids = (req.query.ids as string).trim().split(",");
+  if (ids.length === 0)
+    throw new FieldsRequiredError();
+  if (ids.every(id => !id.startsWith("lesson:")))
+    throw new FieldsInvalidError();
+
   const selection = [];
   selection.push("*");
   if (req.query.include) {
-    const include = new Set((req.query.include as string)
-      .trim().split(",")).intersection(new Set(["teachers", "students_attended", "students_replaced"]));
-    if (include.has("teachers")) selection.push("teachers.*.*");
-    if (include.has("students_attended")) selection.push("<-attended<-student.* as students_attended");
-    if (include.has("students_replaced")) selection.push("<-replaced<-student.* as students_replaced");
+    const include = new Set((req.query.include as string).trim().split(","));
+    if (include.has("students_attended")) selection.push("<-attended<-student as students_attended");
+    if (include.has("students_replaced")) selection.push("<-replaced<-student as students_replaced");
   }
-  const lesson = (await db.query<Lesson[]>(`
-    SELECT ${selection.join(",")} OMIT teachers.*.password, teachers.*.session_key FROM ONLY type::thing($id) FETCH location;
-  `, {id}))[0];
+  const lessons = (await db.query<Lesson[][]>(`
+    SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
+  `, {ids}))[0];
 
-  if (!lesson || !lesson.id)
+  if (!lessons || !lessons.length)
     throw new NotFoundError();
 
   res.status(200).json({
     code: "success",
-    message: "Lesson retrieved",
-    data: { lesson },
+    message: "Lesson(s) retrieved",
+    data: { lessons },
   });
 }));
 
 lessonRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
   const { name, group, notes, location, teachers, start, end } = req.body;
-  if (!start || !end) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "One or more fields are missing or invalid",
-    });
-    return;
-  }
-  try {
-    const lesson = (await db.query(`
-      CREATE ONLY lesson CONTENT {
-        ${name ? "name: $name," : ""}
-        ${notes ? "notes: $notes," : ""}
-        ${location ? "location: type::thing($location)," : ""}
-        ${teachers ? "teachers: array::map($teachers, |$v| type::thing($v))," : ""}
-        ${group ? "group: type::thing($group)," : ""}
-        start: type::datetime($start),
-        end: type::datetime($end)
-      };
-    `, {name, group, notes, location, teachers, start, end}))[0];
-    res.status(200).json({
-      code: "success",
-      message: "Lesson created",
-      data: { lesson },
-    });
-  } catch (e) {
-    console.trace(e);
-    res.status(400).json({
-      code: "bad_request",
-      message: "One or more fields are missing or invalid",
-    });
-  }
+  if (!start || !end) 
+    throw new FieldsRequiredError();
+
+  const lesson = (await db.query(`
+    CREATE ONLY lesson CONTENT {
+      ${name ? "name: $name," : ""}
+      ${notes ? "notes: $notes," : ""}
+      ${location ? "location: type::thing($location)," : ""}
+      ${teachers ? "teachers: array::map($teachers, |$v| type::thing($v))," : ""}
+      ${group ? "group: type::thing($group)," : ""}
+      start: type::datetime($start),
+      end: type::datetime($end)
+    };
+  `, {name, group, notes, location, teachers, start, end}))[0];
+  res.status(200).json({
+    code: "success",
+    message: "Lesson created",
+    data: { lesson },
+  });
 }));
 
 lessonRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   const { id, name, group, notes, location, teachers, start, end } = req.body;
-  if (!id || !id.startsWith("lesson:")) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "The ID field is required",
-    });
-    return;
-  }
+  if (!id)
+    throw new FieldsRequiredError();
+  if (!id.startsWith("lesson:")) 
+    throw new FieldsInvalidError();
 
   const lesson = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
@@ -147,13 +123,10 @@ lessonRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
 
 lessonRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   const { id } = req.body;
-  if (!id || !id.startsWith("lesson:")) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "The ID field is required",
-    });
-    return;
-  }
+  if (!id)
+    throw new FieldsRequiredError();
+  if (!id.startsWith("lesson:")) 
+    throw new FieldsInvalidError();
 
   const lesson = (await db.query(`DELETE ONLY type::thing($id);`, { id }))[0];
 

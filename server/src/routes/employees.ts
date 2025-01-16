@@ -4,7 +4,7 @@ import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import type { Employee } from '../database/models';
 import errorHandler from '../lib/errorHandler';
-import { BadRequestError, FieldsInvalidError, FieldsRequiredError } from '../lib/errors';
+import { BadRequestError, FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 
 const employeesRouter = express.Router();
 
@@ -20,50 +20,32 @@ employeesRouter.get('/all', ensureAdmin, errorHandler(async (req, res) => {
   });
 }));
 
-employeesRouter.get('/:id', errorHandler(async (req, res) => {
-  if (!req.params.id)
+employeesRouter.get('/get', errorHandler(async (req, res) => {
+  const ids = (req.query.ids as string).trim().split(",");
+  if (ids.length === 0)
     throw new FieldsRequiredError();
-  if (!req.params.id.startsWith("employee:")) 
+  if (ids.every(id => !id.startsWith("employee:")))
     throw new FieldsInvalidError();
-  
-  if (req.query.include && isAdmin(req)) {
-    const include = new Set((req.query.include as string).trim().split(","));
-    const dbResponse = (await db.query<{employee: Employee, unpaid_work: any, groups: any}[]>(`
-      RETURN {
-        employee: (SELECT * OMIT password, session_key FROM ONLY type::thing($employee)),
-        ${include.has("unpaid_work") ?
-        "unpaid_work: (SELECT ->worked_at[WHERE ! paid].* as _ FROM ONLY type::thing($employee) FETCH _.out)._," : ""}
-        ${include.has("groups") ?
-        "groups: (SELECT * FROM group WHERE type::thing($employee) IN teachers)," : ""}
-      }`, { employee: req.params.id }))[0];
-  
-    if (!dbResponse.employee || !dbResponse.employee.name) 
-      throw new BadRequestError();
-  
-    res.status(200).json({
-      code: "success",
-      message: "Employee data retrieved",
-      data: {
-        employee: dbResponse.employee,
-        unpaid_work: dbResponse.unpaid_work,
-        groups: dbResponse.groups,
-      },
-    });
 
-  } else {
-    const employee = (await db.query<Employee[]>(
-      "SELECT * OMIT password, session_key FROM ONLY type::thing($employee)",
-      { employee: req.params.id }))[0];
-  
-    if (!employee || !employee.name) 
-      throw new BadRequestError();
-  
-    res.status(200).json({
-      code: "success",
-      message: "Employee data retrieved",
-      data: { employee },
-    });
+  const selection = [];
+  selection.push("*");
+  if (req.query.include) {
+    const include = new Set((req.query.include as string).trim().split(","));
+    if (include.has("unpaid_work")) selection.push("->worked_at[WHERE ! paid].* as unpaid_work");
+    if (include.has("groups")) selection.push("(SELECT VALUE id FROM group WHERE type::thing($parent.id) IN teachers) as groups");
   }
+  const employees = (await db.query<Employee[][]>(`
+    SELECT ${selection.join(",")} OMIT password, session_key FROM array::map($ids, |$id| type::thing($id));
+  `, {ids}))[0];
+
+  if (!employees || !employees.length)
+    throw new NotFoundError();
+
+  res.status(200).json({
+    code: "success",
+    message: "Employee(s) retrieved",
+    data: { employees },
+  });
 }));
 
 employeesRouter.post('/remove', errorHandler(async (req, res) => {

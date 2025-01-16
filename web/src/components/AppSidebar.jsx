@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { toast } from "sonner"
 import { getMonogram, getTopRole } from "@/lib/utils"
+import { Button } from "./ui/button"
 
 
 export function AppSidebar() {
@@ -87,20 +88,20 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <DropdownMenu>
-          <DropdownMenuTrigger className="outline-none" aria-label="Felhasználó menü">
-            <div className="w-full flex justify-between items-center border rounded-lg p-2">
+          <DropdownMenuTrigger aria-label="Felhasználó menü" asChild>
+            <Button variant="ghost" className="h-auto flex justify-between items-center p-2">
               <div className="flex justify-center items-center gap-2">
                 <Avatar>
                   <AvatarImage src="https://uploads.dailydot.com/2024/07/wet-owl-1.jpg?auto=compress&fm=pjpg" />
                   <AvatarFallback>{getMonogram(auth.user.name)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-bold text-left">{auth.user.name.length > 14 ? auth.user.name.slice(0, 12) + "..." : auth.user.name}</p>
+                  <p className="font-bold text-left">{auth.user.name.length > 15 ? auth.user.name.slice(0, 15) + "..." : auth.user.name}</p>
                   <p className="text-left text-sm opacity-70">{getTopRole(auth.user.roles)}</p>
                 </div>
               </div>
               <ChevronsUpDown />
-            </div>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onSelect={() => navigate("/settings")}>

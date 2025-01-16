@@ -138,7 +138,7 @@ export default function Home() {
     <div className='flex flex-col md:grid grid-cols-2 grid-rows-3 gap-4 p-4 md:h-screen w-full'>
       <div className='bg-primary-foreground rounded-xl p-4 row-span-3 h-full flex flex-col overflow-auto'>
         <h2 className='md:text-left text-center mb-4'>Következő óra</h2>
-        <Card className="w-full flex md:flex-row flex-col mb-4">
+        <Card className="w-full flex xl:flex-row flex-col mb-4">
           <div className='p-4 pr-0 md:self-auto self-center md:w-32 w-20'>
             <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center' />
           </div>
@@ -173,7 +173,7 @@ export default function Home() {
               </div>
             </CardContent>
           </div>
-          <Button className="m-4 md:ml-auto md:h-28 md:aspect-square flex md:flex-col gap-4" variant="outline">
+          <Button className="m-4 xl:ml-auto xl:h-28 xl:aspect-square flex xl:flex-col gap-4" variant="outline">
             <Play />
             Kezdés
           </Button>

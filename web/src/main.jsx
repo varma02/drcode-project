@@ -83,7 +83,7 @@ createRoot(document.getElementById('root')).render(
           <LoaderCircle className='animate-spin ' />
         </div>
       }>
-        <RouterProvider router={router} future={{v7_startTransition: true}} /* TODO: add fallback */ />
+        <RouterProvider router={router} />
       </Suspense>
     </AuthProvider>
     <Toaster 

@@ -55,7 +55,7 @@ export const AssignmentMessage = () => {
             <PopoverContent>
               <ScrollArea className="h-52">
                 {new Array(10).fill(0).map((_, i) => (
-                  <div className='flex gap-4 mb-4'>
+                  <div key={i} className='flex gap-4 mb-4'>
                     <Avatar>
                       <AvatarImage src="https://uploads.dailydot.com/2024/07/wet-owl-1.jpg?auto=compress&fm=pjpg" />
                       <AvatarFallback>LÜ</AvatarFallback>

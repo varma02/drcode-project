@@ -1,9 +1,14 @@
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import AreYouSureAlert from '@/components/AreYouSureAlert'
+import DataTable from '@/components/DataTable'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { getAllGroups, getEmployee } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
+import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 export const Groups = () => {
   const auth = useAuth()
@@ -25,21 +30,91 @@ export const Groups = () => {
     });
   }, [groups])
 
-  return (
-    <div>
-      {
-        groups.map(e => 
-          <Card className="w-full" key={e.id}>
-            <CardHeader>{e.name}</CardHeader>
-            <CardContent>
-              {e.teachers.map(t => <p key={t}>{teachers[t]}</p>)}
-            </CardContent>
-            <CardFooter>
-              {format(e.created, "Pp", {locale: hu})}
-            </CardFooter>
-          </Card>
+  const columns = [
+    {
+      id: "select",
+      ignoreClickEvent: true,
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          className="float-left"
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          className="float-left"
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      displayName: "Név",
+      accessorKey: "name",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {column.columnDef.displayName}
+            {!column.getIsSorted() ? <ArrowUpDown /> 
+            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
+          </Button>
         )
-      }
+      },
+    },
+    {
+      displayName: "Helyszín",
+      accessorKey: "location",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {column.columnDef.displayName}
+            {!column.getIsSorted() ? <ArrowUpDown /> 
+            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
+          </Button>
+        )
+      },
+      cell: ({ row }) => (row.getValue("location")?.name || "N/A"),
+    },
+    {
+      displayName: "Tanárok",
+      accessorKey: "teachers",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => row.getValue("teachers")?.map(e => teachers[e]).join(", ") || "N/A",
+    },
+    {
+      displayName: "Létrehozva",
+      accessorKey: "created",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => (
+        <div className="capitalize text-center">{format(new Date(row.getValue("created")), "P", {locale: hu} )}</div>
+      ),
+    },
+  ]
+  return (
+    <div className='max-w-screen-xl md:w-full mx-auto p-4'>
+      <h1 className='text-4xl py-4'>Csoportok</h1>
+
+      <DataTable data={groups} columns={columns}
+      headerAfter={<div className='flex gap-4 pl-4'>
+        <AreYouSureAlert />
+        <Link to='/groups/add'>
+          <Button variant="outline"><Plus /> Hozzáadás</Button>
+        </Link>
+      </div>} />
     </div>
   )
 }

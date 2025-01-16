@@ -105,7 +105,7 @@ userRouter.post('/update', errorHandler(async (req, res) => {
     if (!name && !email && !new_password) 
       throw new FieldsRequiredError("At least one of the optional fields is required");
 
-    if (new_password && verifyPassword(new_password)) 
+    if (new_password && !verifyPassword(new_password)) 
       throw new PasswordTooWeakError();
   
     const updates = [];
@@ -115,12 +115,14 @@ userRouter.post('/update', errorHandler(async (req, res) => {
 
     const updatedUser = (await db.query<Employee[]>(
       `UPDATE ONLY type::thing($employee) SET ${updates.join(", ")} WHERE crypto::argon2::compare(password, $old_password)`,
-      { employee: req.employee?.id, name, email, new_password, old_password }
+      { employee: req.employee!.id, name, email, new_password, old_password }
     ))[0];
 
     if (!updatedUser || !updatedUser.name) 
       throw new BadRequestError();
 
+    delete updatedUser.password;
+    delete updatedUser.session_key;
     res.status(200).json({
       code: "success",
       message: "Employee data updated",

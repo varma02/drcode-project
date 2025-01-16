@@ -1,41 +1,54 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { getAllEmployees } from '@/lib/api/api';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { getAllEmployees, updateUser } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
-import { Pen } from 'lucide-react'
+import { Pen } from 'lucide-react';
 import React, { useState } from 'react'
+import { toast } from 'sonner';
 
 export default function Settings() {
-  const auth = useAuth()
-
-  const [formData, setFormData] = useState({
-    name: auth.user.name || '',
-    password: auth.user.password || '',
-    email: auth.user.email || '',
-  })
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value
-    }))
-  }
+  const auth = useAuth();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Form Submitted:', formData)
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    if (formData.get("new_password") !== formData.get("new_password_again")) {
+      toast.error("A megadott új jelszavak nem egyeznek!");
+      return;
+    }
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      old_password: formData.get("old_password"),
+      new_password: formData.get("new_password"),
+    }
+    updateUser(auth.token, data)
+    .then(() => toast.success("Profil módosítva!"))
+    .catch((error) => { 
+      console.error(error);
+      switch (error.response?.data?.code) {
+        case "fields_required":
+        case "fields_invalid":
+          return toast.error("Az egyik mező hibás vagy helytelen jelszó!")
+        case "bad_request":
+          return toast.error("Helytelen jelszó!")
+        case "password_too_weak":
+          return toast.error("Az új jelszó nem elég erős!")
+        default:
+          return toast.error("Ismeretlen hiba történt!")
+      }
+    });
   }
-
-  console.log(auth.token);
-  // console.log(getAllEmployees());
   
 
   return (
-    <div className='flex flex-col items-center w-full p-4'>
-      <h2 className='text-xl font-bold mb-4'>Beállíások</h2>
+    <div className='flex flex-col items-center w-full p-4 pt-10'>
       <div className='max-w-[600px] w-[600px] bg-[#18181b] rounded-xl'>
-        <div className={`${auth.user.roles.includes("administrator") ? "bg-red-500" : "bg-green-500"} px-4 py-2 rounded-t-xl relative h-20`}></div>
+        <h2 className='sr-only'>Beállíások</h2>
+        <div className={`${auth.user.roles.includes("administrator") ? "bg-red-500" : "bg-green-500"} px-4 py-2 rounded-t-xl relative h-14`}></div>
         <form className='text-right min-h-20 flex gap-2 px-4 mb-4' onSubmit={handleSubmit}>
           <div className='min-w-36 min-h-36 relative'>
             <Avatar className="min-w-36 min-h-36 absolute border-4 border-[#18181b] -top-10">
@@ -46,53 +59,31 @@ export default function Settings() {
             <div className='pointer-events-none absolute min-w-36 min-h-36 flex justify-center items-center peer-hover:bg-black/30 opacity-0 peer-hover:opacity-100 rounded-full transition-all duration-300 -top-10'><Pen /></div>
             <Button className="absolute bottom-0 left-0 w-full font-bold" type="submit">Mentés</Button>
           </div>
-          <div className='w-full flex flex-col'>
-            <div className='p-3 flex justify-between items-center relative'>
-              <div className='flex flex-col w-full absolute'>
-                <label className='opacity-50 text-sm text-left'>Felhasználónév</label>
-                <input name='name' type="text" value={formData.name} onChange={handleChange} className='bg-transparent outline-none w-full absolute pt-4' />
-              </div>
-              <Pen className='ml-auto mt-6' />
+          <div className='w-full flex flex-col pt-6 p-4 gap-4'>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="name" className="text-left">Teljes név *</Label>
+              <Input name="name" type="text" id="name" placeholder="Minta Péter" required defaultValue={auth.user.name} />
             </div>
-            <div className='p-3 flex justify-between items-center relative'>
-              <div className='flex flex-col w-full absolute'>
-                <label className='opacity-50 text-sm text-left'>Jelszó</label>
-                <input name='password' type="password" value={formData.password} onChange={handleChange} className='bg-transparent outline-none w-full absolute pt-4' />
-              </div>
-              <Pen className='ml-auto mt-6' />
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="email" className="text-left">E-mail cím *</Label>
+              <Input name="email" type="email" id="email" placeholder="minta.peter@example.com" required defaultValue={auth.user.email} />
             </div>
-            <div className='p-3 flex justify-between items-center relative'>
-              <div className='flex flex-col w-full absolute'>
-                <label className='opacity-50 text-sm text-left'>Email</label>
-                <input name='email' type="email" value={formData.email} onChange={handleChange} className='bg-transparent outline-none w-full absolute pt-4' />
-              </div>
-              <Pen className='ml-auto mt-6' />
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="old_password" className="text-left">Jelenlegi jelszó *</Label>
+              <Input name="old_password" type="password" id="old_password" required />
+            </div>
+            <Separator />
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="new_password" className="text-left">Új jelszó</Label>
+              <Input name="new_password" type="password" id="new_password" />
+            </div>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="new_password_again" className="text-left">Új jelszó újra</Label>
+              <Input name="new_password_again" type="password" id="new_password_again" />
             </div>
           </div>
         </form>
       </div>
-      {/* <div className='w-96'>
-        <div className='bg-[#2a2a30] rounded-xl divide-y divide-black'>
-        <div className='p-3 flex justify-between items-center'>
-            <div className='flex flex-col'>
-              <label className='opacity-50 text-sm'>Felhasználónév</label>
-              <input type="text" value={"Username"} className='bg-transparent' />
-            </div>
-            <Pen />
-          </div>
-          <div className='p-3 flex justify-between items-center'>
-            <div className='flex flex-col'>
-              <label className='opacity-50 text-sm'>Jelszó</label>
-              <input type="password" value={"12345678"} className='bg-transparent' />
-            </div>
-            <Pen />
-          </div>
-          <div className='p-3 flex justify-between items-center'>
-            <p>Profilkép</p>
-            <input type="file" className='bg-transparent w-20 rounded-lg' />
-          </div>
-        </div>
-      </div> */}
     </div>
   )
 }

@@ -149,3 +149,16 @@ export async function register(invite_id: string, name: string, email:string, pa
     )
   ).data;
 }
+
+export async function updateUser(token: string, data: { name?:string, email?:string, new_password?:string, old_password:string }) {
+  return (
+    await axios.post(
+      API_URL + "/auth/update", 
+      data, 
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}

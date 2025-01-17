@@ -64,6 +64,48 @@ export async function getGroup(token: string, ...ids: string[]) {
   ).data;
 }
 
+export async function getGroupWithDetails(token: string, ...ids: string[]) {
+  return (
+    await axios.get(
+      API_URL + "/group/get", 
+      {
+        params: { 
+          ids: ids.join(","),
+          include: "lessons,subjects,enroled"
+        },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
+export async function getSubject(token: string, ...ids: string[]) {
+  return (
+    await axios.get(
+      API_URL + "/subject/get", 
+      {
+        params: { ids: ids.join(",") },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
+export async function getStudent(token: string, ...ids: string[]) {
+  return (
+    await axios.get(
+      API_URL + "/student/get", 
+      {
+        params: { ids: ids.join(",") },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
 export async function createGroup(token: string, name:string, location:string, teachers:string[], notes:string, lessons:object[]) {
   return (
     await axios.post(

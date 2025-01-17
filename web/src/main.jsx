@@ -25,6 +25,7 @@ const LoginPage = lazy(() => import('@/routes/Login'))
 const RegisterPage = lazy(() => import('@/routes/Register'))
 const Locations = lazy(() => import('@/routes/Locations'))
 const Groups = lazy(() => import('@/routes/Groups'))
+const GroupDetails = lazy(() => import('@/routes/GroupDetails'))
 const Subjects = lazy(() => import('@/routes/Subjects'))
 
 
@@ -67,6 +68,7 @@ const router = createBrowserRouter([
       {path: "/calendar/add/group", element: <AddCalendarGroup />},
       {path: "/calendar/add/event", element: <AddCalendarEvent />},
       {path: "/groups", element: <Groups />},
+      {path: "/groups/:id", element: <GroupDetails />},
       {path: "/locations", element: <Locations />},
       {path: "/subjects", element: <Subjects />},
     ]

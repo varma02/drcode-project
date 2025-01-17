@@ -8,10 +8,11 @@ import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function Groups() {
   const auth = useAuth()
+  const navigate = useNavigate()
   const [groups, setGroups] = useState([])
   const [teachers, setTeachers] = useState({})
 
@@ -108,7 +109,7 @@ export default function Groups() {
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Csoportok</h1>
 
-      <DataTable data={groups} columns={columns}
+      <DataTable data={groups} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("group:", ""))}
       headerAfter={<div className='flex gap-4 pl-4'>
         <AreYouSureAlert />
         <Link to='add'>

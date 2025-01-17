@@ -89,6 +89,18 @@ export async function getAllLocations(token: string) {
   ).data;
 }
 
+export async function getAllSubjects(token: string) {
+  return (
+    await axios.get(
+      API_URL + "/subject/all", 
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
 export async function getLocation(token: string, ...ids: string[]) {
   return (
     await axios.get(

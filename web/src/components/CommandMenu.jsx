@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger }
 import { Input } from './ui/input'
 import { Combobox } from './ComboBox'
 
-export const CommandMenu = () => {
+export default function CommandMenu() {
   const auth = useAuth()
   const [commandOpen, setCommandOpen] = useState(false)
   const navigate = useNavigate()

@@ -9,8 +9,8 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
 import { AuthProvider, useAuth } from '@/lib/api/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
-import { CommandMenu } from './components/CommandMenu'
-import { Groups } from './routes/Groups'
+
+const CommandMenu = lazy(() => import('./components/CommandMenu'))
 
 const Home = lazy(() => import('@/routes/Home'))
 const Search = lazy(() => import('@/routes/Search'))
@@ -23,6 +23,10 @@ const AddCalendarGroup = lazy(() => import('@/routes/AddCalendarGroup'))
 const AddCalendarEvent = lazy(() => import('@/routes/AddCalendarEvent'))
 const LoginPage = lazy(() => import('@/routes/Login'))
 const RegisterPage = lazy(() => import('@/routes/Register'))
+const Locations = lazy(() => import('@/routes/Locations'))
+const Groups = lazy(() => import('@/routes/Groups'))
+const Subjects = lazy(() => import('@/routes/Subjects'))
+
 
 function SidebarWrapper() {
   const navigate = useNavigate();
@@ -63,6 +67,8 @@ const router = createBrowserRouter([
       {path: "/calendar/add/group", element: <AddCalendarGroup />},
       {path: "/calendar/add/event", element: <AddCalendarEvent />},
       {path: "/groups", element: <Groups />},
+      {path: "/locations", element: <Locations />},
+      {path: "/subjects", element: <Subjects />},
     ]
   },
   {

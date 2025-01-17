@@ -8,6 +8,7 @@ import groupsRouter from './routes/groups';
 import locationsRouter from './routes/location';
 import lessonRouter from './routes/lesson';
 import inviteRouter from './routes/invite';
+import subjectRouter from './routes/subject';
 
 export const app = express();
 
@@ -46,6 +47,7 @@ export async function setup(): Promise<string | null> {
   app.use('/location', locationsRouter);
   app.use('/lesson', lessonRouter);
   app.use('/invite', inviteRouter);
+  app.use('/subject', subjectRouter);
   
   app.use((req, res, next) => {
     res.status(404).json({

@@ -2,7 +2,7 @@ import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAllGroups, getEmployee } from '@/lib/api/api'
+import { getAllGroups, getAllLocations, getEmployee } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -10,25 +10,13 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-export default function Groups() {
+export default function Locations() {
   const auth = useAuth()
-  const [groups, setGroups] = useState([])
-  const [teachers, setTeachers] = useState({})
+  const [locations, setLocations] = useState([])
 
   useEffect(() => {
-    getAllGroups(auth.token).then(data => setGroups(data.data.groups))
+    getAllLocations(auth.token).then(data => setLocations(data.data.locations))
   }, [])
-
-  useEffect(() => {
-    const tids = new Set()
-    groups.forEach(e => e.teachers.forEach(t => tids.add(t)))
-    if (tids.size === 0) return;
-    getEmployee(auth.token, Array.from(tids)).then(data => {
-      const temp = {}
-      data.data.employees.forEach(e => temp[e.id] = e.name)
-      setTeachers(temp)
-    });
-  }, [groups])
 
   const columns = [
     {
@@ -73,8 +61,8 @@ export default function Groups() {
       },
     },
     {
-      displayName: "Helyszín",
-      accessorKey: "location",
+      displayName: "Cím",
+      accessorKey: "address",
       header: ({ column }) => {
         return (
           <Button
@@ -87,28 +75,34 @@ export default function Groups() {
           </Button>
         )
       },
-      cell: ({ row }) => (row.getValue("location")?.name || "N/A"),
     },
     {
-      displayName: "Tanárok",
-      accessorKey: "teachers",
+      accessorKey: "contact_email",
+      displayName: "E-mail cím",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => row.getValue("teachers")?.map(e => teachers[e]).join(", ") || "N/A",
+    },
+    {
+      accessorKey: "contact_phone",
+      displayName: "Telefonszám",
+      header: ({ column }) => column.columnDef.displayName,
+    },
+    {
+      accessorKey: "notes",
+      displayName: "Megjegyzés",
+      header: ({ column }) => column.columnDef.displayName,
     },
     {
       displayName: "Létrehozva",
       accessorKey: "created",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => (
-        <div className="capitalize text-center">{format(new Date(row.getValue("created")), "P", {locale: hu} )}</div>
-      ),
+      cell: ({ row }) => format(new Date(row.getValue("created")), "P", {locale: hu}),
     },
   ]
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
-      <h1 className='text-4xl py-4'>Csoportok</h1>
+      <h1 className='text-4xl py-4'>Helyszínek</h1>
 
-      <DataTable data={groups} columns={columns}
+      <DataTable data={locations} columns={columns}
       headerAfter={<div className='flex gap-4 pl-4'>
         <AreYouSureAlert />
         <Link to='add'>

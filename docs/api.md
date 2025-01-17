@@ -264,7 +264,7 @@ Retrieves groups' data, including the specified details.
 ##### Query parameters
 - `ids`: the IDs of the groups to retrieve (list separated by commas, ex: field1,field2)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
-	- `students`: a list of students enroled to the group
+	- `enroled`: a list of enrolments to the group
 	- `subjects`: the subjects that students are enroled to
 	- `lessons`: all lessons assigned to the selected group
 ##### Response on success

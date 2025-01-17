@@ -33,7 +33,7 @@ groupsRouter.get('/get', errorHandler(async (req, res) => {
   selection.push("*");
   if (req.query.include) {
     const include = new Set((req.query.include as string).trim().split(","));
-    if (include.has("students")) selection.push("<-enroled<-student as students");
+    if (include.has("enroled")) selection.push("<-enroled.* as enroled");
     if (include.has("subjects")) selection.push("array::group(<-enroled.subject) as subjects");
     if (include.has("lessons")) selection.push("(SELECT VALUE id FROM lesson WHERE $parent.id = group.id) AS lessons");
   }

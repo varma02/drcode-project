@@ -47,6 +47,7 @@ $kodular = CREATE ONLY subject CONTENT {
 
 $elek = CREATE ONLY student CONTENT {
   name: "Ebéd Elek",
+  grade: 5,
   parent: {
     name: "Ebéd Bakos",
     email: "support@bakos.hu",
@@ -56,6 +57,7 @@ $elek = CREATE ONLY student CONTENT {
 
 $joska = CREATE ONLY student CONTENT {
   name: "Főznünk Kell Józsi",
+  grade: 4,
   parent: {
     name: "Mr Fehér",
     email: "walter@citromail.hu",
@@ -65,6 +67,7 @@ $joska = CREATE ONLY student CONTENT {
 
 $pisti = CREATE ONLY student CONTENT {
   name: "Erős Pista",
+  grade: 5,
   parent: {
     name: "Univer-Product Zrt.",
     email: "informacio@univer.hu",

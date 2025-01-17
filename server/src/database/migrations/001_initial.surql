@@ -47,13 +47,13 @@ DEFINE TABLE student SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE student TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE student TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD grade ON TABLE student TYPE int;
 DEFINE FIELD parent ON TABLE student TYPE option<object>;
 DEFINE FIELD parent.name ON TABLE student TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD parent.email ON TABLE student TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD parent.phone ON TABLE student TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD email ON TABLE student TYPE option<string> ASSERT string::is::email($value);
 DEFINE FIELD phone ON TABLE student TYPE option<string> ASSERT string::len($value) <= 48;
-DEFINE FIELD extra_fields ON TABLE student FLEXIBLE TYPE object DEFAULT {};
 DEFINE FIELD notes ON TABLE student TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 
 

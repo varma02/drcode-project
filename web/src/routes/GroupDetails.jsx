@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
-import { getGroup, getGroupWithDetails, getStudent, getSubject } from "@/lib/api/api"
+import { getEmployee, getGroup, getGroupWithDetails, getStudent, getSubject } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
 import { hu, id } from "date-fns/locale"
@@ -21,6 +21,7 @@ export default function GroupDetails() {
   const [group, setGroup] = useState(null)
   const [subjects, setSubjects] = useState(null)
   const [students, setStudents] = useState(null)
+  const [teachers, setTeachers] = useState(null)
 
   useEffect(() => {
     getGroupWithDetails(auth.token, "group:" + params.id)
@@ -45,6 +46,14 @@ export default function GroupDetails() {
       .then(data => setStudents(data.data.students))
     else
       setStudents([])
+
+    const tids = new Set()
+    group.teachers?.forEach(s => tids.add(s))
+    if (tids.size !== 0)
+      getEmployee(auth.token, Array.from(tids))
+      .then(data => setTeachers(data.data.employees))
+    else
+      setTeachers([])
   }, [group]);
 
 
@@ -100,7 +109,7 @@ export default function GroupDetails() {
       cell: ({ row }) => subjects.find(s => s.id == row.original.subject)?.name,
     },
     {
-      displayName: "Létrehozva",
+      displayName: "Csoportba felvéve",
       accessorKey: "created",
       header: ({ column }) => column.columnDef.displayName,
       cell: ({ row }) => (
@@ -116,26 +125,50 @@ export default function GroupDetails() {
         <Textarea id="notes" placeholder="Lorem ipsum dolor..." className="h-28 max-h-48" defaultValue={group.notes} />
       </div>
 
-      <div className="flex flex-col gap-2 py-4">
-        <h3 className='font-bold'>Kurzusok</h3>
-        {subjects?.length > 0 ? (
-          <ScrollArea className='pb-2 overflow-x-auto'>
-            <div className='flex w-max gap-4 pb-1'>
-              {subjects.map(subject => (
-                <Link to={`/subjects/${subject.id}`} key={subject.id}>
-                  <Button variant='outline' className='flex items-center gap-2'>
-                    {subject.name} <SquareArrowOutUpRight />
-                  </Button>
-                </Link>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        ) : subjects ? (
-          <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>
-        ) : (
-          <LoaderCircle className='animate-spin ' />
-        )}
+      <div className="flex flex-col lg:flex-row lg:gap-10">
+        <div className="flex flex-col gap-2 py-4">
+          <h3 className='font-bold'>Tanárok</h3>
+          {teachers?.length > 0 ? (
+            <ScrollArea className='pb-2 overflow-x-auto'>
+              <div className='flex w-max gap-4 pb-1'>
+                {teachers.map(teacher => (
+                  <Link to={`/employee/${teacher.id.replace("employee:", "")}`} key={teacher.id}>
+                    <Button variant='outline' className='flex items-center gap-2'>
+                      {teacher.name} <SquareArrowOutUpRight />
+                    </Button>
+                  </Link>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          ) : teachers ? (
+            <p>Ehhez a csoporthoz még nem tartoznak tanárok.</p>
+          ) : (
+            <LoaderCircle className='animate-spin ' />
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2 py-4">
+          <h3 className='font-bold'>Kurzusok</h3>
+          {subjects?.length > 0 ? (
+            <ScrollArea className='pb-2 overflow-x-auto'>
+              <div className='flex w-max gap-4 pb-1'>
+                {subjects.map(subject => (
+                  <Link to={`/subjects/${subject.id.replace("subject:", "")}`} key={subject.id}>
+                    <Button variant='outline' className='flex items-center gap-2'>
+                      {subject.name} <SquareArrowOutUpRight />
+                    </Button>
+                  </Link>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          ) : subjects ? (
+            <p>Ehhez a csoporthoz még nem tartoznak kurzusok.</p>
+          ) : (
+            <LoaderCircle className='animate-spin ' />
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col gap-2 py-4">

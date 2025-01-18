@@ -124,7 +124,7 @@ export default function EmployeeDetails() {
           <ScrollArea className='pb-2 overflow-x-auto'>
             <div className='flex w-max gap-4 pb-1'>
               {groups.map(group => (
-                <Link to={`/groups/${group.id}`} key={group.id}>
+                <Link to={`/groups/${group.id.replace("group:", "")}`} key={group.id}>
                   <Button variant='outline' className='flex items-center gap-2'>
                     {group.name} <SquareArrowOutUpRight />
                   </Button>

@@ -44,7 +44,13 @@ function SidebarWrapper() {
     <SidebarProvider>
       <SidebarTrigger className="fixed top-0 p-4" />
       <AppSidebar />
-      <Outlet />
+      <Suspense fallback={
+        <div className='h-screen w-full bg-background flex items-center justify-center'>
+          <LoaderCircle className='animate-spin ' />
+        </div>
+      }>
+        <Outlet />
+      </Suspense>
       <CommandMenu />
     </SidebarProvider>
   ) : (

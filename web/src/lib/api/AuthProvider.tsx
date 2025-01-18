@@ -1,21 +1,20 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 
-import { ErrorResponse, LoginResponse, MeResponse } from "./models";
-import { API_URL } from "./constants";
+import { API_URL, defaultTimeout } from "./constants";
 import axios from "axios";
 
-async function loginEmailPassword(email: string, password: string, remember: boolean): Promise<LoginResponse | ErrorResponse> {
-  return (await axios.post(API_URL + "/auth/login", { email, password, remember }, { timeout: 2000 })).data;
+async function loginEmailPassword(email: string, password: string, remember: boolean): Promise<any> {
+  return (await axios.post(API_URL + "/auth/login", { email, password, remember }, { timeout: defaultTimeout })).data;
 }
 
-async function getLoggedInUser(token:string): Promise<MeResponse | ErrorResponse> {
-  return (await axios.get(API_URL + "/auth/me", {headers: {Authorization: `Bearer ${token}`}, timeout: 2000})).data;
+async function getLoggedInUser(token:string): Promise<any> {
+  return (await axios.get(API_URL + "/auth/me", {headers: {Authorization: `Bearer ${token}`}, timeout: defaultTimeout})).data;
 }
 
 type AuthState = "loading" | "yes" | "no";
 
 const AuthContext = createContext<{
-  user: null | MeResponse["data"]["employee"],
+  user: null | object,
   token: null | string,
   authState: AuthState,
   loginEmailPassword: (email: string, password: string, remember: boolean) => Promise<void>,
@@ -40,7 +39,7 @@ export function AuthProvider({children}) {
       getLoggedInUser(localToken).then((response) => {
         if (response) {
           console.debug("User logged in")
-          setUser((response as MeResponse).data.employee)
+          setUser(response.data.employee)
           setToken(localToken)
           setAuthState("yes")
         } else {
@@ -67,7 +66,7 @@ export function AuthProvider({children}) {
       try {
         const response = await loginEmailPassword(email, password, remember)
         if (response.code !== "success") throw response
-        const { token, employee } = (response as LoginResponse).data
+        const { token, employee } = response.data
         localStorage.setItem("drcode-auth-token", token)
         setUser(employee)
         setToken(token)

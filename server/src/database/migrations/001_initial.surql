@@ -8,6 +8,7 @@ DEFINE TABLE employee SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE employee TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE employee TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD notes ON TABLE employee TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD email ON TABLE employee TYPE string ASSERT string::is::email($value);
 DEFINE FIELD password ON TABLE employee TYPE string;
 DEFINE FIELD roles ON TABLE employee TYPE set<"teacher" | "administrator">;

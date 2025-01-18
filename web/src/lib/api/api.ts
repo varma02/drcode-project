@@ -26,12 +26,15 @@ export async function getEmployee(token: string, ...ids: string[]) {
   ).data;
 }
 
-export async function getEmployeeWithDetails(token: string, ids: string[], details: string[]) {
+export async function getEmployeeWithDetails(token: string, ...ids: string[]) {
   return (
     await axios.get(
       API_URL + "/employee/get",
       {
-        params: { ids: ids.join(","), include: details.join(",") },
+        params: {
+          ids: ids.join(","),
+          include: "groups,unpaid_work"
+        },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }

@@ -18,7 +18,7 @@ const CalendarPage = lazy(() => import('@/routes/CalendarPage'))
 const Settings = lazy(() => import('@/routes/Settings'))
 const Inbox = lazy(() => import('@/routes/Inbox'))
 const Employee = lazy(() => import('@/routes/Employee'))
-// const EmployeeDetails = lazy(() => import('@/components/EmployeeDetails'))
+const EmployeeDetails = lazy(() => import('@/routes/EmployeeDetails'))
 const AddCalendarGroup = lazy(() => import('@/routes/AddCalendarGroup'))
 const AddCalendarEvent = lazy(() => import('@/routes/AddCalendarEvent'))
 const LoginPage = lazy(() => import('@/routes/Login'))
@@ -64,7 +64,8 @@ const router = createBrowserRouter([
       {path: "/calendar", element: <CalendarPage />},
       {path: "/search", element: <Search />},
       {path: "/settings", element: <Settings />},
-      {path: "/employee/", element: <Employee />},
+      {path: "/employee", element: <Employee />},
+      {path: "/employee/:id", element: <EmployeeDetails />},
       {path: "/calendar/add/group", element: <AddCalendarGroup />},
       {path: "/calendar/add/event", element: <AddCalendarEvent />},
       {path: "/groups", element: <Groups />},

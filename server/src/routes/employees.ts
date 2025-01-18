@@ -35,7 +35,7 @@ employeesRouter.get('/get', errorHandler(async (req, res) => {
     if (include.has("groups")) selection.push("(SELECT VALUE id FROM group WHERE type::thing($parent.id) IN teachers) as groups");
   }
   const employees = (await db.query<Employee[][]>(`
-    SELECT ${selection.join(",")} OMIT password, session_key FROM array::map($ids, |$id| type::thing($id));
+    SELECT ${selection.join(", ")} OMIT password, session_key FROM array::map($ids, |$id| type::thing($id));
   `, {ids}))[0];
 
   if (!employees || !employees.length)

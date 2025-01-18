@@ -9,7 +9,6 @@ import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, ArrowUpDown, Copy, LoaderCircle, Plus, SquareArrowOutUpRight, Trash } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { getMonogram, getTopRole, role_map } from '@/lib/utils';
 import { GroupComboBox } from '@/components/GroupComboBox';
@@ -18,9 +17,11 @@ import { Input } from '@/components/ui/input';
 import { Card} from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import AreYouSureAlert from '@/components/AreYouSureAlert';
+import { useNavigate } from 'react-router-dom';
 
 export default function Employee() {
   const auth = useAuth();
+  const navigate = useNavigate();
 
   const [employees, setEmployees] = useState([])
 
@@ -163,21 +164,18 @@ export default function Employee() {
         <ScrollArea className='pb-2 overflow-x-auto'>
           <div className='flex w-max gap-4 pb-1'>
             {invites.map(invite => (
-              <Card key={invite.id} className="flex flex-row p-2 gap-2 items-center">
-                <p className='text-base'>
-                  {invite.id.replace("invite:", "")}
-                </p>
-                <Button variant="outline" size="icon" onClick={() => {setSelectedInvite(invite);setInviteDialogOpen(true)}}>
-                  <SquareArrowOutUpRight />
-                </Button>
-              </Card>
+              <Button variant='outline' className='flex items-center gap-2' key={invite.id}
+              onClick={() => {setSelectedInvite(invite);setInviteDialogOpen(true)}}>
+                {invite.id.replace("invite:", "")} <SquareArrowOutUpRight />
+              </Button>
             ))}
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </>)}
 
-      <DataTable data={employees} columns={columns} //rowOnClick={(v)=>navigate(`/employee/${v.original.id.replace("employee:", "")}`)}
+      <DataTable data={employees} columns={columns}
+      rowOnClick={(v)=>navigate(v.original.id.replace("employee:", ""))}
       headerAfter={<div className='flex gap-4 pl-4'>
         <AreYouSureAlert />
         <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>

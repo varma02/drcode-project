@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from './ui/command'
 import { useNavigate } from 'react-router-dom'
-import { getAllEmployees, getAllGroups, getAllInvites, getAllLocations } from '@/lib/api/api'
+import { getAllEmployees, getAllGroups, getAllInvites, getAllLocations, getAllSubjects } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from './ui/dialog'
 import { Input } from './ui/input'
@@ -61,15 +61,19 @@ export default function CommandMenu() {
       },
       {
         title: "Log Employees",
-        func(value) { getAllEmployees(auth.token).then(data => console.log(data.data.employees)) },
+        func: (value) => getAllEmployees(auth.token).then(data => console.log(data.data.employees)),
       },
       {
         title: "Log Locations",
-        func(value) { getAllLocations(auth.token).then(data => console.log(data.data.locations)) },
+        func: (value) => getAllLocations(auth.token).then(data => console.log(data.data.locations)),
       },
       {
         title: "Log Invites",
-        func(value) { getAllInvites(auth.token).then(data => console.log(data.data.invites)) },
+        func: (value) => getAllInvites(auth.token).then(data => console.log(data.data.invites)),
+      },
+      {
+        title: "Log Subjects",
+        func: (value) => getAllSubjects(auth.token).then(data => console.log(data.data.subjects)),
       },
     ]
   }

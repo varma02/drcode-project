@@ -872,3 +872,129 @@ Removes a subject. Admin only.
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no subject with the provided ID
+
+## Student management `/student`
+
+### Get a list of all student `GET /all`
+Gets a list of all students.
+##### Response on success
+```
+{
+	code: "success",
+	message: "All students retrieved",
+	data: {
+		students: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+
+### Get students by ID `GET /get`
+Retrieves students' data.
+##### Query parameters
+- `ids`: the IDs of the students to retrieve (list separated by commas, ex: field1,field2)
+##### Response on success
+```
+{
+	code: "success",
+	message: "Student(s) retrieved",
+	data: {
+		students: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no student with the provided ID
+
+### Create an student `POST /create`
+Creates a student. Admin only!
+##### Request body
+```
+{
+	name: "Scratch",
+	grade: 5,
+
+	// the following is optional
+	email: "gyerok@example.com",
+	phone: "+3612345678",
+	parent: {
+		name: "Parent",
+		email: "parent@example.com",
+		phone: "+3612345678"
+	},
+	notes: ""
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Student created",
+	data: {
+		student: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Update a student `POST /update`
+Updates a student. Admin only!
+##### Request body
+```
+{
+	id: "student:123",
+
+	// the following is optional
+
+	name: "Scratch",
+	grade: 5,
+	email: "gyerok@example.com",
+	phone: "+3612345678",
+	parent: {
+		name: "Parent",
+		email: "parent@example.com",
+		phone: "+3612345678"
+	},
+	notes: ""
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "student updated",
+	data: {
+		student: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+- `not_found`: there is no student with the provided ID
+
+### Remove a student `POST /remove`
+Removes a student. Admin only.
+##### Request body
+```
+{
+	id: "student:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Student removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no student with the provided ID

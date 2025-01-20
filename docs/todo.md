@@ -50,16 +50,31 @@ asztali alkalmazásként készül el).
 	- [x] Get logged in user
 	- [x] Update user
 - Employees
-	- [x] Get all
-	- [x] Get one
-		- [x] Unpaid work
-		- [x] Classes
-	- [x] Invite
-	- [x] Remove
-	- [x] Update
-- Classes
-	- [ ] Get all
-	- [ ] Get one
-	- [ ] Create
-	- [ ] Remove
-	- [ ] Update
+	- [x] Default CRUD
+	- [x] Invite new employees
+	- [x] get unpaid work
+	- [x] get groups where employee is a teacher
+- Groups
+	- [x] Default CRUD
+	- [x] get lessons
+	- [x] get enroled students
+	- [x] get subjects
+- Students
+	- [x] Default CRUD
+	- [ ] get groups where student is enroled
+	- [ ] get attendance
+- Lessons
+	- [x] Default CRUD
+	- [x] get lessons between dates
+	- [x] get attendance
+	- [x] get replacing students
+- Locations
+	- [x] Default CRUD
+	- [ ] get groups at location
+	- [ ] get lessons at location
+- Subjects
+	- [x] Default CRUD
+	- [ ] get groups with subject
+	- [ ] get teachers who teach subject
+- Invites
+	- [x] Default CRUD

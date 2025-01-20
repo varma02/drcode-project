@@ -39,7 +39,6 @@
 				"esbenp.prettier-vscode",
 				"surrealdb.surrealql",
 				"formulahendry.auto-rename-tag",
-				"rangav.vscode-thunder-client",
 				"unjinjang.rest-api-client"
 			]
 		}

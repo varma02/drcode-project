@@ -31,7 +31,7 @@ asztali alkalmazásként készül el).
 - [x] Sidebar design
 - [x] Calendar / schedule page design
 - [ ] Admin dashboard design
-- [ ] Profile page design
+- [x] Profile page design
 - [ ] Route transitions
 - [ ] Add Poppins font
 

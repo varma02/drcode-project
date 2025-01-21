@@ -116,7 +116,7 @@ groupsRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   if (!id.startsWith("group:"))
     throw new FieldsInvalidError();
 
-  const group = (await db.query(`DELETE ONLY type::thing($id);`, { id }))[0];
+  const group = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
 
   res.status(200).json({
     code: "success",

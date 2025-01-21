@@ -95,7 +95,7 @@ subjectRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   if (!id.startsWith("subject:"))
     throw new FieldsInvalidError();
 
-  const subject = (await db.query(`DELETE ONLY type::thing($id);`, { id }))[0];
+  const subject = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
 
   res.status(200).json({
     code: "success",

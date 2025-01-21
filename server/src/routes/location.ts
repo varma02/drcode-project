@@ -51,13 +51,8 @@ locationsRouter.get('/get', errorHandler(async (req, res) => {
 
 locationsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
   const { name, notes, address, contact_email, contact_phone } = req.body;
-  if (!name || !address || !contact_email || !contact_phone) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "One or more of the required fields are missing",
-    });
-    return;
-  }
+  if (!name || !address || !contact_email || !contact_phone) 
+    throw new FieldsRequiredError();
 
   const location = (await db.query(`
     CREATE ONLY location CONTENT {
@@ -78,13 +73,10 @@ locationsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
 
 locationsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   const { id, name, notes, address, contact_email, contact_phone } = req.body;
-  if (!id || !id.startsWith("location:")) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "The ID field is required",
-    });
-    return;
-  }
+  if (!id) 
+    throw new FieldsRequiredError();
+  if (!id.startsWith("location:")) 
+    throw new FieldsInvalidError();
 
   const location = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
@@ -105,15 +97,12 @@ locationsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
 
 locationsRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   const { id } = req.body;
-  if (!id || !id.startsWith("location:")) {
-    res.status(400).json({
-      code: "fields_required",
-      message: "The ID field is required",
-    });
-    return;
-  }
+  if (!id) 
+    throw new FieldsRequiredError();
+  if (!id.startsWith("location:")) 
+    throw new FieldsInvalidError();
 
-  const location = (await db.query(`DELETE ONLY type::thing($id);`, { id }))[0];
+  const location = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
 
   res.status(200).json({
     code: "success",

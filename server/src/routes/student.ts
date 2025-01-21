@@ -99,7 +99,7 @@ studentRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   if (!id.startsWith("student:"))
     throw new FieldsInvalidError();
 
-  const student = (await db.query(`DELETE ONLY type::thing($id);`, { id }))[0];
+  const student = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
 
   res.status(200).json({
     code: "success",

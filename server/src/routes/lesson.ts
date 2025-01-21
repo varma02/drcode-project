@@ -128,7 +128,7 @@ lessonRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   if (!id.startsWith("lesson:")) 
     throw new FieldsInvalidError();
 
-  const lesson = (await db.query(`DELETE ONLY type::thing($id);`, { id }))[0];
+  const lesson = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
 
   res.status(200).json({
     code: "success",

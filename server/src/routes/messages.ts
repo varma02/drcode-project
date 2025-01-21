@@ -10,15 +10,19 @@ const messagesRouter = express.Router();
 messagesRouter.use(ensureAuth);
 
 messagesRouter.get('/received', errorHandler(async (req, res) => {
-  const { page = 1, limit = 50 } = req.query;
+  const { page = 1, limit = 50, author, include = "global" } = req.query;
   if (isNaN(+page) || isNaN(+limit)) 
     throw new FieldsInvalidError();
-  if (+page < 1 || +limit < 1)
+  if (+page < 1 || +limit < 1 || +limit > 50)
     throw new FieldsInvalidError();
+
+  const include_global = include?.toString().includes("global");
+  const include_direct = include?.toString().includes("direct");
 
   const messages = (await db.query(`
     SELECT * FROM message 
-    WHERE recipient IN [$user_id, NONE, NULL] 
+    WHERE recipient IN [${include_direct ? "$user_id," : ""} ${include_global ? "NONE, NULL," : ""}] 
+    ${author ? `AND author IN [$author, $user_id]` : ""}
     ORDER BY created DESC
     LIMIT $limit
     START $page * $limit - $limit;
@@ -26,6 +30,7 @@ messagesRouter.get('/received', errorHandler(async (req, res) => {
     user_id: req.employee?.id,
     page: +page,
     limit: +limit,
+    author,
   }))[0];
 
   res.status(200).json({

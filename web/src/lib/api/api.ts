@@ -197,6 +197,18 @@ export async function getAllInvites(token: string) {
   ).data;
 }
 
+export async function getAllStudents(token: string) {
+  return (
+    await axios.get(
+      API_URL + "/student/all", 
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
 export async function register(invite_id: string, name: string, email:string, password:string) {
   return (
     await axios.post(

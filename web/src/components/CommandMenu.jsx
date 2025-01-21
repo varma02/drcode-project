@@ -1,11 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from './ui/command'
 import { useNavigate } from 'react-router-dom'
-import { getAllEmployees, getAllGroups, getAllInvites, getAllLocations, getAllSubjects } from '@/lib/api/api'
+import { getAllEmployees, getAllGroups, getAllInvites, getAllLocations, getAllStudents, getAllSubjects } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from './ui/dialog'
-import { Input } from './ui/input'
-import { Combobox } from './ComboBox'
 
 export default function CommandMenu() {
   const auth = useAuth()
@@ -74,6 +71,10 @@ export default function CommandMenu() {
       {
         title: "Log Subjects",
         func: (value) => getAllSubjects(auth.token).then(data => console.log(data.data.subjects)),
+      },
+      {
+        title: "Log Students",
+        func: (value) => getAllStudents(auth.token).then(data => console.log(data.data.students)),
       },
     ]
   }

@@ -49,46 +49,46 @@ asztali alkalmazásként készül el).
 	- [x] Clear sessions
 	- [x] Get logged in user
 	- [x] Update user
-	- [ ] docs
+	- [x] docs
 - Employees
 	- [x] Default CRUD
 	- [x] Invite new employees
 	- [x] get unpaid work
 	- [x] get groups where employee is a teacher
-	- [ ] docs
+	- [x] docs
 - Groups
 	- [x] Default CRUD
 	- [x] get lessons
 	- [x] get enroled students
 	- [x] get subjects
-	- [ ] docs
+	- [x] docs
 - Students
 	- [x] Default CRUD
 	- [ ] get groups where student is enroled
 	- [ ] get attendance
-	- [ ] docs
+	- [x] docs
 - Lessons
 	- [x] Default CRUD
 	- [x] get lessons between dates
 	- [x] get attendance
 	- [x] get replacing students
-	- [ ] docs
+	- [x] docs
 - Locations
 	- [x] Default CRUD
 	- [ ] get groups at location
 	- [ ] get lessons at location
-	- [ ] docs
+	- [x] docs
 - Subjects
 	- [x] Default CRUD
 	- [ ] get groups with subject
 	- [ ] get teachers who teach subject
-	- [ ] docs
+	- [x] docs
 - Invites
 	- [x] Default CRUD
-	- [ ] docs
+	- [x] docs
 - Messaging
 	- [x] Default CRUD
 	- [x] get all addressed to user
 	- [x] get all of author addressed to user
-	- [x] attachments
-	- [ ] docs
+	- [ ] attachments
+	- [x] docs

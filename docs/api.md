@@ -19,7 +19,6 @@ The response is always in JSON format, like this:
 - [Group management](#group-management-group)
 - [Location management](#location-management-location)
 - [Lesson management](#lesson-management-lesson)
-- [Event management](#event-management-event)
 - [Subject management](#subject-management-subject)
 
 ## Data models
@@ -175,7 +174,7 @@ Gets a list of all employees (without details). Admin only.
 ### Get employees by ID `GET /get`
 Retrieves employees' data, including the specified details.
 ##### Query parameters
-- `ids`: the IDs of the employees to retrieve (list separated by commas, ex: field1,field2)
+- `ids`: the IDs of the employees to retrieve (list separated by commas, ex: id1,id2)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `unpaid_work`: all the logged work for the given employee that hasn't been paid
 	- `groups`: all groups where the employee is the assigned teacher
@@ -262,7 +261,7 @@ Gets a list of all groups (without details).
 ### Get groups by ID `GET /get`
 Retrieves groups' data, including the specified details.
 ##### Query parameters
-- `ids`: the IDs of the groups to retrieve (list separated by commas, ex: field1,field2)
+- `ids`: the IDs of the groups to retrieve (list separated by commas, ex: id1,id2)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `enroled`: a list of enrolments to the group
 	- `subjects`: the subjects that students are enroled to
@@ -385,7 +384,7 @@ Gets a list of all locations.
 ### Get locations by ID `GET /get`
 Retrieves locations' data.
 ##### Query parameters
-- `ids`: the IDs of the locations to retrieve (list separated by commas, ex: field1,field2)
+- `ids`: the IDs of the locations to retrieve (list separated by commas, ex: id1,id2)
 ##### Response on success
 ```
 {
@@ -520,7 +519,7 @@ Retrieves all lessons between the two dates provided (without details).
 ### Get lessons by ID `GET /get`
 Retrieves lessons' data, including the specified details.
 ##### Query parameters
-- `ids`: the IDs of the lessons to retrieve (list separated by commas, ex: field1,field2)
+- `ids`: the IDs of the lessons to retrieve (list separated by commas, ex: id1,id2)
 - `include`: Get more details on fields (list separated by commas, ex: field1,field2)
 	- `students_attended`: a list of students who attended the lesson
 	- `students_replaced`: a list of students who replaced another lesson with this one
@@ -624,144 +623,6 @@ Removes a lesson. Admin only.
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no lesson with the provided ID
 
-## Event management `/event`
-
-### Get a list of all event `GET /all`
-Gets a list of all event (without details).
-##### Response on success
-```
-{
-	code: "success",
-	message: "All events retrieved",
-	data: {
-		events: { ... }
-	}
-}
-```
-##### Error codes
-- `unauthorized`: the user is not authorized to complete this action
-
-### Get all events between two dates `GET /between_dates`
-Retrives all events between the two dates provided (without details).
-##### Query parameters
-- `start`: Start ISO8601 datetime
-- `end`: End ISO8601 datetime
-##### Response on success
-```
-{
-	code: "success",
-	message: "Lessons retrieved",
-	data: {
-		lessons: { ... }
-	}
-}
-```
-##### Error codes
-- `unauthorized`: the user is not authorized to complete this action
-- `fields_required`: At least one query parameter is required
-
-### Get events by ID `GET /get`
-Retrieves events' data, including the specified details.
-##### Query parameters
-- `ids`: the IDs of the events to retrieve (list separated by commas, ex: field1,field2)
-##### Response on success
-```
-{
-	code: "success",
-	message: "Event retrieved",
-	data: {
-		Event: { ... }
-	}
-}
-```
-##### Error codes
-- `unauthorized`: the user is not authorized to complete this action
-- `not_found`: there is no event with the provided ID
-
-### Create an event `POST /create`
-Creates a event. Admin only!
-##### Request body
-```
-{
-	name: "Nagykőrös toborzás",
-	start: "2025-01-01T10:00:00Z",
-	end: "2025-01-01T15:00:00Z",
-	
-	// the following are optional
-	
-	location: "location:123",
-	signup_limit: 1,
-	notes: "",
-}
-```
-##### Response on success
-```
-{
-	code: "success",
-	message: "Event created",
-	data: {
-		event: { ... }
-	}
-}
-```
-##### Error codes
-- `unauthorized`: the user is not authorized to complete this action
-- `fields_required`: one or more of the required fields was not found in the body
-- `bad_request`: One or more fields are invalid
-
-### Update a event `POST /update`
-Updates a event. Admin only!
-##### Request body
-```
-{
-	id: "event:123"
-	
-	// the following are optional
-	
-	start: "2025-01-01T15:10:00Z",
-	end: "2025-01-01T16:10:00Z",
-	name: "Arany Hétfő 17:10",
-	location: "location:123",
-	signup_limit: 1,
-	notes: "Lorem ipsum dolor..."
-}
-```
-##### Response on success
-```
-{
-	code: "success",
-	message: "Event updated",
-	data: {
-		event: { ... }
-	}
-}
-```
-##### Error codes
-- `unauthorized`: the user is not authorized to complete this action
-- `fields_required`: one or more of the required fields was not found in the body
-- `bad_request`: One or more fields are invalid
-- `not_found`: there is no event with the provided ID
-
-### Remove a event `POST /remove`
-Removes a event. Admin only.
-##### Request body
-```
-{
-	id: "event:123"
-}
-```
-##### Response on success
-```
-{
-	code: "success",
-	message: "Event removed"
-}
-```
-##### Error codes
-- `unauthorized`: the user is not authorized to complete this action
-- `fields_required`: one or more of the required fields was not found in the body
-- `not_found`: there is no event with the provided ID
-
 ## Subject management `/subject`
 
 ### Get a list of all subject `GET /all`
@@ -782,7 +643,7 @@ Gets a list of all subjects.
 ### Get subjects by ID `GET /get`
 Retrieves subjects' data.
 ##### Query parameters
-- `ids`: the IDs of the subjects to retrieve (list separated by commas, ex: field1,field2)
+- `ids`: the IDs of the subjects to retrieve (list separated by commas, ex: id1,id2)
 ##### Response on success
 ```
 {
@@ -893,7 +754,7 @@ Gets a list of all students.
 ### Get students by ID `GET /get`
 Retrieves students' data.
 ##### Query parameters
-- `ids`: the IDs of the students to retrieve (list separated by commas, ex: field1,field2)
+- `ids`: the IDs of the students to retrieve (list separated by commas, ex: id1,id2)
 ##### Response on success
 ```
 {
@@ -998,3 +859,117 @@ Removes a student. Admin only.
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no student with the provided ID
+
+## Messaging `/message`
+
+### Get a list of messages `GET /received`
+Gets a list of messages the user received with the provided criteria.
+(The user's own messages are always included)
+##### Query parameters
+- `page`: the page to retrieve (depends on limit)
+- `limit`: the number of messages to retrieve (default and max is 50)
+- `author`: filter for messages from a specific author
+- `include`: filter for global / direct messages, you may provide a value of `global` (default), `direct` or `global,direct`
+##### Response on success
+```
+{
+	code: "success",
+	message: "Messages retrieved",
+	data: {
+		messages: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+
+### Get messages by ID `GET /get`
+Retrieves messages' data.
+##### Query parameters
+- `ids`: the IDs of the messages to retrieve (list separated by commas, ex: id1,id2)
+##### Response on success
+```
+{
+	code: "success",
+	message: "Message(s) retrieved",
+	data: {
+		messages: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no message with the provided ID
+
+### Create a message `POST /create`
+Creates a message.
+##### Request body
+```
+{
+	text: "Lorem ipsum dolor...",
+
+	// the following is optional
+	
+	recipient: "employee:123",
+	reply_to: "message:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Message created",
+	data: {
+		message: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Update a message `POST /update`
+Updates a message.
+##### Request body
+```
+{
+	id: "message:123",
+	text: "Lorem ipsum dolor..."
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Message updated",
+	data: {
+		message: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+- `not_found`: there is no message with the provided ID
+
+### Remove a message `POST /remove`
+Removes a message.
+##### Request body
+```
+{
+	id: "message:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Message removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no message with the provided ID

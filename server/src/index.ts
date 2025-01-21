@@ -1,4 +1,4 @@
-import express, { type ErrorRequestHandler } from 'express';
+import express from 'express';
 import cors from 'cors';
 import db, { db_connect } from './database/connection';
 
@@ -11,6 +11,7 @@ import inviteRouter from './routes/invite';
 import subjectRouter from './routes/subject';
 import studentRouter from './routes/student';
 import NginxVerifyAuth from './routes/nginx_auth';
+import messagesRouter from './routes/messages';
 
 export const app = express();
 
@@ -51,6 +52,7 @@ export async function setup(): Promise<string | null> {
   app.use('/invite', inviteRouter);
   app.use('/subject', subjectRouter);
   app.use('/student', studentRouter);
+  app.use('/message', messagesRouter);
   
   app.get('/nginx_verify_auth', NginxVerifyAuth);
   

@@ -25,19 +25,6 @@ export interface Invite {
   roles: Role[],
 }
 
-export interface DEvent {
-  id: string,
-  created: Date,
-  author: string | Employee,
-  location?: string | Location,
-  name: string,
-  notes: string,
-  signups: string[] | Employee[],
-  signup_limit: number,
-  start: Date,
-  end: Date,
-}
-
 export interface Subject {
   id: string,
   created: Date,
@@ -121,10 +108,19 @@ export interface RelationAttended {
 export interface RelationWorkedAt {
   id: string,
   in: string | Employee,
-  out: string | Lesson | DEvent,
+  out: string | Lesson,
   created: Date,
   paid: boolean,
   notes: string,
   start?: Date,
   end?: Date,
+}
+
+export interface Message {
+  id: string,
+  created: Date,
+  text: string,
+  author: string | Employee,
+  recipient?: string | Employee,
+  reply_to?: string | Message,
 }

@@ -3,6 +3,7 @@ import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, Comma
 import { useNavigate } from 'react-router-dom'
 import { getAllEmployees, getAllGroups, getAllInvites, getAllLocations, getAllStudents, getAllSubjects } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
+import { ScrollArea } from './ui/scroll-area'
 
 export default function CommandMenu() {
   const auth = useAuth()

@@ -11,7 +11,7 @@ services:
   db:
     image: surrealdb/surrealdb:latest
     volumes:
-      - db-data:/mydata:rw
+      - ../data.dev/surrealdb:/surrealdb:rw
     entrypoint:
       - /surreal
       - start
@@ -20,7 +20,11 @@ services:
       - root
       - --pass
       - root
-      - memory
+      - surrealkv://surrealdb
 
-volumes:
-  db-data:
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ../data.dev/nginx:/app/static:ro
+      - ../web/dist:/app/www:ro
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro

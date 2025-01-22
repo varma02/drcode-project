@@ -40,6 +40,9 @@ asztali alkalmazásként készül el).
 - [x] Create initial db migration
 - [x] Create base express.js app
 - [x] Get started with testing
+- Real-time updates
+	- [ ] websocket connect endpoint
+	- [ ] add ws notify to all create/update/delete operations
 - Middlewares
 	- [x] ensureauth
 	- [x] ensureadmin
@@ -73,6 +76,7 @@ asztali alkalmazásként készül el).
 	- [x] get attendance
 	- [x] get replacing students
 	- [x] docs
+	- [ ] teachers should only get their own lessons
 - Locations
 	- [x] Default CRUD
 	- [ ] get groups at location

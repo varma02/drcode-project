@@ -66,7 +66,7 @@ const router = createBrowserRouter([
     element: <SidebarWrapper />,
     children: [
       {path: "/", element: <Home />},
-      {path: "/inbox", element: <Inbox />},
+      {path: "/inbox/:id?", element: <Inbox />},
       {path: "/calendar", element: <CalendarPage />},
       {path: "/search", element: <Search />},
       {path: "/settings", element: <Settings />},

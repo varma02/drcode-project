@@ -231,3 +231,20 @@ export async function updateUser(token: string, data: { name?:string, email?:str
     )
   ).data;
 }
+
+export async function getGlobalMessages(token: string, page: number = 1) {
+  return (
+    await axios.get(
+      API_URL + "/message/received", 
+      {
+        params: {
+          include: "global",
+          limit: 50,
+          page,
+        },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}

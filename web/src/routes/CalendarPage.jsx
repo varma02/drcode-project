@@ -3,50 +3,139 @@ import { LessonCardItem } from '@/components/LessonCardItem'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { getAllLessonsBetweenDates, getEmployee, getGroup, getLocation } from '@/lib/api/api'
+import { useAuth } from '@/lib/api/AuthProvider'
 import { Plus } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 export default function CalendarPage() {
+  const auth = useAuth()
+  const [rows, setRows] = useState([])
+  const [date, setDate] = useState(new Date())
+  const [lessons, setLessons] = useState([])
+  const [teachers, setTeachers] = useState({})
+  const [locations, setLocations] = useState({})
+  const [groups, setGroups] = useState({})
 
   const days = "Hétfő Kedd Szerda Csütörtök Péntek Szombat Vasárnap".split(" ")
 
   const data = [
-    [{id:1, course: "Scratch", teacher: "Bypassed User"}],
-    [{id:2, course: "Web", teacher: "Bypassed User"}],
-    [{id:3, course: "WeDo 1.0", teacher: "Bypassed User"}, {id:31, course: "WeDo 2.0", teacher: "Bypassed User"}],
+    // [{id:1, course: "Scratch", teacher: "Bypassed User"}],
+    // [{id:2, course: "Web", teacher: "Bypassed User"}],
+    // [{id:3, course: "WeDo 1.0", teacher: "Bypassed User"}, {id:31, course: "WeDo 2.0", teacher: "Bypassed User"}],
+    // [],
+    // [{id:5, course: "Unity", teacher: "Bypassed User"}],
+    // [{id:6, course: "Scratch", teacher: "Bypassed User"}],
+    // [],
+
     [],
-    [{id:5, course: "Unity", teacher: "Bypassed User"}],
-    [{id:6, course: "Scratch", teacher: "Bypassed User"}],
     [],
+    [],
+    [],
+    [],
+    [],
+    []
   ]
 
-  const rows = []
-
-  for (let i = 0; i < Math.max(...data.map(e => e.length))+1; i++) {
-    rows.push(
-      <TableRow key={i}>
-        { 
-          data.map((day, idx) => 
-          (
-            <TableCell key={"day"+idx} className="text-center w-[14.286%]">
-              {
-                day[i] ? 
-                <LessonCardItem course={day[i].course} teacher={day[i].teacher} /> 
-                : 
-                typeof day[i-1] == Object ? <p>+</p> : <hr />
-              }
-            </TableCell>)
-          )
-        }
-      </TableRow>
-    )
+  function getWeek(date) {
+    const diffToMonday = (date.getDay() === 0 ? -6 : 1) - date.getDay()
+    const monday = new Date(date.setHours(0, 0))
+    monday.setDate(date.getDate() + diffToMonday)
+    const sunday = new Date(monday)
+    sunday.setDate(monday.getDate() + 6)
+    return {
+      start: monday,
+      end: sunday
+    }
   }
-  
-  const [date, setDate] = useState(new Date())
+
+  useEffect(() => {
+    // getAllLessonsBetweenDates(auth.token, { ...getWeek(date) }).then(resp => console.log(resp.data.lesons))
+    getAllLessonsBetweenDates(auth.token, getWeek(date).start, getWeek(date).end).then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
+  }, [date])
+
+  console.log("Groups: ", groups)
+  console.log("Techers: ", teachers)
+  console.log("Locations: ", locations)
+
+  useEffect(() => {
+    setRows([])
+    setGroups({})
+    data.map((e, i) => data[i] = [])
+    const gids = new Set()
+    const eids = new Set()
+    const lids = new Set()
+    lessons.forEach(e => {
+      gids.add(e.group)
+      data[new Date(e.start).getDay()-1].push(e)
+      setGroups(p => ({
+        ...p,
+        [e.group]: {}
+      }))
+    })
+    console.log("Data: ", data)
+    if (gids.size == 0) return
+    getGroup(auth.token, Array.from(gids).join(",")).then(resp => resp.data.groups.map(e => {
+      setGroups(p => ({
+        ...p,
+        [e.id]: {
+          ...p[e.id],
+          name: e.name,
+          teachers: e.teachers,
+          location: e.location
+        }
+      }))
+
+      eids.add(...e.teachers)
+      lids.add(e.location)
+    }))
+
+    setTimeout(() => {
+      getEmployee(auth.token, Array.from(eids).join(",")).then(resp => resp.data.employees.map(e => {
+        setTeachers(p => ({
+          ...p,
+          [e.id]: e.name
+        }))
+      }))
+
+      getLocation(auth.token, Array.from(lids).join(",")).then(resp => resp.data.locations.map(e => {
+        setLocations(p => ({
+          ...p,
+          [e.id]: e.address
+        }))
+      }))
+    }, 100);
+
+
+    
+    for (let i = 0; i < Math.max(...data.map(e => e.length))+1; i++) {
+      setRows(p => [...p,
+        <TableRow key={i}>
+          { 
+            data.map((day, idx) => 
+            (
+              <TableCell key={"day"+idx} className="text-center w-[14.286%]">
+                {
+                  day[i] ? 
+                  <LessonCardItem allTeachers={teachers} allLocations={locations}  />
+                  // <div className='h-12 bg-red-500 rounded-lg flex justify-center items-center'>id</div>
+                  : 
+                  typeof day[i-1] == Object ? <p>+</p> : <hr />
+                }
+              </TableCell>
+            ))
+          }
+        </TableRow>
+      ])
+    }
+  }, [lessons])
+
+  // console.log(lessons.length > 0 && days[new Date(lessons[3].start).getDay()-1])
+  // console.log(getWeek(date))
   
   return (
-    <div className='flex items-center flex-col gap-2 m-4'>
+    <div className='flex items-center flex-col gap-2 m-4 w-full'>
       <div className='flex gap-2'>
         <DatePicker date={date} setDate={setDate} required />
         <Popover>

@@ -67,39 +67,39 @@ export default function AddCalendarGroup() {
 
   return (
     <form className='flex flex-col max-w-screen-xl md:w-full mx-auto p-4 gap-6' onSubmit={handleSubmit}>
-        <h1 className='text-4xl mb-4'>Csoport Hozzáadása</h1>
-        <div className='flex gap-4'>
-          <Input type="text" placeholder="Név" name="name" />
-          <Combobox data={locations} displayName={"name"} placeholder='Válassz helyszínt...' value={location} setValue={setLocation} className={"w-full"} name="location" />
-        </div>
-        <GroupComboBox data={employees} displayName={"name"} placeholder='Válassz oktatót...' title={"Oktatók"} className={"w-full"} name="employees" />
-        <Textarea placeholder="Megjegyzés..." name="note" />
+      <h1 className='text-4xl mb-4'>Csoport Hozzáadása</h1>
+      <div className='flex gap-4'>
+        <Input type="text" placeholder="Név" name="name" />
+        <Combobox data={locations} displayName={"name"} placeholder='Válassz helyszínt...' value={location} setValue={setLocation} className={"w-full"} name="location" />
+      </div>
+      <GroupComboBox data={employees} displayName={"name"} placeholder='Válassz oktatót...' title={"Oktatók"} className={"w-full"} name="employees" />
+      <Textarea placeholder="Megjegyzés..." name="note" />
 
-        <div className='flex gap-4'>
-          <h4>Órák generálása</h4>
-          <Switch />
-        </div>
-        <div className='flex justify-between'>
-          <div className='flex gap-2'>
-            <div className="flex flex-col gap-2">
-              <p>Első óra dátuma,</p>
-              <DatePicker date={startDate} setDate={setStartDate} name="startDate" required />
-            </div>
-            <TimePicker date={startDate} setDate={setStartDate} name="startTime" label="Kezdete," className={"px-5"} />
-            <p className='flex items-end pb-2'>-</p>
-            <TimePicker date={endDate} setDate={setEndDate} name="endTime" label="Befejezése" className={"px-5"} />
-            <div className="flex flex-col gap-2">
-              <Label>Óraszám</Label>
-              <Input type="number" min={1} name="lessonNum" placeholder="például: 12" />
-            </div>
+      <div className='flex gap-4'>
+        <h4>Órák generálása</h4>
+        <Switch />
+      </div>
+      <div className='flex justify-between'>
+        <div className='flex gap-2'>
+          <div className="flex flex-col gap-2">
+            <p>Első óra dátuma,</p>
+            <DatePicker date={startDate} setDate={setStartDate} name="startDate" required />
+          </div>
+          <TimePicker date={startDate} setDate={setStartDate} name="startTime" label="Kezdete," className={"px-5"} />
+          <p className='flex items-end pb-2'>-</p>
+          <TimePicker date={endDate} setDate={setEndDate} name="endTime" label="Befejezése" className={"px-5"} />
+          <div className="flex flex-col gap-2">
+            <Label>Óraszám</Label>
+            <Input type="number" min={1} name="lessonNum" placeholder="például: 12" />
           </div>
         </div>
-        <div className='flex gap-6 ml-auto'>
-          <Link to="/groups">
-            <Button variant="outline" className="w-28">Vissza</Button>
-          </Link>
-          <Button className="w-28 mx-auto" type="submit">Hozzáadás</Button>
-        </div>
+      </div>
+      <div className='flex gap-6 ml-auto'>
+        <Link to="/groups">
+          <Button variant="outline" className="w-28">Vissza</Button>
+        </Link>
+        <Button className="w-28 mx-auto" type="submit">Hozzáadás</Button>
+      </div>
     </form>
   )
 }

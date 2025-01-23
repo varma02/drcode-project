@@ -159,6 +159,31 @@ export async function getLocation(token: string, ...ids: string[]) {
   ).data;
 }
 
+export async function getAllLessons(token: string) {
+  return (
+    await axios.get(
+      API_URL + "/lesson/all", 
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
+export async function getAllLessonsBetweenDates(token: string, start: Date, end: Date) {
+  return (
+    await axios.get(
+      API_URL + "/lesson/between_dates", 
+      {
+        params: { start: start.toISOString(), end: end.toISOString() },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
 export async function createInvite(token: string, roles: string[]) {
   return (
     await axios.post(

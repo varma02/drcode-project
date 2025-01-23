@@ -1,7 +1,8 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from './ui/dialog'
 
-export const LessonCardItem = ({course, teacher, location = "Központ", time_start = "16:00", time_end = "17:00"}) => {
+export const LessonCardItem = ({course = "Scratch", allTeachers, teachers, allLocations, locations, group, time_start = "16:00", time_end = "17:00"}) => {
+  console.log(allTeachers, teachers)
   return (
     // <Card className="w-full">
     //   <CardContent className="mt-6">
@@ -25,9 +26,9 @@ export const LessonCardItem = ({course, teacher, location = "Központ", time_sta
           <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='max-w-8 object-cover object-center' />
           <div className='text-left'>
             <p>{course}</p>
-            <p className='opacity-50'>{teacher}</p>
+            <p className='opacity-50'>{teachers}</p>
           </div>
-          <p className='opacity-50'>{location}</p>
+          <p className='opacity-50'>{locations}</p>
           <div>
             <p>{time_start}</p>
             <p>{time_end}</p>

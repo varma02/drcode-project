@@ -10,7 +10,7 @@ import { hu } from 'date-fns/locale'
 export const DatePicker = ({numberOfMonths = 1, date, setDate, dateFormat = "PPP", showTimePicker, name, includeTime, required = false}) => {
   return (
     <Popover>
-      <input type="text" name={name} defaultValue={includeTime ? date.toISOString() : date.toISOString().slice(0, 10)} className="hidden" />
+      <input type="text" name={name} value={includeTime ? date.toISOString() : date.toISOString().slice(0, 10)} onChange={() => {}} className="hidden" />
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}

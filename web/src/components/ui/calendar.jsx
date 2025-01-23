@@ -11,8 +11,8 @@ import { setHours, setMinutes } from "date-fns"
 function Calendar({ className, classNames, showOutsideDays = true, showTimePicker = false, date, setDate, ...props }) {
   const [timeValue, setTimeValue] = useState(`${date.getHours()}:${date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes()}`)
 
-  console.log("timeValaue: ", timeValue)
-  console.log("date: ", date)
+  // console.log("timeValaue: ", timeValue)
+  // console.log("date: ", date)
 
   const handleTimeChange = (e) => {
     const time = e.target.value

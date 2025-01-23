@@ -248,3 +248,16 @@ export async function getGlobalMessages(token: string, page: number = 1) {
     )
   ).data;
 }
+
+export async function sendMessage(token: string, text: string, recipient?: string, reply_to?: string) {
+  return (
+    await axios.post(
+      API_URL + "/message/create", 
+      { text, recipient, reply_to }, 
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}

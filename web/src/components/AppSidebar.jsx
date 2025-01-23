@@ -12,7 +12,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useHref, useNavigate } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { toast } from "sonner"
@@ -23,6 +23,7 @@ import { Button } from "./ui/button"
 export function AppSidebar() {
   const navigate = useNavigate();
   const auth = useAuth();
+  const href = useHref();
 
   const items = {
     "Dr Code": [
@@ -83,7 +84,10 @@ export function AppSidebar() {
                   {items[e].map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
-                        <Link to={item.url}>
+                        <Link to={item.url} className={
+                          (href.startsWith(item.url) && item.url != "/") || href === item.url ?
+                          "!bg-primary !text-primary-foreground" : ""
+                        }>
                           <item.icon />
                           <span>{item.title}</span>
                         </Link>

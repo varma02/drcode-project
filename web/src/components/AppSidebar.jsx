@@ -1,4 +1,4 @@
-import { Album, Calendar, ChevronsUpDown, Component, Home, Inbox, LogOut, MapPinned, Search, Settings, Users } from "lucide-react"
+import { Album, Calendar, ChevronsUpDown, Component, GraduationCap, Home, Inbox, LogOut, MapPinned, Search, Settings, Users } from "lucide-react"
 
 import {
   Sidebar,
@@ -53,6 +53,11 @@ export function AppSidebar() {
         title: "Alkalmazottak",
         url: "/employee",
         icon: Users,
+      },
+      {
+        title: "Tanulók",
+        url: "/students",
+        icon: GraduationCap,
       },
       {
         title: "Csoportok",

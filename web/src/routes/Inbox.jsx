@@ -53,6 +53,7 @@ export default function Inbox() {
     setLoading(false);
     setHasMore(true);
     handleLoadMore();
+    setTimeout(() => setScrollBottomTrigger(new Date().getTime()), 20);
   }, [params.id]);
 
   useEffect(() => {

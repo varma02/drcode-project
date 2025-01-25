@@ -31,10 +31,10 @@ studentRouter.get('/get', errorHandler(async (req, res) => {
 
   const selection = [];
   selection.push("*");
-  // if (req.query.include) {
-  //   const include = new Set((req.query.include as string).trim().split(","));
-  //   if (include.has("something")) selection.push("some_query");
-  // }
+  if (req.query.include) {
+    const include = new Set((req.query.include as string).trim().split(","));
+    if (include.has("enroled")) selection.push("->enroled.* as enroled");
+  }
   const students = (await db.query<Subject[][]>(`
     SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
   `, {ids}))[0];

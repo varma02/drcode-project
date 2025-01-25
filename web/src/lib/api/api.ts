@@ -115,7 +115,7 @@ export async function getStudentWithDetails(token: string, ...ids: string[]) {
       API_URL + "/student/get", 
       {
         params: {
-          include: "groups",
+          include: "enroled",
           ids: ids.join(","),
         },
         headers: { Authorization: `Bearer ${token}` },

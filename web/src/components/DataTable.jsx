@@ -58,17 +58,19 @@ export default function DataTable({ columns, data, hasFooter = false, className,
   return (
     <div className={className}>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Szűrés Névre..."
-          value={(table.getColumn("name")?.getFilterValue()) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm mx-1"
-        />
+        { table.getAllColumns().find((v) => v.id === "name") && (
+          <Input
+            placeholder="Szűrés Névre..."
+            value={(table.getColumn("name")?.getFilterValue()) ?? ""}
+            onChange={(event) =>
+              table.getColumn("name")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm mx-1"
+          />
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="ml-auto" type="button">
               Oszlopok <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
@@ -154,6 +156,7 @@ export default function DataTable({ columns, data, hasFooter = false, className,
         </div>
         <div className="space-x-2">
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
@@ -162,6 +165,7 @@ export default function DataTable({ columns, data, hasFooter = false, className,
             Előző
           </Button>
           <Button
+          type="button"
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}

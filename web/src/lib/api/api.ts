@@ -273,6 +273,19 @@ export async function updateUser(token: string, data: { name?:string, email?:str
   ).data;
 }
 
+export async function updateStudent(token: string, data: { id: string, name: string, email: string, phone: string, notes: string, parent: {name: string, email: string, phone: string} }) {
+  return (
+    await axios.post(
+      API_URL + "/student/update",
+      data, 
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
 export async function getGlobalMessages(token: string, page: number = 1) {
   return (
     await axios.get(

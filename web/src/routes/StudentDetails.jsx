@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
-import { getEmployeeWithDetails, getGroup, getGroupWithDetails, getStudent, getStudentWithDetails, getSubject } from "@/lib/api/api"
+import { getEmployeeWithDetails, getGroup, getGroupWithDetails, getStudent, getStudentWithDetails, getSubject, updateStudent } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
 import { hu, id } from "date-fns/locale"
@@ -49,33 +49,32 @@ export default function StudentDetails() {
       setSubjects([])
   }, [student]);
 
-  // const [saveTimer, setSaveTimer] = useState(0);
-  // const [saveTimerInterval, setSaveTimerInterval] = useState(null);
-
+  const [saveTimer, setSaveTimer] = useState(0);
   function handleChange(e) {
-  //   setSaveTimer(0);
-  //   if (!saveTimerInterval) {
-  //     setSaveTimerInterval(
-  //       setInterval(() => {
-  //         setSaveTimer((o) => {
-  //           if (saveTimer >= 50) {
-  //             clearInterval(saveTimerInterval);
-  //             setSaveTimerInterval(null);
-  //             handleSave(e);
-  //             return 0;
-  //           } else {
-  //             return o + 1;
-  //           }
-  //         })
-  //     }, 50))
-  //   }
+    if (saveTimer == 0) {
+      const interval = setInterval(() => {
+        setSaveTimer((o) => {
+          if (o >= 50) {
+            clearInterval(interval);
+            handleSave({preventDefault: e.preventDefault, target: e.target.form});
+            return 0;
+          } else {
+            return o + 1;
+          }
+        })
+      }, 50);
+    }
+    setSaveTimer(1);
   }
 
+  const [saveLoading, setSaveLoading] = useState(false);
   function handleSave(e) {
-    e.preventDefault()
-    const form = e.target
-    const data = new FormData(form)
+    e.preventDefault();
+    if (saveLoading) return;
+    setSaveLoading(true);
+    const data = new FormData(e.target);
     const studentData = {
+      id: "student:" + params.id,
       name: data.get("studentName"),
       grade: data.get("studentGrade"),
       email: data.get("studentEmail"),
@@ -86,9 +85,13 @@ export default function StudentDetails() {
         phone: data.get("parentPhone"),
       },
       notes: data.get("notes"),
-    }
-
-    console.log(studentData);
+    };
+    updateStudent(auth.token, studentData)
+    .then((v) => {
+      setStudent((o) => ({...o, ...v.data.student}));
+      toast.success("Tanuló mentve");
+    }).catch(() => toast.error("Hiba történt mentés közben!"))
+    .finally(() => setSaveLoading(false))
   }
 
   const [editName, setEditName] = useState(false);
@@ -184,19 +187,16 @@ export default function StudentDetails() {
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
       <div className="group flex gap-2 my-4">
-        {editName ? (
-          <Input defaultValue={student.name} type="text" name="studentName"
-          placeholder="tanuló neve" className="w-max"/>
-        ) : (
-          <h1 className='text-4xl'>{student.name}</h1>
-        )}
+        <Input defaultValue={student.name} type="text" name="studentName"
+        placeholder="tanuló neve" className={editName ? "w-max" : "hidden"}/>
+        <h1 className={editName ? "hidden" : "text-4xl"}>{student.name}</h1>
         <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
         onClick={() => setEditName((o) => !o)} type="button">
           <Edit />
         </Button>
 
-        <Button size="icon" className="ml-auto" type="submit">
-          <Save />
+        <Button size="icon" className="ml-auto" type="submit" disabled={saveLoading}>
+          {saveLoading ? <LoaderCircle className="animate-spin" /> : <Save />}
         </Button>
       </div>
       

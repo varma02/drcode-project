@@ -70,7 +70,7 @@ studentRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
 }));
 
 studentRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, email, notes, parent } = req.body;
+  const { id, name, email, phone, notes, parent } = req.body;
   if (!id)
     throw new FieldsRequiredError();
   if (!id.startsWith("student:"))
@@ -78,10 +78,11 @@ studentRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
 
   const student = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
-      ${notes ? "notes: $notes," : ""}
-      ${email ? "email: $email," : ""}
-      ${parent ? "parent: $parent," : ""}
-      ${name ? "name: $name," : ""}
+      notes: ${notes ? "$notes" : "\"\""},
+      email: ${email ? "$email" : "NONE"},
+      phone: ${phone ? "$phone" : "NONE"},
+      parent: ${parent ? "$parent" : ""},
+      name: ${name ? "$name" : "\"\""},
     };
   `, { id, name, email, notes, parent }))[0];
 

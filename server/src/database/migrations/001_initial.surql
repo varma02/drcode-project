@@ -24,6 +24,19 @@ DEFINE FIELD author ON TABLE invite TYPE record<employee> READONLY ASSERT $value
 DEFINE FIELD roles ON TABLE invite TYPE set<"teacher" | "administrator"> READONLY;
 
 
+DEFINE TABLE file SCHEMAFULL CHANGEFEED 4w;
+
+DEFINE FIELD created ON TABLE file TYPE datetime DEFAULT time::now() READONLY;
+DEFINE FIELD author ON TABLE file TYPE record<employee> READONLY ASSERT $value.exists();
+DEFINE FIELD name ON TABLE file TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD mime_type ON TABLE file TYPE string ASSERT string::len($value) <= 48;
+DEFINE FIELD path ON TABLE file TYPE string ASSERT string::len($value) <= 256;
+DEFINE FIELD shared_with ON TABLE file TYPE set<record<employee>> DEFAULT [] ASSERT array::all($value, |$v| $v.exists());
+DEFINE FIELD size ON TABLE file TYPE int;
+
+DEFINE INDEX path_unique ON file FIELDS path UNIQUE;
+
+
 DEFINE TABLE subject SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE subject TYPE datetime DEFAULT time::now() READONLY;

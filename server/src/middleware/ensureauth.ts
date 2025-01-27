@@ -6,7 +6,7 @@ import type { JWTData, Employee } from '../database/models';
 const ensureAuth: RequestHandler = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '').trim() || "";
-    const tokenData = jwt.verify(token, process.env.JWT_SECRET!, {algorithms:['HS256']}) as JWTData;
+    const tokenData = jwt.verify(token, process.env.AUTHTOKEN_SECRET!, {algorithms:['HS512']}) as JWTData;
     if (!tokenData || !tokenData.employee_id) throw new Error("unauthorized");
 
     const employee = (await db.query<Employee[]>(

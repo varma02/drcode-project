@@ -25,6 +25,15 @@ export interface Invite {
   roles: Role[],
 }
 
+export interface File {
+  id: string,
+  created: Date,
+  author: string | Employee,
+  name: string,
+  mime_type: string,
+  size: number,
+}
+
 export interface Subject {
   id: string,
   created: Date,

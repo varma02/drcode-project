@@ -22,8 +22,8 @@ userRouter.post('/login', errorHandler(async (req, res) => {
 
   const token = jwt.sign(
     { employee_id: employee.id, session_key: employee.session_key, user_agent: req.headers['employee-agent'] } as JWTData,
-    process.env.JWT_SECRET!,
-    { algorithm: 'HS256', expiresIn: remember ? '1m' : '1d' }
+    process.env.AUTHTOKEN_SECRET!,
+    { algorithm: 'HS512', expiresIn: remember ? '1m' : '1d' }
   );
 
   delete employee.password;

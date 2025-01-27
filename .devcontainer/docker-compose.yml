@@ -25,6 +25,6 @@ services:
   nginx:
     image: nginx:alpine
     volumes:
-      - ../data.dev/nginx:/app/static:ro
+      - ../data.dev/nginx:/app/static:rw
       - ../web/dist:/app/www:ro
       - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro

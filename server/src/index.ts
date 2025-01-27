@@ -10,14 +10,18 @@ import lessonRouter from './routes/lesson';
 import inviteRouter from './routes/invite';
 import subjectRouter from './routes/subject';
 import studentRouter from './routes/student';
-import NginxVerifyAuth from './routes/nginx_auth';
+import fileRouter from './routes/file';
 import messagesRouter from './routes/messages';
 
 export const app = express();
 
 export async function setup(): Promise<string | null> {
-  if (!process.env.JWT_SECRET) {
-    return "JWT_SECRET environment variable is not set";
+  if (!process.env.AUTHTOKEN_SECRET) {
+    return "AUTHTOKEN_SECRET environment variable is not set";
+  }
+
+  if (!process.env.FILETOKEN_SECRET) {
+    return "FILETOKEN_SECRET environment variable is not set";
   }
 
   if (!process.env.API_PORT) {
@@ -53,8 +57,7 @@ export async function setup(): Promise<string | null> {
   app.use('/subject', subjectRouter);
   app.use('/student', studentRouter);
   app.use('/message', messagesRouter);
-  
-  app.get('/nginx_verify_auth', NginxVerifyAuth);
+  app.use('/file', fileRouter);
   
   app.use((req, res, next) => {
     res.status(404).json({

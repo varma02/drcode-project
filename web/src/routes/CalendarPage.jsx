@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { getAllLessonsBetweenDates, getEmployee, getGroup, getLocation } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
+import { format } from 'date-fns'
 import { Plus } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -12,7 +13,7 @@ import { Link } from 'react-router-dom'
 export default function CalendarPage() {
   const auth = useAuth()
   const [rows, setRows] = useState([])
-  const [date, setDate] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState(new Date())
   const [lessons, setLessons] = useState([])
   const [teachers, setTeachers] = useState({})
   const [locations, setLocations] = useState({})
@@ -52,12 +53,12 @@ export default function CalendarPage() {
 
   useEffect(() => {
     // getAllLessonsBetweenDates(auth.token, { ...getWeek(date) }).then(resp => console.log(resp.data.lesons))
-    getAllLessonsBetweenDates(auth.token, getWeek(date).start, getWeek(date).end).then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
-  }, [date])
+    getAllLessonsBetweenDates(auth.token, getWeek(selectedDate).start, getWeek(selectedDate).end).then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
+  }, [selectedDate])
 
   console.log("Groups: ", groups)
-  console.log("Techers: ", teachers)
-  console.log("Locations: ", locations)
+  // console.log("Techers: ", teachers)
+  // console.log("Locations: ", locations)
 
   useEffect(() => {
     setRows([])
@@ -89,9 +90,7 @@ export default function CalendarPage() {
 
       eids.add(...e.teachers)
       lids.add(e.location)
-    }))
 
-    setTimeout(() => {
       getEmployee(auth.token, Array.from(eids).join(",")).then(resp => resp.data.employees.map(e => {
         setTeachers(p => ({
           ...p,
@@ -105,30 +104,30 @@ export default function CalendarPage() {
           [e.id]: e.address
         }))
       }))
-    }, 100);
 
-
-    
-    for (let i = 0; i < Math.max(...data.map(e => e.length))+1; i++) {
-      setRows(p => [...p,
-        <TableRow key={i}>
-          { 
-            data.map((day, idx) => 
-            (
-              <TableCell key={"day"+idx} className="text-center w-[14.286%]">
-                {
-                  day[i] ? 
-                  <LessonCardItem allTeachers={teachers} allLocations={locations}  />
-                  // <div className='h-12 bg-red-500 rounded-lg flex justify-center items-center'>id</div>
-                  : 
-                  typeof day[i-1] == Object ? <p>+</p> : <hr />
-                }
-              </TableCell>
-            ))
-          }
-        </TableRow>
-      ])
-    }
+      setRows([])
+      for (let i = 0; i < Math.max(...data.map(e => e.length)); i++) {
+        setRows(p => [...p,
+          <TableRow key={i}>
+            { 
+              data.map((day, idx) => 
+              (
+                <TableCell key={"day"+idx} className="text-center w-[14.286%]">
+                  {
+                    day[i] ? 
+                    // <LessonCardItem location={locations[groups[day[i].group].location]} teachers={day[i]} />
+                    <LessonCardItem location={"Főhadiszállás"} time_start={format(new Date(day[i].start), "p").split(" ")[0]} time_end={format(new Date(day[i].end), "p").split(" ")[0]} />
+                    // <div className='h-12 bg-red-500 rounded-lg flex justify-center items-center'>id</div>
+                    : 
+                    typeof day[i-1] == Object ? <p>+</p> : <hr className='w-full' />
+                  }
+                </TableCell>
+              ))
+            }
+          </TableRow>
+        ])
+      }
+    }))
   }, [lessons])
 
   // console.log(lessons.length > 0 && days[new Date(lessons[3].start).getDay()-1])
@@ -136,8 +135,8 @@ export default function CalendarPage() {
   
   return (
     <div className='flex items-center flex-col gap-2 m-4 w-full'>
-      <div className='flex gap-2'>
-        <DatePicker date={date} setDate={setDate} required />
+      <div className='flex gap-2 w-full'>
+        <DatePicker date={selectedDate} setDate={setSelectedDate} required />
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline"><Plus /></Button>

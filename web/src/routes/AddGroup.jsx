@@ -67,7 +67,7 @@ export default function AddCalendarGroup() {
 
   return (
     <form className='flex flex-col max-w-screen-xl md:w-full mx-auto p-4 gap-6' onSubmit={handleSubmit}>
-      <h1 className='text-4xl mb-4'>Csoport Hozzáadása</h1>
+      <h1 className='text-4xl py-4'>Csoport Hozzáadása</h1>
       <div className='flex gap-4'>
         <Input type="text" placeholder="Név" name="name" />
         <Combobox data={locations} displayName={"name"} placeholder='Válassz helyszínt...' value={location} setValue={setLocation} className={"w-full"} name="location" />

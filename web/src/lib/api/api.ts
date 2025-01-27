@@ -96,6 +96,19 @@ export async function getSubject(token: string, ...ids: string[]) {
   ).data;
 }
 
+export async function createSubject(token: string, name:string, notes:string) {
+  return (
+    await axios.post(
+      API_URL + "/subject/create", 
+      {name, notes}, 
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
 export async function getStudent(token: string, ...ids: string[]) {
   return (
     await axios.get(
@@ -168,6 +181,19 @@ export async function getLocation(token: string, ...ids: string[]) {
       API_URL + "/location/get", 
       {
         params: { ids: ids.join(",") },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
+export async function createLocation(token: string, name:string, address:string, contact_email:string, contact_phone:string, notes:string) {
+  return (
+    await axios.post(
+      API_URL + "/location/create", 
+      {name, address, contact_email, contact_phone, notes}, 
+      {
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }

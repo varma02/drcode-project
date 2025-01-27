@@ -9,6 +9,8 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
 import { AuthProvider, useAuth } from '@/lib/api/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
+import AddNewLocation from './routes/AddLocation'
+import AddNewSubject from './routes/AddSubject'
 
 const CommandMenu = lazy(() => import('./components/CommandMenu'))
 
@@ -79,7 +81,9 @@ const router = createBrowserRouter([
       {path: "/groups/add", element: <AddCalendarGroup />},
       {path: "/groups/:id", element: <GroupDetails />},
       {path: "/locations", element: <Locations />},
+      {path: "/locations/add", element: <AddNewLocation />},
       {path: "/subjects", element: <Subjects />},
+      {path: "/subjects/add", element: <AddNewSubject />},
       {path: "/students", element: <Students />},
       {path: "/students/:id", element: <StudentDetails />},
     ]

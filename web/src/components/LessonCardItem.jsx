@@ -6,7 +6,7 @@ import { Clock, Ellipsis, MapPin, User2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 import { Button } from './ui/button'
 
-export const LessonCardItem = ({course = "Scratch", teachers = ["Legfőbb ügyész", "Népírtás"], location, time_start = "16:00", time_end = "17:00"}) => {
+export const LessonCardItem = ({course = "Scratch", teachers = ["Legfőbb Ügyész", "Legfőbb Ügyész2"], location, time_start = "16:00", time_end = "17:00"}) => {
   console.log("AAAAAAAAAAAAAAAAAAAAAAAA: ", location)
   // console.log(teachers)
   return (

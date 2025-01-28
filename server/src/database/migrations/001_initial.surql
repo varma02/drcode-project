@@ -30,7 +30,7 @@ DEFINE FIELD created ON TABLE file TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD author ON TABLE file TYPE record<employee> READONLY ASSERT $value.exists();
 DEFINE FIELD name ON TABLE file TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD mime_type ON TABLE file TYPE string ASSERT string::len($value) <= 48;
-DEFINE FIELD path ON TABLE file TYPE string ASSERT string::len($value) <= 256;
+DEFINE FIELD path ON TABLE file TYPE string ASSERT string::len($value) <= 256 DEFAULT string::join("/", author, id, name);
 DEFINE FIELD shared_with ON TABLE file TYPE set<record<employee>> DEFAULT [] ASSERT array::all($value, |$v| $v.exists());
 DEFINE FIELD size ON TABLE file TYPE int;
 

@@ -32,6 +32,8 @@ export interface File {
   name: string,
   mime_type: string,
   size: number,
+  path: string,
+  shared_with: string[] | Employee[],
 }
 
 export interface Subject {

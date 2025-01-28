@@ -4,32 +4,32 @@ import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import type { File } from '../database/models';
+import type { Employee, File } from '../database/models';
 import jwt from 'jsonwebtoken';
 
 const fileRouter = express.Router();
 
-fileRouter.get('/nginx_verify', (req, res) => {
-  //   proxy_set_header X-Real-IP $remote_addr;
-  //   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  //   proxy_set_header X-Original-URI $request_uri;
-  //   proxy_set_header X-HTTP-Method $request_method;
+fileRouter.get('/nginx_verify', async (req, res): Promise<any> => {
   try {
-    console.log(req.headers);
     const url = new URL("http://localhost" + req.headers['x-original-uri']?.toString());
-    console.log(url)
     const token = url.searchParams.get("token") || "";
-    console.log(token);
     const payload = jwt.verify(token, process.env.FILETOKEN_SECRET!);
-    console.log(payload);
     if (typeof payload !== "object") throw new Error("Invalid JWT payload");
-    console.log("payload ok")
     if (req.headers['x-real-ip']?.includes(payload.ip) || payload.ip?.includes(req.headers['x-real-ip'])) throw new Error("IP mismatch");
-    console.log("ip ok")
-    res.status(200).send("OK");
+    const employee = (await db.query<Employee[]>(`SELECT * FROM ONLY type::employee($id);`, { id: payload.employee_id }))[0];
+    if (!employee) throw new Error("Employee not found");
+    if (!employee.session_key || employee.session_key !== payload.session_key) throw new Error("Session key mismatch");
+    if (url.pathname.includes("/upload") || payload.upload) {
+      const file = (await db.query<File[]>(`SELECT * FROM ONLY type::thing($id);`, { id: payload.files[0] }))[0];
+      if (!file) throw new Error("File not found");
+      if (employee.id !== file.author) throw new Error("Unauthorized");
+      if (!url.pathname.endsWith(file.path)) throw new Error("Path mismatch");
+    }
+    return res.status(200).send("OK");
   } catch (e) {
-    res.status(401).send("Unauthorized");
+    console.trace(e);
   }
+  res.status(401).send("Unauthorized");
 });
 
 fileRouter.use(ensureAuth);
@@ -53,6 +53,7 @@ fileRouter.get('/get', errorHandler(async (req, res) => {
         user_agent: req.headers['user-agent'],
         ip: req.ip,
         files: files.map(file => file.id),
+        upload: false,
       },
       process.env.FILETOKEN_SECRET!,
       { algorithm: 'HS512', expiresIn: '5h' }
@@ -72,24 +73,40 @@ fileRouter.get('/get', errorHandler(async (req, res) => {
 }));
 
 fileRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, notes, address, contact_email, contact_phone } = req.body;
-  if (!name || !address || !contact_email || !contact_phone) 
+  const { name, mime_type, shared_with = [], size } = req.body;
+  if (!name || !mime_type || !size) 
     throw new FieldsRequiredError();
 
-  const location = (await db.query(`
-    CREATE ONLY location CONTENT {
+  const file = (await db.query<File[]>(`
+    CREATE ONLY file CONTENT {
+      author: type::thing($user_id),
       name: $name,
-      ${notes ? "notes: $notes," : ""}
-      address: $address,
-      contact_email: $contact_email,
-      contact_phone: $contact_phone
+      mime_type: $mime_type,
+      shared_with: array::map($shared_with, |$id| type::thing($id)),
+      size: $size,
     };
-  `, { name, notes, address, contact_email, contact_phone }))[0];
+  `, { name, mime_type, shared_with, size, user_id: req.employee?.id }))[0];
+
+  const token = jwt.sign(
+    {
+      employee_id: req.employee?.id,
+      session_key: req.employee?.session_key,
+      user_agent: req.headers['user-agent'],
+      ip: req.ip,
+      files: [file.id],
+      upload: true,
+    },
+    process.env.FILETOKEN_SECRET!,
+    { algorithm: 'HS512', expiresIn: '1h' }
+  );
 
   res.status(200).json({
     code: "success",
-    message: "Location created",
-    data: { location },
+    message: "File created",
+    data: {
+      token,
+      file,
+    },
   });
 }));
 

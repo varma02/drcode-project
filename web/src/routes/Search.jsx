@@ -31,11 +31,13 @@ export default function Search() {
       mime_type: file.type,
       size: file.size,
     }).then((resp) => {
-      const formData = new FormData()
-      formData.append('file', file)
+      // const formData = new FormData()
+      // formData.append('file', file)
+      // console.log(formData, file);
+      
       axios.put(
-        "http://localhost:42581/upload/"+resp.data.file.path,
-        formData,
+        "http://localhost:41663/upload/"+resp.data.file.path,
+        file,
         {
           params: {
             token: resp.data.token

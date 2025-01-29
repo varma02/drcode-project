@@ -3,7 +3,7 @@ import db from '../database/connection';
 import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
-import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
+import { FieldsInvalidError, FieldsRequiredError, NotFoundError, UnauthorizedError } from '../lib/errors';
 import type { Employee, File } from '../database/models';
 import jwt from 'jsonwebtoken';
 
@@ -14,26 +14,24 @@ fileRouter.get('/nginx_verify', async (req, res): Promise<any> => {
     const url = new URL("http://localhost" + req.headers['x-original-uri']?.toString());
     const token = url.searchParams.get("token") || "";
     const payload = jwt.verify(token, process.env.FILETOKEN_SECRET!);
-    console.log(payload);
   
-    if (typeof payload != "object") throw new Error("Invalid JWT payload");
-    if (req.headers['x-real-ip']?.includes(payload.ip) || payload.ip?.includes(req.headers['x-real-ip'])) throw new Error("IP mismatch");
+    if (typeof payload != "object") throw new UnauthorizedError("Invalid JWT payload");
+    if (req.headers['x-real-ip']?.includes(payload.ip) || payload.ip?.includes(req.headers['x-real-ip'])) throw new UnauthorizedError("IP mismatch");
     const employee = (await db.query<Employee[]>(`SELECT * OMIT password FROM ONLY type::thing($id);`, { id: payload.employee_id }))[0];
-    console.log(employee);
     
-    if (!employee) throw new Error("Employee not found");
-    // if (!employee.session_key || employee.session_key != payload.session_key) throw new Error("Session key mismatch");
+    if (!employee) throw new UnauthorizedError("Employee not found");
+    // if (!employee.session_key || employee.session_key != payload.session_key) throw new UnauthorizedError("Session key mismatch");
     if (url.pathname.includes("/upload") || payload.upload) {
       const file = (await db.query<File[]>(`SELECT * FROM ONLY type::thing($id);`, { id: payload.files[0] }))[0];
-      console.log(file);
       
-      if (!file) throw new Error("File not found");
-      if (employee.id.toString() != file.author.toString()) throw new Error("Unauthorized");
-      if (!url.pathname.endsWith(file.path)) throw new Error("Path mismatch");
+      if (!file) throw new UnauthorizedError("File not found");
+      if (employee.id.toString() != file.author.toString()) throw new UnauthorizedError("Unauthorized");
+      if (!url.pathname.endsWith(file.path)) throw new UnauthorizedError("Path mismatch");
     }
     return res.status(200).send("OK");
   } catch (e) {
-    console.trace(e);
+    if (!(e instanceof UnauthorizedError))
+      console.trace(e);
   }
   res.status(401).send("Unauthorized");
 });

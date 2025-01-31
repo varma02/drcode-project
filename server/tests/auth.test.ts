@@ -2,7 +2,6 @@ import { describe, expect, test } from 'bun:test';
 import request, { type Response } from 'supertest';
 import { app } from '../src/index';
 import db from '../src/database/connection';
-import jwt from 'jsonwebtoken';
 
 describe("Authentication (/auth)", () => {
   let token = "";

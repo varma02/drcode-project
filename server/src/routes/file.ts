@@ -30,13 +30,11 @@ fileRouter.get('/nginx_verify', async (req, res): Promise<any> => {
       if (!url.pathname.endsWith(file.path)) throw new UnauthorizedError("Path mismatch");
 
     } else if (!url.pathname.match(/\/employee:.+\/profile\.webp$/)) {
-      if (payload.files?.length == 0) {
-        const file_ids = (await db.query<string[][]>(`
-          SELECT VALUE id FROM file WHERE !shared_with OR type::thing($user_id) IN shared_with OR author = type::thing($user_id);`,
-          { user_id: employee.id }))[0];
-        if (isDev()) console.log(file_ids);
-        payload.files = file_ids;
-      }
+      const file_ids = (await db.query<string[][]>(`
+        SELECT VALUE id FROM file WHERE !shared_with OR type::thing($user_id) IN shared_with OR author = type::thing($user_id);`,
+        { user_id: employee.id }))[0];
+      if (isDev()) console.log(file_ids);
+      payload.files = file_ids;
       if (!payload.files.some((id: string) => url.pathname.match(`\\/${id}\\/`))) throw new UnauthorizedError("Invalid file ID");
     }
 
@@ -89,7 +87,6 @@ fileRouter.get('/get', errorHandler(async (req, res) => {
         employee_id: req.employee?.id,
         user_agent: req.headers['user-agent'],
         ip: req.ip,
-        files: files.map(file => file.id),
         upload: false,
       },
       process.env.FILETOKEN_SECRET!,

@@ -70,12 +70,12 @@ export async function getEmployeeWithDetails(token: string, ...ids: string[]) {
   ).data;
 }
 
-export async function removeEmployee(token: string, id: string) {
+export async function removeEmployee(token: string, ...ids: string[]) {
   return (
     await axios.post(
       API_URL + "/employee/remove",
       {
-        params: { id },
+        params: { ids: ids.join(",") },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }
@@ -165,11 +165,11 @@ export async function updateGroup(token: string, id: string, name: string, locat
   ).data;
 }
 
-export async function removeGroup(token: string, id: string) {
+export async function removeGroup(token: string, ...ids: string[]) {
   return (
     await axios.post(
       API_URL + "/group/remove",
-      { id },
+      { ids },
       {
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
@@ -232,11 +232,11 @@ export async function updateLocation(token: string, id: string, name: string, ad
   ).data;
 }
 
-export async function removeLocation(token: string, id: string) {
+export async function removeLocation(token: string, ...ids: string[]) {
   return (
     await axios.post(
       API_URL + "/location/remove",
-      { id },
+      { ids },
       {
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
@@ -272,7 +272,7 @@ export async function getAllLessonsBetweenDates(token: string, start: Date, end:
   ).data;
 }
 
-export async function getLesson(token: string, ids: string[]) {
+export async function getLesson(token: string, ...ids: string[]) {
   return (
     await axios.get(
       API_URL + "/lesson/get",
@@ -311,12 +311,12 @@ export async function updateLesson(token: string, id: string, start: Date, end: 
   ).data;
 }
 
-export async function removeLesson(token: string, id: string) {
+export async function removeLesson(token: string, ...ids: string[]) {
   return (
     await axios.post(
       API_URL + "/lesson/remove",
       {
-        params: { id },
+        params: { ids: ids.join(",") },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }
@@ -377,11 +377,11 @@ export async function updateSubject(token: string, id: string, name: string, not
   ).data;
 }
 
-export async function removeSubject(token: string, id: string) {
+export async function removeSubject(token: string, ...ids: string[]) {
   return (
     await axios.post(
       API_URL + "/subject/remove",
-      { id },
+      { ids },
       {
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
@@ -459,12 +459,12 @@ export async function updateStudent(token: string, data: { id: string, name: str
   ).data;
 }
 
-export async function removeStudent(token: string, id: string) {
+export async function removeStudent(token: string, ...ids: string[]) {
   return (
     await axios.post(
       API_URL + "/student/remove",
+      { ids },
       {
-        params: { id },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }
@@ -474,15 +474,16 @@ export async function removeStudent(token: string, id: string) {
 
 // MARK: Message
 
-export async function getGlobalMessages(token: string, page: number = 1, limit: number = 50) {
+export async function getGlobalMessages(token: string, page: number = 1, limit: number = 50, author: string) {
   return (
     await axios.get(
       API_URL + "/message/received",
       {
         params: {
-          include: "global",
-          limit,
           page,
+          limit,
+          author,
+          include: "global"
         },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
@@ -491,17 +492,12 @@ export async function getGlobalMessages(token: string, page: number = 1, limit: 
   ).data;
 }
 
-export async function getMessages(token: string, ids: string[], page: number = 1, limit: number = 50) {
+export async function getMessages(token: string, ...ids: string[]) {
   return (
     await axios.get(
-      API_URL + "/message/received",
+      API_URL + "/message/get",
       {
-        params: {
-          ids: ids.join(","),
-          include: "global",
-          limit,
-          page,
-        },
+        params: { ids: ids.join(",") },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }
@@ -535,11 +531,11 @@ export async function updateMessage(token: string, id: string, text: string) {
   ).data;
 }
 
-export async function removeMessage(token: string, id: string) {
+export async function removeMessage(token: string, ...ids: string[]) {
   return (
     await axios.post(
       API_URL + "/message/remove",
-      { id },
+      { ids },
       {
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
@@ -575,11 +571,11 @@ export async function createInvite(token: string, roles: string[]) {
   ).data;
 }
 
-export async function removeInvite(token: string, id: string) {
+export async function removeInvite(token: string, ...ids: string[]) {
   return (
     await axios.post(
       API_URL + "/invite/remove",
-      { id },
+      { ids },
       {
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout

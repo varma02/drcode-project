@@ -1,5 +1,17 @@
-# API documentation
-Base URL: `/api`
+# Contents
+- [Data Models](#data-models)
+### Rest API
+- [Authentication & Profile management](#authentication--profile-management-auth)
+- [Employee management](#employee-management-employee)
+- [Group management](#group-management-group)
+- [Location management](#location-management-location)
+- [Lesson management](#lesson-management-lesson)
+- [Subject management](#subject-management-subject)
+
+# Data models
+TODO
+
+# REST API documentation `/api`
 **All endpoints require authentication except Login and Register!**
 The response is always in JSON format, like this:
 ```
@@ -11,18 +23,6 @@ The response is always in JSON format, like this:
 	}
 }
 ```
-
-# Contents
-- [Data Models](#data-models)
-- [Authentication & Profile management](#authentication--profile-management-auth)
-- [Employee management](#employee-management-employee)
-- [Group management](#group-management-group)
-- [Location management](#location-management-location)
-- [Lesson management](#lesson-management-lesson)
-- [Subject management](#subject-management-subject)
-
-## Data models
-TODO: rewrite this section
 
 ## Authentication & Profile management `/auth`
 
@@ -117,7 +117,7 @@ Updates the authenticated user's data. A password re-prompt is always required.
 ##### Response on success
 ```
 {
-	code: "user_updated",
+	code: "success",
 	message: "User data updated",
 	data: {
 		user: { ... }
@@ -130,6 +130,22 @@ Updates the authenticated user's data. A password re-prompt is always required.
 - `fields_required`: one or more of the required fields was not found in the body
 - `invalid_password`:  the password must contain at least one lowercase letter, uppercase letter, number, special character, and be at least 8 characters long
 - `bad_request`: an unexpected error has occurred
+
+### Replace profile picture `POST /replace_profile_picture`
+Gives a token which the user can use to upload a new profile picture at `/upload`.
+##### Response on success
+```
+{
+	code: "success",
+	message: "Profile picture token",
+	data: {
+		token: ...,
+		path: "/employee:1234/profile_picture.webp"
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
 
 ## Employee management `/employee`
 

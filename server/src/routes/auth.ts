@@ -150,7 +150,7 @@ userRouter.post('/replace_profile_picture', errorHandler(async (req, res) => {
 
   res.status(200).json({
     code: "success",
-    message: "File created",
+    message: "Profile picture token",
     data: {
       token,
       path: "/" + req.employee?.id + "/profile_picture.webp",

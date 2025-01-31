@@ -52,6 +52,7 @@ asztali alkalmazásként készül el).
 	- [x] Clear sessions
 	- [x] Get logged in user
 	- [x] Update user
+	- [ ] Update profile picture
 	- [x] docs
 - Employees
 	- [x] Default CRUD

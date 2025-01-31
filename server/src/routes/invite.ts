@@ -4,10 +4,13 @@ import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError } from '../lib/errors';
+import { addRemover } from '../lib/defaultCRUD';
 
 const inviteRouter = express.Router();
 
 inviteRouter.use(ensureAuth);
+
+addRemover(inviteRouter, "invite");
 
 inviteRouter.get('/all', errorHandler(async (req, res) => {
   const invites = (await db.query(`
@@ -33,22 +36,6 @@ inviteRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
   res.status(200).json({
     code: "success",
     message: "Invite created",
-    data: { invite },
-  });
-}));
-
-inviteRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
-  const { id } = req.body;
-  if (!id)
-    throw new FieldsRequiredError();
-  if (!id.startsWith("invite:"))
-    throw new FieldsInvalidError();
-  
-  const invite = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Invite removed",
     data: { invite },
   });
 }));

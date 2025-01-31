@@ -5,10 +5,13 @@ import ensureAuth from '../middleware/ensureauth';
 import type { Employee } from '../database/models';
 import errorHandler from '../lib/errorHandler';
 import { BadRequestError, FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
+import { addRemover } from '../lib/defaultCRUD';
 
 const employeesRouter = express.Router();
 
 employeesRouter.use(ensureAuth);
+
+addRemover(employeesRouter, "employee");
 
 employeesRouter.get('/all', ensureAdmin, errorHandler(async (req, res) => {
   const employees = (await db.query<Employee[][]>('SELECT * OMIT password, session_key FROM employee'))[0];
@@ -45,24 +48,6 @@ employeesRouter.get('/get', errorHandler(async (req, res) => {
     code: "success",
     message: "Employee(s) retrieved",
     data: { employees },
-  });
-}));
-
-employeesRouter.post('/remove', errorHandler(async (req, res) => {
-  const { id } = req.body;
-  if (!id)
-    throw new FieldsRequiredError();
-  if (!id.startsWith("employee:"))
-    throw new FieldsInvalidError();
-
-  const result = await db.query<Employee[]>("DELETE ONLY type::thing($employee) RETURN BEFORE;", { employee: id });
-
-  if (result?.[0]?.email) 
-    throw new BadRequestError();
-
-  res.status(200).json({
-    code: "success",
-    message: "Employee deleted",
   });
 }));
 

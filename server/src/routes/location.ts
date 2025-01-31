@@ -5,10 +5,13 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Location } from '../database/models';
+import { addRemover } from '../lib/defaultCRUD';
 
 const locationsRouter = express.Router();
 
 locationsRouter.use(ensureAuth);
+
+addRemover(locationsRouter, "location");
 
 locationsRouter.get('/all', errorHandler(async (req, res) => {
   const locations = (await db.query(`
@@ -91,22 +94,6 @@ locationsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   res.status(200).json({
     code: "success",
     message: "Location updated",
-    data: { location },
-  });
-}));
-
-locationsRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
-  const { id } = req.body;
-  if (!id) 
-    throw new FieldsRequiredError();
-  if (!id.startsWith("location:")) 
-    throw new FieldsInvalidError();
-
-  const location = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Location removed",
     data: { location },
   });
 }));

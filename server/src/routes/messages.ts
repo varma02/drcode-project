@@ -4,10 +4,13 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Location, Message } from '../database/models';
+import { addRemover } from '../lib/defaultCRUD';
 
 const messagesRouter = express.Router();
 
 messagesRouter.use(ensureAuth);
+
+addRemover(messagesRouter, "message", "author = $user_id", { user_id: "$user_id" });
 
 messagesRouter.get('/received', errorHandler(async (req, res) => {
   const { page = 1, limit = 50, author, include = "global" } = req.query;
@@ -111,27 +114,6 @@ messagesRouter.post('/update', errorHandler(async (req, res) => {
   res.status(200).json({
     code: "success",
     message: "Message updated",
-    data: { message },
-  });
-}));
-
-messagesRouter.post('/remove', errorHandler(async (req, res) => {
-  const { id } = req.body;
-  if (!id) 
-    throw new FieldsRequiredError();
-  if (!id.startsWith("message:")) 
-    throw new FieldsInvalidError();
-
-  const message = (await db.query<Message[]>(`
-    DELETE ONLY type::thing($id) WHERE author = $user_id RETURN BEFORE;
-  `, { id, user_id: req.employee?.id }))[0];
-
-  if (!message || !message.id)
-    throw new NotFoundError();
-
-  res.status(200).json({
-    code: "success",
-    message: "Message removed",
     data: { message },
   });
 }));

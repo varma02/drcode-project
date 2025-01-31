@@ -5,10 +5,13 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Lesson } from '../database/models';
+import { addRemover } from '../lib/defaultCRUD';
 
 const lessonRouter = express.Router();
 
 lessonRouter.use(ensureAuth);
+
+addRemover(lessonRouter, "lesson");
 
 lessonRouter.get('/all', errorHandler(async (req, res) => {
   const lessons = (await db.query(`
@@ -117,22 +120,6 @@ lessonRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   res.status(200).json({
     code: "success",
     message: "Lesson updated",
-    data: { lesson },
-  });
-}));
-
-lessonRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
-  const { id } = req.body;
-  if (!id)
-    throw new FieldsRequiredError();
-  if (!id.startsWith("lesson:")) 
-    throw new FieldsInvalidError();
-
-  const lesson = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Lesson removed",
     data: { lesson },
   });
 }));

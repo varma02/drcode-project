@@ -7,6 +7,7 @@ import { FieldsInvalidError, FieldsRequiredError, NotFoundError, UnauthorizedErr
 import type { Employee, File } from '../database/models';
 import jwt from 'jsonwebtoken';
 import { isDev } from '../lib/utils';
+import { addRemover } from '../lib/defaultCRUD';
 
 const fileRouter = express.Router();
 
@@ -48,6 +49,8 @@ fileRouter.get('/nginx_verify', async (req, res): Promise<any> => {
 });
 
 fileRouter.use(ensureAuth);
+
+addRemover(fileRouter, "file");
 
 fileRouter.get('/get', errorHandler(async (req, res) => {
   if (!req.query.ids) {
@@ -160,22 +163,6 @@ fileRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   res.status(200).json({
     code: "success",
     message: "File updated",
-    data: { file },
-  });
-}));
-
-fileRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
-  const { id } = req.body;
-  if (!id) 
-    throw new FieldsRequiredError();
-  if (!id.startsWith("file:")) 
-    throw new FieldsInvalidError();
-
-  const file = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "File removed",
     data: { file },
   });
 }));

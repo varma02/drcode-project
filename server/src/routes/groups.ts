@@ -5,10 +5,13 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Group } from '../database/models';
+import { addRemover } from '../lib/defaultCRUD';
 
 const groupsRouter = express.Router();
 
 groupsRouter.use(ensureAuth);
+
+addRemover(groupsRouter, "group");
 
 groupsRouter.get('/all', errorHandler(async (req, res) => {
   const groups = (await db.query(`
@@ -105,22 +108,6 @@ groupsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   res.status(200).json({
     code: "success",
     message: "Group updated",
-    data: { group },
-  });
-}));
-
-groupsRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
-  const { id } = req.body;
-  if (!id)
-    throw new FieldsRequiredError();
-  if (!id.startsWith("group:"))
-    throw new FieldsInvalidError();
-
-  const group = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Group removed",
     data: { group },
   });
 }));

@@ -5,10 +5,13 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Subject } from '../database/models';
+import { addRemover } from '../lib/defaultCRUD';
 
 const subjectRouter = express.Router();
 
 subjectRouter.use(ensureAuth);
+
+addRemover(subjectRouter, "subject");
 
 subjectRouter.get('/all', errorHandler(async (req, res) => {
   const subjects = (await db.query(`
@@ -84,22 +87,6 @@ subjectRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   res.status(200).json({
     code: "success",
     message: "Subject updated",
-    data: { subject },
-  });
-}));
-
-subjectRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
-  const { id } = req.body;
-  if (!id)
-    throw new FieldsRequiredError();
-  if (!id.startsWith("subject:"))
-    throw new FieldsInvalidError();
-
-  const subject = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Subject removed",
     data: { subject },
   });
 }));

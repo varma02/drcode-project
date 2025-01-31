@@ -70,8 +70,6 @@ fileRouter.get('/get', errorHandler(async (req, res) => {
       },
     });
   }
-    
-
   const ids = (req.query.ids as string).trim().split(",");
   if (ids.length === 0)
     throw new FieldsRequiredError();
@@ -146,26 +144,23 @@ fileRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
 }));
 
 fileRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, notes, address, contact_email, contact_phone } = req.body;
+  const { id, name, shared_with } = req.body;
   if (!id) 
     throw new FieldsRequiredError();
-  if (!id.startsWith("location:")) 
+  if (!id.startsWith("file:")) 
     throw new FieldsInvalidError();
 
-  const location = (await db.query(`
+  const file = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
       ${name ? "name: $name," : ""}
-      ${notes ? "notes: $notes," : ""}
-      ${address ? "address: $address," : ""}
-      ${contact_email ? "contact_email: $contact_email," : ""}
-      ${contact_phone ? "contact_phone: $contact_phone," : ""}
+      ${shared_with ? "shared_with: array::map($shared_with, |$v| type::thing($v))," : ""}
     };
-  `, { id, name, notes, address, contact_email, contact_phone }))[0];
+  `, { id, name, shared_with }))[0];
 
   res.status(200).json({
     code: "success",
-    message: "Location updated",
-    data: { location },
+    message: "File updated",
+    data: { file },
   });
 }));
 
@@ -173,15 +168,15 @@ fileRouter.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
   const { id } = req.body;
   if (!id) 
     throw new FieldsRequiredError();
-  if (!id.startsWith("location:")) 
+  if (!id.startsWith("file:")) 
     throw new FieldsInvalidError();
 
-  const location = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
+  const file = (await db.query(`DELETE ONLY type::thing($id) RETURN BEFORE;`, { id }))[0];
 
   res.status(200).json({
     code: "success",
-    message: "Location removed",
-    data: { location },
+    message: "File removed",
+    data: { file },
   });
 }));
 

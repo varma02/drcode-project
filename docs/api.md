@@ -989,3 +989,116 @@ Removes a message.
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body
 - `not_found`: there is no message with the provided ID
+
+## File storage `/file`
+
+### Get viewing token `GET /get`
+Gives a token which the user can use to view all files that either they uploaded or were shared with them.
+##### Response on success
+```
+{
+	code: "success",
+	message: "File viewing token",
+	data: {
+		token: ...,
+		files: [] // empty array
+	}
+}
+```
+
+### Get files by ID `GET /get`
+Retrieves files' data and also gets a viewing token.
+##### Query parameters
+- `ids`: the IDs of the files to retrieve (list separated by commas, ex: id1,id2)
+##### Response on success
+```
+{
+	code: "success",
+	message: "Files retrieved",
+	data: {
+		token: ...,
+		files: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no file with the provided ID
+
+### Create a file `POST /create`
+Creates a file with an upload token that can be used on `/upload`.
+##### Request body
+```
+{
+	name: "funny_pic.jpg",
+	mime_type: "image/jpeg",
+	size: 123456,               // in bytes
+	
+	// the following are optional
+	
+	shared_with: ["employee:123", ...]
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "File created",
+	data: {
+		token: ...,
+		file: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Update a file `POST /update`
+Updates a file's metadata. (the file content cannot be changed)
+##### Request body
+```
+{
+	id: "file:123"
+	
+	// the following are optional
+	
+	name: "serious_pic.jpg",
+	shared_with: ["employee:123", ...]
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "File updated",
+	data: {
+		file: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Remove a file `POST /remove`
+Removes a file.
+##### Request body
+```
+{
+	id: "file:123"
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "File removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no file with the provided ID

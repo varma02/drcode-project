@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { createInvite, getAllEmployees, getAllInvites, removeInvite } from '@/lib/api/api';
+import { createInvite, getAllEmployees, getAllInvites, removeEmployee, removeInvite } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
@@ -14,7 +14,6 @@ import { getMonogram, getTopRole, role_map } from '@/lib/utils';
 import { GroupComboBox } from '@/components/GroupComboBox';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import { Card} from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import AreYouSureAlert from '@/components/AreYouSureAlert';
 import { useNavigate } from 'react-router-dom';
@@ -24,9 +23,10 @@ export default function Employee() {
   const navigate = useNavigate();
 
   const [employees, setEmployees] = useState([])
-
   const [invites, setInvites] = useState([]);
   const [selectedInvite, setSelectedInvite] = useState(null);
+  const [rowSelection, setRowSelection] = useState({})
+  console.log(rowSelection)
 
   useEffect(() => {
     getAllInvites(auth.token).then(i => setInvites(i.data.invites))
@@ -155,6 +155,13 @@ export default function Employee() {
     });
   }
 
+  function handleDelete() {
+    removeEmployee(auth.token, ...Object.keys(rowSelection).map(e => employees[+e].id)).then(resp => {
+      console.log(resp);
+      setEmployees(p => p.filter(e => !resp.data.employees.find(f => f.id == e.id)))
+    })
+  }
+
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Alkalmazottak</h1>
@@ -175,9 +182,10 @@ export default function Employee() {
       </>)}
 
       <DataTable data={employees} columns={columns}
+      rowSelection={rowSelection} setRowSelection={setRowSelection}
       rowOnClick={(v)=>navigate(v.original.id.replace("employee:", ""))}
       headerAfter={<div className='flex gap-4 pl-4'>
-        <AreYouSureAlert />
+        <AreYouSureAlert onConfirm={handleDelete} />
         <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
           <DialogTrigger asChild onClick={() => setSelectedInvite(null)}>
             <Button variant="outline"><Plus />Meghívás</Button>

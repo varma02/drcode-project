@@ -25,16 +25,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ScrollArea } from "./ui/scroll-area"
+import { useState } from "react"
 
-export default function DataTable({ columns, data, hasFooter = false, className, headerAfter, rowOnClick }) {
-  const [sorting, setSorting] = React.useState([])
-  const [columnFilters, setColumnFilters] = React.useState(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState({})
-  const [rowSelection, setRowSelection] = React.useState({})
+export default function DataTable({ columns, data, hasFooter = false, className, headerAfter, rowOnClick, rowSelection = [], setRowSelection }) {
+  const [sorting, setSorting] = useState([])
+  const [columnFilters, setColumnFilters] = useState([])
+  const [columnVisibility, setColumnVisibility] = useState({})
 
   const table = useReactTable({
     data,

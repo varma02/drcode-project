@@ -2,7 +2,7 @@ import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAllGroups, getEmployee } from '@/lib/api/api'
+import { getAllGroups, getEmployee, removeGroup } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -15,6 +15,7 @@ export default function Groups() {
   const navigate = useNavigate()
   const [groups, setGroups] = useState([])
   const [teachers, setTeachers] = useState({})
+  const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
     getAllGroups(auth.token).then(data => setGroups(data.data.groups))
@@ -30,6 +31,13 @@ export default function Groups() {
       setTeachers(temp)
     });
   }, [groups])
+
+  function handleDelete() {
+    removeGroup(auth.token, ...Object.keys(rowSelection).map(e => groups[+e].id)).then(resp => {
+      console.log(resp);
+      setGroups(p => p.filter(e => !resp.data.groups.find(f => f.id == e.id)))
+    })
+  }
 
   const columns = [
     {
@@ -110,8 +118,9 @@ export default function Groups() {
       <h1 className='text-4xl py-4'>Csoportok</h1>
 
       <DataTable data={groups} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("group:", ""))}
+      rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={<div className='flex gap-4 pl-4'>
-        <AreYouSureAlert />
+        <AreYouSureAlert onConfirm={handleDelete} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>
         </Link>

@@ -2,7 +2,7 @@ import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAllGroups, getAllLocations, getEmployee } from '@/lib/api/api'
+import { getAllLocations, removeLocation } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -13,10 +13,18 @@ import { Link } from 'react-router-dom'
 export default function Locations() {
   const auth = useAuth()
   const [locations, setLocations] = useState([])
+  const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
     getAllLocations(auth.token).then(data => setLocations(data.data.locations))
   }, [])
+
+  function handleDelete() {
+    removeLocation(auth.token, ...Object.keys(rowSelection).map(e => locations[+e].id)).then(resp => {
+      console.log(resp);
+      setLocations(p => p.filter(e => !resp.data.locations.find(f => f.id == e.id)))
+    })
+  }
 
   const columns = [
     {
@@ -98,13 +106,15 @@ export default function Locations() {
       cell: ({ row }) => format(new Date(row.getValue("created")), "P", {locale: hu}),
     },
   ]
+
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Helyszínek</h1>
 
       <DataTable data={locations} columns={columns}
+      rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={<div className='flex gap-4 pl-4'>
-        <AreYouSureAlert />
+        <AreYouSureAlert onConfirm={handleDelete} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>
         </Link>

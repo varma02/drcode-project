@@ -2,7 +2,7 @@ import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAllGroups, getAllLocations, getAllStudents, getAllSubjects, getEmployee } from '@/lib/api/api'
+import { getAllGroups, getAllLocations, getAllStudents, getAllSubjects, getEmployee, removeStudent } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -14,10 +14,18 @@ export default function Students() {
   const auth = useAuth()
   const navigate = useNavigate()
   const [students, setStudents] = useState([])
+  const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
     getAllStudents(auth.token).then(data => setStudents(data.data.students))
   }, [])
+
+  function handleDelete() {
+    removeStudent(auth.token, ...Object.keys(rowSelection).map(e => students[+e].id)).then(resp => {
+      console.log(resp);
+      setStudents(p => p.filter(e => !resp.data.students.find(f => f.id == e.id)))
+    })
+  }
 
   console.log(students)
 
@@ -100,10 +108,10 @@ export default function Students() {
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Tanulók</h1>
 
-      <DataTable data={students} columns={columns}
+      <DataTable data={students} columns={columns} rowSelection={rowSelection} setRowSelection={setRowSelection}
       rowOnClick={(row) => navigate(`/students/${row.original.id.replace("student:", "")}`)}
       headerAfter={<div className='flex gap-4 pl-4'>
-        <AreYouSureAlert />
+        <AreYouSureAlert onConfirm={handleDelete} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>
         </Link>

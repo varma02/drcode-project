@@ -26,29 +26,31 @@ async function _apply_migrations(start: number, force: boolean = false): Promise
   return true;
 }
 
-async function apply_seed() {
+export async function apply_seed() {
   console.log("Seeding database...");
   const seed = fs.readFileSync(path.join(__dirname, './seed.surql'), 'utf-8');
   await db.query(seed);
   console.log("Seed data applied.");
 }
 
-async function reset() {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  const confirmReset = await new Promise((resolve) => {
-    console.log("\nDoing this will reset the database and \x1b[31m all data will be lost. \x1b[0m");
-    rl.question('Are you sure you want to continue? (y/N): ', (answer) => {
-      rl.close();
-      resolve(answer.toLowerCase().trim() === 'y');
+export async function reset(force = false) {
+  if (!force) {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
     });
-  });
+    const confirmReset = await new Promise((resolve) => {
+      console.log("\nDoing this will reset the database and \x1b[31m all data will be lost. \x1b[0m");
+      rl.question('Are you sure you want to continue? (y/N): ', (answer) => {
+        rl.close();
+        resolve(answer.toLowerCase().trim() === 'y');
+      });
+    });
 
-  if (!confirmReset) {
-    console.log("Database reset aborted.");
-    return;
+    if (!confirmReset) {
+      console.log("Database reset aborted.");
+      return;
+    }
   }
 
   try {
@@ -68,12 +70,12 @@ async function reset() {
   return await _apply_migrations(0, true)
 }
 
-async function migrate() {
+export async function migrate() {
   const db_version = (await db.query<number[]>('RETURN $db_version;'))[0] || 0;
   await _apply_migrations(db_version);
 }
 
-async function create_migration() {
+export async function create_migration() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout

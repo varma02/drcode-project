@@ -1,6 +1,6 @@
 import express from 'express';
 import db from '../database/connection';
-import type { JWTData, Employee } from '../database/models';
+import type { JWTData, Employee, File } from '../database/models';
 import jwt from 'jsonwebtoken';
 import ensureAuth from '../middleware/ensureauth';
 import { verifyPassword } from '../lib/utils';
@@ -21,7 +21,11 @@ userRouter.post('/login', errorHandler(async (req, res) => {
   if (!employee || !employee.name) throw new InvalidCredentialsError();
 
   const token = jwt.sign(
-    { employee_id: employee.id, session_key: employee.session_key, user_agent: req.headers['employee-agent'] } as JWTData,
+    { 
+      employee_id: employee.id, 
+      session_key: employee.session_key, 
+      user_agent: req.headers['employee-agent']
+    } as JWTData,
     process.env.AUTHTOKEN_SECRET!,
     { algorithm: 'HS512', expiresIn: remember ? '1m' : '1d' }
   );
@@ -130,6 +134,28 @@ userRouter.post('/update', errorHandler(async (req, res) => {
         employee: updatedUser,
       },
     });
+}));
+
+userRouter.post('/replace_profile_picture', errorHandler(async (req, res) => {
+  const token = jwt.sign(
+    {
+      employee_id: req.employee?.id,
+      user_agent: req.headers['user-agent'],
+      ip: req.ip,
+      upload: "profile_picture",
+    },
+    process.env.FILETOKEN_SECRET!,
+    { algorithm: 'HS512', expiresIn: '1h' }
+  );
+
+  res.status(200).json({
+    code: "success",
+    message: "File created",
+    data: {
+      token,
+      path: "/" + req.employee?.id + "/profile_picture.webp",
+    },
+  });
 }));
 
 export default userRouter;

@@ -6,6 +6,7 @@ import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError, UnauthorizedError } from '../lib/errors';
 import type { Employee, File } from '../database/models';
 import jwt from 'jsonwebtoken';
+import { isDev } from '../lib/utils';
 
 const fileRouter = express.Router();
 
@@ -18,19 +19,29 @@ fileRouter.get('/nginx_verify', async (req, res): Promise<any> => {
     if (typeof payload != "object") throw new UnauthorizedError("Invalid JWT payload");
     if (req.headers['x-real-ip']?.includes(payload.ip) || payload.ip?.includes(req.headers['x-real-ip'])) throw new UnauthorizedError("IP mismatch");
     const employee = (await db.query<Employee[]>(`SELECT * OMIT password FROM ONLY type::thing($id);`, { id: payload.employee_id }))[0];
-    
     if (!employee) throw new UnauthorizedError("Employee not found");
-    // if (!employee.session_key || employee.session_key != payload.session_key) throw new UnauthorizedError("Session key mismatch");
-    if (url.pathname.includes("/upload") || payload.upload) {
+    // TODO: if (!employee.session_key || employee.session_key != payload.session_key) throw new UnauthorizedError("Session key mismatch");
+
+    if ((url.pathname.includes("/upload/") || payload.upload) && payload.upload != "profile_picture") {
       const file = (await db.query<File[]>(`SELECT * FROM ONLY type::thing($id);`, { id: payload.files[0] }))[0];
-      
       if (!file) throw new UnauthorizedError("File not found");
       if (employee.id.toString() != file.author.toString()) throw new UnauthorizedError("Unauthorized");
       if (!url.pathname.endsWith(file.path)) throw new UnauthorizedError("Path mismatch");
+
+    } else if (!url.pathname.match(/\/employee:.+\/profile\.webp$/)) {
+      if (payload.files?.length == 0) {
+        const file_ids = (await db.query<string[][]>(`
+          SELECT VALUE id FROM file WHERE !shared_with OR type::thing($user_id) IN shared_with OR author = type::thing($user_id);`,
+          { user_id: employee.id }))[0];
+        if (isDev()) console.log(file_ids);
+        payload.files = file_ids;
+      }
+      if (!payload.files.some((id: string) => url.pathname.match(`\\/${id}\\/`))) throw new UnauthorizedError("Invalid file ID");
     }
+
     return res.status(200).send("OK");
   } catch (e) {
-    if (!(e instanceof UnauthorizedError))
+    if (!(e instanceof UnauthorizedError) || isDev())
       console.trace(e);
   }
   res.status(401).send("Unauthorized");
@@ -39,6 +50,28 @@ fileRouter.get('/nginx_verify', async (req, res): Promise<any> => {
 fileRouter.use(ensureAuth);
 
 fileRouter.get('/get', errorHandler(async (req, res) => {
+  if (!req.query.ids) {
+    const token = jwt.sign(
+      {
+        employee_id: req.employee?.id,
+        user_agent: req.headers['user-agent'],
+        ip: req.ip,
+        upload: false,
+      },
+      process.env.FILETOKEN_SECRET!,
+      { algorithm: 'HS512', expiresIn: '5h' }
+    );
+    res.status(200).json({
+      code: "success",
+      message: "Viewing token retrieved",
+      data: {
+        token,
+        files: [],
+      },
+    });
+  }
+    
+
   const ids = (req.query.ids as string).trim().split(",");
   if (ids.length === 0)
     throw new FieldsRequiredError();
@@ -47,7 +80,7 @@ fileRouter.get('/get', errorHandler(async (req, res) => {
 
   const files = (await db.query<File[][]>(`
     SELECT * FROM array::map($ids, |$id| type::thing($id))
-    WHERE !shared_with OR $user_id IN shared_with;
+    WHERE !shared_with OR type::thing($user_id) IN shared_with OR author = type::thing($user_id);
   `, {ids, user_id: req.employee?.id}))[0];
 
   const token = jwt.sign(

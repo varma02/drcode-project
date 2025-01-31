@@ -14,9 +14,9 @@ export function addRemover(router: Router, table: string, WHERE = "", DBPARAMS?:
   
     let removed: any;
     if (!WHERE) {
-      removed = (await db.query(`DELETE ONLY array::map($ids, |$v| type::thing($v)) RETURN BEFORE;`, { ids }))[0];
+      removed = (await db.query(`DELETE array::map($ids, |$v| type::thing($v)) RETURN BEFORE;`, { ids }))[0];
     } else {
-      removed = (await db.query(`DELETE ONLY array::map($ids, |$v| type::thing($v)) WHERE ${WHERE} RETURN BEFORE;`, { ids, ...DBPARAMS }))[0];
+      removed = (await db.query(`DELETE array::map($ids, |$v| type::thing($v)) WHERE ${WHERE} RETURN BEFORE;`, { ids, ...DBPARAMS }))[0];
     }
 
     if (!removed || !removed.length)

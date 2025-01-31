@@ -7,6 +7,7 @@ export default function errorHandler(func : express.RequestHandler) {
     try {
       await func(req, res, next);
     } catch (err: any) {
+      console.trace(err)
       let code = "", message = "";
       if (err instanceof BaseError) {
         code = err.code;

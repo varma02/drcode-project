@@ -50,7 +50,7 @@ studentRouter.get('/get', errorHandler(async (req, res) => {
 }));
 
 studentRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, email, notes, parent } = req.body;
+  const { name, email, notes, parent, grade } = req.body;
   if (!name)
     throw new FieldsRequiredError();
   
@@ -59,9 +59,10 @@ studentRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
       ${notes ? "notes: $notes," : ""}
       ${email ? "email: $email," : ""}
       ${parent ? "parent: $parent," : ""}
+      grade: $grade,
       name: $name,
     };
-  `, { name, email, notes, parent }))[0];
+  `, { name, email, notes, parent, grade }))[0];
   res.status(200).json({
     code: "success",
     message: "Student created",

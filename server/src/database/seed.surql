@@ -1,4 +1,4 @@
-BEGIN TRANSACTION;
+-- BEGIN TRANSACTION;
 
 $defadmin = CREATE ONLY employee CONTENT {
   name: "Default Administrator",
@@ -90,14 +90,20 @@ $csoport1 = CREATE ONLY group CONTENT {
 
 $cs1ora1 = CREATE ONLY lesson CONTENT {
   group: $csoport1.id,
-  start: d'2024-12-02T16:10:00+01:00',
-  end: d'2024-12-02T17:10:00+01:00',
+  start: time::now(),
+  end: time::now() + 1h,
 };
 
 $cs1ora2 = CREATE ONLY lesson CONTENT {
   group: $csoport1.id,
-  start: d'2024-12-09T16:10:00+01:00',
-  end: d'2024-12-09T17:10:00+01:00',
+  start: time::now() + 1w,
+  end: time::now() + 1w + 1h,
+};
+
+$cs1ora2 = CREATE ONLY lesson CONTENT {
+  group: $csoport1.id,
+  start: time::now() + 2w,
+  end: time::now() + 2w + 1h,
 };
 
 RELATE $elek->enroled->$csoport1 CONTENT {
@@ -115,4 +121,4 @@ RELATE $pisti->enroled->$csoport1 CONTENT {
   price: 990,
 };
 
-COMMIT TRANSACTION;
+-- COMMIT TRANSACTION;

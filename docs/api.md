@@ -149,24 +149,6 @@ Gives a token which the user can use to upload a new profile picture at `/upload
 
 ## Employee management `/employee`
 
-### Invite `POST /invite`
-Administrators can Invite new users with this endpoint. Admin only.
-##### Request body
-```
-{
-	roles: [ ... ]   // a list of roles that the invited employee will have
-}
-```
-##### Response on success
-```
-{
-	code: "success",
-	message: "Invite created",
-	data: {
-		invite: { ... }
-	}
-}
-```
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body

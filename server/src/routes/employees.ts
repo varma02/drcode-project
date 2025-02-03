@@ -13,7 +13,7 @@ employeesRouter.use(ensureAuth);
 
 addRemover(employeesRouter, "employee");
 
-addAllGetter(employeesRouter, "employee", "*, OMIT password, session_key");
+addAllGetter(employeesRouter, "employee", "* OMIT password, session_key");
 
 employeesRouter.get('/get', errorHandler(async (req, res) => {
   const ids = (req.query.ids as string).trim().split(",");

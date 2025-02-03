@@ -17,7 +17,7 @@ $constemployee2 = CREATE ONLY employee:54321 CONTENT {
 $constinvite1 = CREATE ONLY invite:1234 CONTENT {
   author: $constemployee1.id,
   roles: ["teacher", "administrator"],
-}
+};
 
 $defadmin = CREATE ONLY employee CONTENT {
   name: "Default Administrator",

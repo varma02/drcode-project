@@ -121,7 +121,7 @@ $cs2ora2 = CREATE ONLY lesson CONTENT {
 
 $arany1 = CREATE ONLY group CONTENT {
   name: "Arany Szerda 15:00",
-  location: $ezi.id,
+  location: $arany.id,
   teachers: [$nepirtas.id],
 };
 

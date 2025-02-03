@@ -28,9 +28,9 @@ $nepirtas = CREATE ONLY employee CONTENT {
   roles: ["teacher"]
 };
 
-$mano = CREATE ONLY employee CONTENT {
-  name: "Máté Manó Bárdos",
-  email: "mano@example.com", 
+$varma = CREATE ONLY employee CONTENT {
+  name: "Váradi Marcell",
+  email: "varma@example.com", 
   password: crypto::argon2::generate("1234"),
   roles: ["teacher"]
 };
@@ -43,6 +43,104 @@ $scratch = CREATE ONLY subject CONTENT {
 $kodular = CREATE ONLY subject CONTENT {
   name: "Kodular",
   notes: "Scratch-nél nehezebb, telefonos alkalmazás fejlesztés"
+};
+
+$lego1 = CREATE ONLY subject CONTENT {
+  name: "Lego WeDo 1.0",
+  notes: "Belépő szintű kurzus, legozás 3-4. évfolyamnak"
+};
+
+$fohadiszallas = CREATE ONLY location CONTENT {
+  name: "Főhadiszállás",
+  address: "6000 Kecskemét, Batthyány utca 11.",
+  contact_email: "admin@example.com",
+  contact_phone: "+36301111111"
+};
+
+$ezi = CREATE ONLY location CONTENT {
+  name: "Kodály Zoltán Ének-Zenei Általános Iskola",
+  address: "6000 Kecskemét, Dózsa György út 22.",
+  contact_email: "valaki@kodaly-iskola.hu",
+  contact_phone: "0676508821"
+};
+
+$arany = CREATE ONLY location CONTENT {
+  name: "Arany János Általános Iskola",
+  address: "6000 Kecskemét, Lukányi János utca 10.",
+  contact_email: "valaki@keszeiskola.hu",
+  contact_phone: "0676478549"
+};
+
+$dok1 = CREATE ONLY group CONTENT {
+  name: "DOK Hétfő 15:00",
+  location: $fohadiszallas.id,
+  teachers: [$vrolandd.id],
+};
+
+$cs1ora1 = CREATE ONLY lesson CONTENT {
+  group: $dok1.id,
+  start: time::now(),
+  end:  time::now() + 1h,
+};
+
+$cs1ora2 = CREATE ONLY lesson CONTENT {
+  group: $dok1.id,
+  start: time::now() + 1w,
+  end:  time::now() + 1w + 1h,
+};
+
+$cs1ora2 = CREATE ONLY lesson CONTENT {
+  group: $dok1.id,
+  start: time::now() + 2w,
+  end:  time::now() + 2w + 1h,
+};
+
+$kodaly1 = CREATE ONLY group CONTENT {
+  name: "Kodály Kedd 16:00",
+  location: $ezi.id,
+  teachers: [$varma.id],
+};
+
+$cs2ora1 = CREATE ONLY lesson CONTENT {
+  group: $kodaly1.id,
+  start: time::now() + 1d + 2h,
+  end:  time::now() + 1d + 2h + 1h,
+};
+
+$cs2ora2 = CREATE ONLY lesson CONTENT {
+  group: $kodaly1.id,
+  start: time::now() + 1d + 1w + 2h,
+  end:  time::now() + 1d + 1w + 2h + 1h,
+};
+
+$cs2ora2 = CREATE ONLY lesson CONTENT {
+  group: $kodaly1.id,
+  start: time::now() + 1d + 2w + 2h,
+  end:  time::now() + 1d + 2w + 2h + 1h,
+};
+
+$arany1 = CREATE ONLY group CONTENT {
+  name: "Arany Szerda 15:00",
+  location: $ezi.id,
+  teachers: [$nepirtas.id],
+};
+
+$cs3ora1 = CREATE ONLY lesson CONTENT {
+  group: $arany1.id,
+  start: time::now() + 2d - 1h,
+  end:  time::now() + 2d - 1h + 1h,
+};
+
+$cs3ora2 = CREATE ONLY lesson CONTENT {
+  group: $arany1.id,
+  start: time::now() + 2d + 1w - 1h,
+  end:  time::now() + 2d + 1w - 1h + 1h,
+};
+
+$cs3ora2 = CREATE ONLY lesson CONTENT {
+  group: $arany1.id,
+  start: time::now() + 2d + 2w - 1h,
+  end:  time::now() + 2d + 2w - 1h + 1h,
 };
 
 $elek = CREATE ONLY student CONTENT {
@@ -75,50 +173,54 @@ $pisti = CREATE ONLY student CONTENT {
   },
 };
 
-$fohadiszallas = CREATE ONLY location CONTENT {
-  name: "Főhadiszállás",
-  address: "123 Itta Rendőrség",
-  contact_email: "admin@example.com",
-  contact_phone: "+36301111111"
+$peti = CREATE ONLY student CONTENT {
+  name: "Molnár Péter",
+  grade: 3,
+  parent: {
+    name: "Molnár Katalin",
+    email: "kati5337@example.com",
+    phone: "+36301111111"
+  },
 };
 
-$csoport1 = CREATE ONLY group CONTENT {
-  name: "DOK Hétfő 16:10",
-  location: $fohadiszallas.id,
-  teachers: [$nepirtas.id],
+$ferko = CREATE ONLY student CONTENT {
+  name: "Ferenc József",
+  grade: 4,
+  parent: {
+    name: "Ferenc Károly",
+    email: "info@amonarchiaorok.hu",
+    phone: "06761848122"
+  },
 };
 
-$cs1ora1 = CREATE ONLY lesson CONTENT {
-  group: $csoport1.id,
-  start: time::now(),
-  end: time::now() + 1h,
-};
-
-$cs1ora2 = CREATE ONLY lesson CONTENT {
-  group: $csoport1.id,
-  start: time::now() + 1w,
-  end: time::now() + 1w + 1h,
-};
-
-$cs1ora2 = CREATE ONLY lesson CONTENT {
-  group: $csoport1.id,
-  start: time::now() + 2w,
-  end: time::now() + 2w + 1h,
-};
-
-RELATE $elek->enroled->$csoport1 CONTENT {
+RELATE $elek->enroled->$dok1 CONTENT {
   subject: $kodular.id,
   price: 620,
 };
 
-RELATE $joska->enroled->$csoport1 CONTENT {
+RELATE $joska->enroled->$dok1 CONTENT {
   subject: $scratch.id,
   price: 1500,
 };
 
-RELATE $pisti->enroled->$csoport1 CONTENT {
+RELATE $joska->enroled->$kodaly1 CONTENT {
+  subject: $lego1.id,
+  price: 1500,
+};
+
+RELATE $pisti->enroled->$dok1 CONTENT {
   subject: $scratch.id,
   price: 990,
+};
+
+RELATE $peti->enroled->$arany1 CONTENT {
+  subject: $kodular.id,
+  price: 1230,
+};
+
+RELATE $pisti->enroled->$arany1 CONTENT {
+  subject: $kodular.id,
+  price: 1400,
 };
 
 -- COMMIT TRANSACTION;

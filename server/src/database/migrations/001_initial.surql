@@ -130,10 +130,10 @@ DEFINE FIELD reply_to ON TABLE message TYPE option<record<message>> ASSERT $valu
 -- DEFINE FIELD attachents ON TABLE message TYPE set<record<lesson | knowledge | file>> DEFAULT [] ASSERT $value.exists();
 
 
-DEFINE TABLE assigned_to SCHEMAFULL TYPE RELATION IN employee OUT group | lesson CHANGEFEED 4w;
+-- DEFINE TABLE assigned_to SCHEMAFULL TYPE RELATION IN employee OUT group | lesson CHANGEFEED 4w;
 
-DEFINE FIELD created ON TABLE assigned_to TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD notes ON TABLE assigned_to TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
+-- DEFINE FIELD created ON TABLE assigned_to TYPE datetime DEFAULT time::now() READONLY;
+-- DEFINE FIELD notes ON TABLE assigned_to TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 
 
 -- DEFINE TABLE event SCHEMAFULL CHANGEFEED 4w;

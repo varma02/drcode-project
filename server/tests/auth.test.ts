@@ -21,6 +21,7 @@ describe("Authentication (/auth)", () => {
     expect(authResponse.body.code).toEqual('success');
     expect(authResponse.body.data).toBeObject();
     expect(authResponse.body.data.token).toBeString();
+    expect(authResponse.body.data.employee).toContainAllKeys(["created", "email", "id", "name", "notes", "roles"])
     done();
   }, 100);
   
@@ -55,6 +56,7 @@ describe("Authentication (/auth)", () => {
     expect(response.body.code).toEqual('success');
     expect(response.body.data.employee).toBeObject();
     expect(response.body.data.employee.id).toBeString();
+    expect(response.body.data.employee).toContainAllKeys(["created", "email", "id", "name", "notes", "roles"])
   }, 100);
 
   test("Try to get user data without token", async () => {
@@ -81,6 +83,7 @@ describe("Authentication (/auth)", () => {
     expect(response.body.data).toBeObject();
     expect(response.body.data.employee).toBeObject();
     expect(response.body.data.employee.name).toEqual(randomName);
+    expect(response.body.data.employee).toContainAllKeys(["created", "email", "id", "name", "notes", "roles"])
   }, 100);
 
   test("Update everything", async () => {
@@ -102,6 +105,7 @@ describe("Authentication (/auth)", () => {
     expect(response.body.data.employee).toBeObject();
     expect(response.body.data.employee.name).toEqual(randomName);
     expect(response.body.data.employee.email).toEqual(randomEmail);
+    expect(response.body.data.employee).toContainAllKeys(["created", "email", "id", "name", "notes", "roles"])
   }, 100);
 
   test("Register a new user", async () => {

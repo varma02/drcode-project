@@ -147,11 +147,68 @@ Gives a token which the user can use to upload a new profile picture at `/upload
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 
-## Employee management `/employee`
+## Invite management `/invite`
 
+### Get a list of all invites `GET /all`
+Gets a list of all invites. Admin only.
+##### Response on success
+```
+{
+	code: "success",
+	message: "Invites retrieved",
+	data: {
+		invites: { ... }
+	}
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `not_found`: there is no employee with the provided ID
+
+### Create an invite `POST /create`
+Creates an invite. Admin only!
+##### Request body
+```
+{
+	roles: ["administrator", "teacher"],
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Invite created",
+	data: {
+		invite: { ... }
+	}
+}
+```
 ##### Error codes
 - `unauthorized`: the user is not authorized to complete this action
 - `fields_required`: one or more of the required fields was not found in the body
+- `bad_request`: One or more fields are invalid
+
+### Remove an invite `POST /remove`
+Removes invites. Admin only.
+##### Request body
+```
+{
+	ids: ["invite:123", ...]
+}
+```
+##### Response on success
+```
+{
+	code: "success",
+	message: "Invite removed"
+}
+```
+##### Error codes
+- `unauthorized`: the user is not authorized to complete this action
+- `fields_required`: one or more of the required fields was not found in the body
+- `not_found`: there is no employee with the provided ID
+
+## Employee management `/employee`
 
 ### Get a list of all employees `GET /all`
 Gets a list of all employees (without details). Admin only.

@@ -6,12 +6,12 @@ import db from "../database/connection";
 
 export function addAllGetter(router: Router, table: string, SELECT = "", FETCH = "") {
   router.get('/all', ensureAdmin, errorHandler(async (req, res) => {
-    const data = (await db.query(`SELECT ${SELECT || "*"} FROM type::thing($table) ${FETCH ? "FETCH " + FETCH : "" }`, { table }))[0];
+    const data = (await db.query(`SELECT ${SELECT || "*"} FROM type::table($table) ${FETCH ? "FETCH " + FETCH : "" }`, { table }))[0];
   
     res.status(200).json({
       code: "success",
       message: `All ${table}s retrieved`,
-      data: { [table]: data },
+      data: { [`${table}s`]: data },
     });
   }));
 }

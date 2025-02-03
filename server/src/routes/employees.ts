@@ -61,6 +61,8 @@ employeesRouter.post("/update", errorHandler(async (req, res) => {
   if (!result?.[0]?.email)
     throw new BadRequestError();
 
+  delete result[0].password;
+  delete result[0].session_key;
   res.status(200).json({
     code: "success",
     message: "Employee updated",

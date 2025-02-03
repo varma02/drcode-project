@@ -1,7 +1,8 @@
-import { describe, expect, test } from 'bun:test';
+import { afterAll, describe, expect, test } from 'bun:test';
 import request, { type Response } from 'supertest';
 import { app } from '../src/index';
 import db from '../src/database/connection';
+import { apply_seed, reset } from '../src/database/cli';
 
 describe("Authentication (/auth)", () => {
   let token = "";
@@ -122,5 +123,10 @@ describe("Authentication (/auth)", () => {
     expect(response.headers["content-type"]).toMatch(/json/);
     expect(response.status).toEqual(200);
     expect(response.body.code).toEqual('success');
+  });
+
+  afterAll(async () => {
+    await reset(true);
+    await apply_seed();
   });
 });

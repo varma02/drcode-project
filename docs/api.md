@@ -193,11 +193,11 @@ Retrieves employees' data, including the specified details.
 - `not_found`: there is no employee with the provided ID
 
 ### Remove an employee `POST /remove`
-Removes an employee. Admin only.
+Removes employees. Admin only.
 ##### Request body
 ```
 {
-	id: "employee:123"
+	ids: ["employee:123", ...]
 }
 ```
 ##### Response on success
@@ -343,11 +343,11 @@ Updates a group. Admin only!
 - `bad_request`: One or more fields are invalid
 
 ### Remove a group `POST /remove`
-Removes a group. Admin only.
+Removes groups. Admin only.
 ##### Request body
 ```
 {
-	id: "group:123"
+	ids: ["group:123", ...]
 }
 ```
 ##### Response on success
@@ -459,11 +459,11 @@ Updates a location. Admin only!
 - `bad_request`: One or more fields are invalid
 
 ### Remove a location `POST /remove`
-Removes a location. Admin only.
+Removes locations. Admin only.
 ##### Request body
 ```
 {
-	id: "location:123"
+	ids: ["location:123", ...]
 }
 ```
 ##### Response on success
@@ -602,11 +602,11 @@ Updates a lesson. Admin only!
 - `not_found`: there is no lesson with the provided ID
 
 ### Remove a lesson `POST /remove`
-Removes a lesson. Admin only.
+Removes lessons. Admin only.
 ##### Request body
 ```
 {
-	id: "lesson:123"
+	ids: ["lesson:123", ...]
 }
 ```
 ##### Response on success
@@ -713,11 +713,11 @@ Updates a subject. Admin only!
 - `not_found`: there is no subject with the provided ID
 
 ### Remove a subject `POST /remove`
-Removes a subject. Admin only.
+Removes subjects. Admin only.
 ##### Request body
 ```
 {
-	id: "subject:123"
+	ids: ["subject:123", ...]
 }
 ```
 ##### Response on success
@@ -839,11 +839,11 @@ Updates a student. Admin only!
 - `not_found`: there is no student with the provided ID
 
 ### Remove a student `POST /remove`
-Removes a student. Admin only.
+Removes students. Admin only.
 ##### Request body
 ```
 {
-	id: "student:123"
+	ids: ["student:123", ...]
 }
 ```
 ##### Response on success
@@ -953,11 +953,11 @@ Updates a message.
 - `not_found`: there is no message with the provided ID
 
 ### Remove a message `POST /remove`
-Removes a message.
+Removes messages.
 ##### Request body
 ```
 {
-	id: "message:123"
+	ids: ["message:123", ...]
 }
 ```
 ##### Response on success
@@ -1066,11 +1066,11 @@ Updates a file's metadata. (the file content cannot be changed)
 - `bad_request`: One or more fields are invalid
 
 ### Remove a file `POST /remove`
-Removes a file.
+Removes files.
 ##### Request body
 ```
 {
-	id: "file:123"
+	ids: ["file:123", ...]
 }
 ```
 ##### Response on success

@@ -51,6 +51,14 @@ export default function DataTable({ columns, data, hasFooter = false, className,
     },
   })
 
+  React.useEffect(() => {
+    table.getAllColumns().forEach((column) => {
+      if (column.columnDef.hidden) {
+        column.toggleVisibility(false)
+      }
+    });
+  }, []);
+
   return (
     <div className={className}>
       <div className="flex items-center py-4">

@@ -29,6 +29,7 @@ const RegisterPage = lazy(() => import('@/routes/Register'))
 const Locations = lazy(() => import('@/routes/Locations'))
 const Groups = lazy(() => import('@/routes/Groups'))
 const GroupDetails = lazy(() => import('@/routes/GroupDetails'))
+const Lessons = lazy(() => import('@/routes/Lessons'))
 const Subjects = lazy(() => import('@/routes/Subjects'))
 const Students = lazy(() => import('@/routes/Students'))
 const StudentDetails = lazy(() => import('@/routes/StudentDetails'))
@@ -81,6 +82,8 @@ const router = createBrowserRouter([
       {path: "/groups", element: <Groups />},
       {path: "/groups/add", element: <AddCalendarGroup />},
       {path: "/groups/:id", element: <GroupDetails />},
+      {path: "/lessons", element: <Lessons />},
+      // {path: "/lessons/:id", element: <GroupDetails />},
       {path: "/locations", element: <Locations />},
       {path: "/locations/add", element: <AddNewLocation />},
       {path: "/subjects", element: <Subjects />},

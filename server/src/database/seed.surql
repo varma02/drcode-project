@@ -1,5 +1,21 @@
 -- BEGIN TRANSACTION;
 
+$constid1 = CREATE ONLY employee CONTENT {
+  id: "12345"
+  name: "Const Id For Testing",
+  email: "12345@example.com", 
+  password: crypto::argon2::generate("1234"),
+  roles: ["administrator"]
+};
+
+$constid2 = CREATE ONLY employee CONTENT {
+  id: "54321"
+  name: "Const Id For Testing",
+  email: "54321@example.com", 
+  password: crypto::argon2::generate("1234"),
+  roles: ["teacher"]
+};
+
 $defadmin = CREATE ONLY employee CONTENT {
   name: "Default Administrator",
   email: "admin@example.com", 

@@ -42,7 +42,23 @@ describe("Employee (/employee)", () => {
     expect(response.body.data.employees).toBeArrayOfSize(2)
     expect(response.body.data.employees[0]).toContainAllKeys(["created", "email", "id", "name", "notes", "roles"])
     expect(response.body.data.employees[0]).not.toContainAnyKeys(["password", "session_key"])
+  }, 100)
 
+  test("Get employees with details by Id", async () => {
+    const response = await request(app)
+      .get('/employee/get')
+      .set('Authorization', `Bearer ${token}`)
+      .query({
+        ids: "employee:12345,employee:54321",
+        include: "groups,unpaid_work"
+      })
+    expect(response.headers["content-type"]).toMatch(/json/)
+    expect(response.status).toEqual(200)
+    expect(response.body.code).toEqual('success')
+    expect(response.body.data).toBeObject()
+    expect(response.body.data.employees).toBeArrayOfSize(2)
+    expect(response.body.data.employees[0]).toContainAllKeys(["created", "email", "id", "name", "notes", "roles", "unpaid_work", "groups"])
+    expect(response.body.data.employees[0]).not.toContainAnyKeys(["password", "session_key"])
   }, 100)
 
   test("Update employee", async () => {

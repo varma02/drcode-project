@@ -107,15 +107,10 @@ describe("Authentication (/auth)", () => {
   test("Register a new user", async () => {
     const randomName = Math.random().toString(36).substring(7);
     const randomEmail = Math.random().toString(36).substring(7) + "@example.com";
-    const invite = (await db.query<any[]>(`
-      CREATE ONLY invite CONTENT {
-        author: (SELECT VALUE id FROM ONLY employee WHERE "administrator" IN roles LIMIT 1),
-        roles: ["teacher", "administrator"],
-      }`))[0];
     const response = await request(app)
       .post("/auth/register")
       .send({
-        invite_id: invite?.id,
+        invite_id: "invite:1234",
         name: randomName,
         email: randomEmail,
         password: "VerySecure1234$#"

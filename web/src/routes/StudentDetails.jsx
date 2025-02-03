@@ -218,15 +218,15 @@ export default function StudentDetails() {
       <div className="flex flex-wrap gap-12 py-4">
         <div>
           <h3 className='font-bold'>Szülő neve</h3>
-          <Input defaultValue={student.parent.name} placeholder="nincs megadva" type="text" name="parentName" />
+          <Input defaultValue={student.parent?.name} placeholder="nincs megadva" type="text" name="parentName" />
         </div>
         <div>
           <h3 className='font-bold'>Szülő E-mail címe</h3>
-          <Input defaultValue={student.parent.email} placeholder="nincs megadva" type="email" name="parentEmail" />
+          <Input defaultValue={student.parent?.email} placeholder="nincs megadva" type="email" name="parentEmail" />
         </div>
         <div>
           <h3 className='font-bold'>Szülő Telefonszáma</h3>
-          <Input defaultValue={student.parent.phone} placeholder="nincs megadva" type="text" name="parentPhone" />
+          <Input defaultValue={student.parent?.phone} placeholder="nincs megadva" type="text" name="parentPhone" />
         </div>
       </div>
 

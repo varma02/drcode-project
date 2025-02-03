@@ -5,7 +5,7 @@ import ensureAuth from '../middleware/ensureauth';
 import type { Employee } from '../database/models';
 import errorHandler from '../lib/errorHandler';
 import { BadRequestError, FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import { addRemover } from '../lib/defaultCRUD';
+import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const employeesRouter = express.Router();
 
@@ -13,15 +13,7 @@ employeesRouter.use(ensureAuth);
 
 addRemover(employeesRouter, "employee");
 
-employeesRouter.get('/all', ensureAdmin, errorHandler(async (req, res) => {
-  const employees = (await db.query<Employee[][]>('SELECT * OMIT password, session_key FROM employee'))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "All employees retrieved",
-    data: { employees },
-  });
-}));
+addAllGetter(employeesRouter, "employee", "*, OMIT password, session_key");
 
 employeesRouter.get('/get', errorHandler(async (req, res) => {
   const ids = (req.query.ids as string).trim().split(",");

@@ -5,7 +5,7 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Subject } from '../database/models';
-import { addRemover } from '../lib/defaultCRUD';
+import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const subjectRouter = express.Router();
 
@@ -13,17 +13,7 @@ subjectRouter.use(ensureAuth);
 
 addRemover(subjectRouter, "subject");
 
-subjectRouter.get('/all', errorHandler(async (req, res) => {
-  const subjects = (await db.query(`
-    SELECT * FROM subject;
-  `))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "All subjects retrieved",
-    data: { subjects },
-  });
-}));
+addAllGetter(subjectRouter, "subject");
 
 subjectRouter.get('/get', errorHandler(async (req, res) => {
   const ids = (req.query.ids as string).trim().split(",");

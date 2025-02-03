@@ -5,7 +5,7 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Lesson } from '../database/models';
-import { addRemover } from '../lib/defaultCRUD';
+import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const lessonRouter = express.Router();
 
@@ -13,17 +13,7 @@ lessonRouter.use(ensureAuth);
 
 addRemover(lessonRouter, "lesson");
 
-lessonRouter.get('/all', errorHandler(async (req, res) => {
-  const lessons = (await db.query(`
-    SELECT * FROM lesson;
-  `))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "All lessons retrieved",
-    data: { lessons },
-  });
-}));
+addAllGetter(lessonRouter, "lesson");
 
 lessonRouter.get('/between_dates', errorHandler(async (req, res) => {
   const { start, end } = req.query;

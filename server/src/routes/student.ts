@@ -5,7 +5,7 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Subject } from '../database/models';
-import { addRemover } from '../lib/defaultCRUD';
+import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const studentRouter = express.Router();
 
@@ -13,17 +13,7 @@ studentRouter.use(ensureAuth);
 
 addRemover(studentRouter, "student");
 
-studentRouter.get('/all', errorHandler(async (req, res) => {
-  const students = (await db.query(`
-    SELECT * FROM student;
-  `))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "All students retrieved",
-    data: { students },
-  });
-}));
+addAllGetter(studentRouter, "student");
 
 studentRouter.get('/get', errorHandler(async (req, res) => {
   const ids = (req.query.ids as string).trim().split(",");

@@ -4,6 +4,18 @@ import errorHandler from "./errorHandler";
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from "./errors";
 import db from "../database/connection";
 
+export function addAllGetter(router: Router, table: string, SELECT = "", FETCH = "") {
+  router.get('/all', ensureAdmin, errorHandler(async (req, res) => {
+    const data = (await db.query(`SELECT ${SELECT || "*"} FROM type::thing($table) ${FETCH ? "FETCH " + FETCH : "" }`, { table }))[0];
+  
+    res.status(200).json({
+      code: "success",
+      message: `All ${table}s retrieved`,
+      data: { [table]: data },
+    });
+  }));
+}
+
 export function addRemover(router: Router, table: string, WHERE = "", DBPARAMS?: object) {
   router.post('/remove', ensureAdmin, errorHandler(async (req, res) => {
     const { ids } = req.body;

@@ -5,7 +5,7 @@ import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import type { Group } from '../database/models';
-import { addRemover } from '../lib/defaultCRUD';
+import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const groupsRouter = express.Router();
 
@@ -13,17 +13,7 @@ groupsRouter.use(ensureAuth);
 
 addRemover(groupsRouter, "group");
 
-groupsRouter.get('/all', errorHandler(async (req, res) => {
-  const groups = (await db.query(`
-    SELECT * FROM group FETCH location;
-  `))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "All groups retrieved",
-    data: { groups },
-  });
-}));
+addAllGetter(groupsRouter, "group", "", "location");
 
 groupsRouter.get('/get', errorHandler(async (req, res) => {
   const ids = (req.query.ids as string).trim().split(",");

@@ -2,7 +2,7 @@ import express from 'express';
 import db from '../database/connection';
 import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
-import type { Employee } from '../database/models';
+import type { DBEmployee } from '../database/models';
 import errorHandler from '../lib/errorHandler';
 import { BadRequestError, FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
 import { addAllGetter, addRemover } from '../lib/defaultCRUD';
@@ -29,7 +29,7 @@ employeesRouter.get('/get', errorHandler(async (req, res) => {
     if (include.has("unpaid_work")) selection.push("->worked_at[WHERE ! paid].* as unpaid_work");
     if (include.has("groups")) selection.push("(SELECT VALUE id FROM group WHERE type::thing($parent.id) IN teachers) as groups");
   }
-  const employees = (await db.query<Employee[][]>(`
+  const employees = (await db.query<DBEmployee[][]>(`
     SELECT ${selection.join(", ")} OMIT password, session_key FROM array::map($ids, |$id| type::thing($id));
   `, {ids}))[0];
 
@@ -51,7 +51,7 @@ employeesRouter.post("/update", errorHandler(async (req, res) => {
   if (!id.startsWith("employee:") || !Array.isArray(roles) || !roles.every(r => r === "administrator" || r === "teacher"))
     throw new FieldsInvalidError();
 
-  const result = await db.query<Employee[]>(`
+  const result = await db.query<DBEmployee[]>(`
     UPDATE ONLY type::thing($employee) MERGE {
       ${name ? "name: $name ," : ""}
       ${email ? "email: $email ," : ""}

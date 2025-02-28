@@ -1,7 +1,7 @@
-import { Employee } from './database/models';
+import { DBEmployee } from './database/models';
 
 declare module 'express-serve-static-core' {
   interface Request {
-    employee?: Employee;
+    employee?: DBEmployee;
   }
 }

@@ -1,6 +1,6 @@
 import express from 'express';
 import db from '../database/connection';
-import type { JWTData, Employee, File } from '../database/models';
+import type { AccountJWT, DBEmployee, DBFile } from '../database/models';
 import jwt from 'jsonwebtoken';
 import ensureAuth from '../middleware/ensureauth';
 import { verifyPassword } from '../lib/utils';
@@ -14,7 +14,7 @@ userRouter.post('/login', errorHandler(async (req, res) => {
   
   if (!email || !password) throw new FieldsRequiredError();
 
-  const employee = (await db.query<Employee[][]>(
+  const employee = (await db.query<DBEmployee[][]>(
     "SELECT *, role.* FROM employee WHERE email = $email AND crypto::argon2::compare(password, $password) LIMIT 1",
     { email, password }))[0][0];
 
@@ -25,7 +25,7 @@ userRouter.post('/login', errorHandler(async (req, res) => {
       employee_id: employee.id, 
       session_key: employee.session_key, 
       user_agent: req.headers['employee-agent']
-    } as JWTData,
+    } as AccountJWT,
     process.env.AUTHTOKEN_SECRET!,
     { algorithm: 'HS512', expiresIn: remember ? '1m' : '1d' }
   );
@@ -54,7 +54,7 @@ userRouter.post('/register', errorHandler(async (req, res) => {
   if (!invite_id.startsWith("invite:")) 
     throw new InvalidInviteError();
 
-  const employee = (await db.query<Employee[]>(`
+  const employee = (await db.query<DBEmployee[]>(`
     BEGIN TRANSACTION;
     $invite = (DELETE ONLY type::thing($invite_id) RETURN BEFORE);
     IF $invite.created > time::now() - 1d {
@@ -117,7 +117,7 @@ userRouter.post('/update', errorHandler(async (req, res) => {
     if (email) updates.push("email = $email");
     if (new_password) updates.push("password = crypto::argon2::generate($new_password)");
 
-    const updatedUser = (await db.query<Employee[]>(
+    const updatedUser = (await db.query<DBEmployee[]>(
       `UPDATE ONLY type::thing($employee) SET ${updates.join(", ")} WHERE crypto::argon2::compare(password, $old_password)`,
       { employee: req.employee!.id, name, email, new_password, old_password }
     ))[0];

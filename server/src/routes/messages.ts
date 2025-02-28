@@ -3,7 +3,7 @@ import db from '../database/connection';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import type { Location, Message } from '../database/models';
+import type { DBLocation, DBMessage } from '../database/models';
 import { addRemover } from '../lib/defaultCRUD';
 
 const messagesRouter = express.Router();
@@ -56,7 +56,7 @@ messagesRouter.get('/get', errorHandler(async (req, res) => {
   //   const include = new Set((req.query.include as string).trim().split(","));
   //   if (include.has("something")) selection.push("some_query");
   // }
-  const messages = (await db.query<Location[][]>(`
+  const messages = (await db.query<DBLocation[][]>(`
     SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id))
     WHERE recipient IN [$user_id, NONE, NULL];
   `, { ids, user_id: req.employee?.id }))[0];
@@ -76,7 +76,7 @@ messagesRouter.post('/create', errorHandler(async (req, res) => {
   if (!text || !text.trim().length)
     throw new FieldsRequiredError();
 
-  const message = (await db.query<Message[]>(`
+  const message = (await db.query<DBMessage[]>(`
     CREATE ONLY message CONTENT {
       text: $text,
       author: type::thing($user_id),
@@ -102,7 +102,7 @@ messagesRouter.post('/update', errorHandler(async (req, res) => {
   if (!id.startsWith("message:") || !text.trim().length)
     throw new FieldsInvalidError();
 
-  const message = (await db.query<Location[]>(`
+  const message = (await db.query<DBLocation[]>(`
     UPDATE ONLY type::thing($id) MERGE {
       text: $text,
     } WHERE author = $user_id;

@@ -1,50 +1,50 @@
-export interface JWTData {
+export interface AccountJWT {
   employee_id: string,
   session_key: string,
   user_agent: string,
 }
 
-export enum Role {
+export enum DBRole {
   Admin = "administrator",
   Teacher = "teacher"
 };
 
-export interface Employee {
+export interface DBEmployee {
   id: string,
   created: Date,
   name: string,
   email: string,
   password?: string,
-  roles: Role[],
+  roles: DBRole[],
   session_key?: string,
 }
 
-export interface Invite {
+export interface DBInvite {
   id: string,
   created: Date,
-  author: string | Employee,
-  roles: Role[],
+  author: string | DBEmployee,
+  roles: DBRole[],
 }
 
-export interface File {
+export interface DBFile {
   id: string,
   created: Date,
-  author: string | Employee,
+  author: string | DBEmployee,
   name: string,
   mime_type: string,
   size: number,
   path: string,
-  shared_with: string[] | Employee[],
+  shared_with: string[] | DBEmployee[],
 }
 
-export interface Subject {
+export interface DBSubject {
   id: string,
   created: Date,
   name: string,
   notes: string,
 }
 
-export interface Student {
+export interface DBStudent {
   id: string,
   created: Date,
   name: string,
@@ -59,7 +59,7 @@ export interface Student {
   notes: string,
 }
 
-export interface Location {
+export interface DBLocation {
   id: string,
   created: Date,
   name?: string,
@@ -69,58 +69,58 @@ export interface Location {
   contact_phone: string,
 }
 
-export interface Group {
+export interface DBGroup {
   id: string,
   created: Date,
-  location: Location,
+  location: DBLocation,
   notes: string,
-  teachers: string[] | Employee[],
+  teachers: string[] | DBEmployee[],
   archived: boolean,
 }
 
-export interface RelationEnroled {
+export interface DBRelationEnroled {
   id: string,
-  in: string | Student,
-  out: string | Group,
+  in: string | DBStudent,
+  out: string | DBGroup,
   created: Date,
-  subject: string | Subject,
+  subject: string | DBSubject,
   price: number,
   notes: string,
 }
 
-export interface Lesson {
+export interface DBLesson {
   id: string,
   created: Date,
   name?: string
-  group?: string | Group,
-  location?: string | Location,
+  group?: string | DBGroup,
+  location?: string | DBLocation,
   notes: string,
-  teachers?: string[] | Employee[],
+  teachers?: string[] | DBEmployee[],
   start: Date,
   end: Date,
 }
 
-export interface RelationReplaced {
+export interface DBRelationReplaced {
   id: string,
-  in: string | Student,
-  out: string | Lesson,
+  in: string | DBStudent,
+  out: string | DBLesson,
   created: Date,
   notes: string,
-  replacement: string | Lesson,
+  replacement: string | DBLesson,
 }
 
-export interface RelationAttended {
+export interface DBRelationAttended {
   id: string,
-  in: string | Student,
-  out: string | Lesson | RelationReplaced,
+  in: string | DBStudent,
+  out: string | DBLesson | DBRelationReplaced,
   created: Date,
   paid: boolean,
 }
 
-export interface RelationWorkedAt {
+export interface DBRelationWorkedAt {
   id: string,
-  in: string | Employee,
-  out: string | Lesson,
+  in: string | DBEmployee,
+  out: string | DBLesson,
   created: Date,
   paid: boolean,
   notes: string,
@@ -128,11 +128,11 @@ export interface RelationWorkedAt {
   end?: Date,
 }
 
-export interface Message {
+export interface DBMessage {
   id: string,
   created: Date,
   text: string,
-  author: string | Employee,
-  recipient?: string | Employee,
-  reply_to?: string | Message,
+  author: string | DBEmployee,
+  recipient?: string | DBEmployee,
+  reply_to?: string | DBMessage,
 }

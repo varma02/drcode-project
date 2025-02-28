@@ -4,7 +4,7 @@ import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import type { Group } from '../database/models';
+import type { DBGroup } from '../database/models';
 import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const groupsRouter = express.Router();
@@ -30,7 +30,7 @@ groupsRouter.get('/get', errorHandler(async (req, res) => {
     if (include.has("subjects")) selection.push("array::group(<-enroled.subject) as subjects");
     if (include.has("lessons")) selection.push("(SELECT VALUE id FROM lesson WHERE $parent.id = group.id) AS lessons");
   }
-  const groups = (await db.query<Group[][]>(`
+  const groups = (await db.query<DBGroup[][]>(`
     SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
   `, {ids}))[0];
 

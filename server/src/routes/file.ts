@@ -4,7 +4,7 @@ import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError, UnauthorizedError } from '../lib/errors';
-import type { Employee, File } from '../database/models';
+import type { DBEmployee, DBFile } from '../database/models';
 import jwt from 'jsonwebtoken';
 import { isDev } from '../lib/utils';
 import { addRemover } from '../lib/defaultCRUD';
@@ -19,12 +19,12 @@ fileRouter.get('/nginx_verify', async (req, res): Promise<any> => {
   
     if (typeof payload != "object") throw new UnauthorizedError("Invalid JWT payload");
     if (req.headers['x-real-ip']?.includes(payload.ip) || payload.ip?.includes(req.headers['x-real-ip'])) throw new UnauthorizedError("IP mismatch");
-    const employee = (await db.query<Employee[]>(`SELECT * OMIT password FROM ONLY type::thing($id);`, { id: payload.employee_id }))[0];
+    const employee = (await db.query<DBEmployee[]>(`SELECT * OMIT password FROM ONLY type::thing($id);`, { id: payload.employee_id }))[0];
     if (!employee) throw new UnauthorizedError("Employee not found");
     // TODO: if (!employee.session_key || employee.session_key != payload.session_key) throw new UnauthorizedError("Session key mismatch");
 
     if ((url.pathname.includes("/upload/") || payload.upload) && payload.upload != "profile_picture") {
-      const file = (await db.query<File[]>(`SELECT * FROM ONLY type::thing($id);`, { id: payload.files[0] }))[0];
+      const file = (await db.query<DBFile[]>(`SELECT * FROM ONLY type::thing($id);`, { id: payload.files[0] }))[0];
       if (!file) throw new UnauthorizedError("File not found");
       if (employee.id.toString() != file.author.toString()) throw new UnauthorizedError("Unauthorized");
       if (!url.pathname.endsWith(file.path)) throw new UnauthorizedError("Path mismatch");
@@ -77,7 +77,7 @@ fileRouter.get('/get', errorHandler(async (req, res) => {
   if (ids.every(id => !id.startsWith("file:")))
     throw new FieldsInvalidError();
 
-  const files = (await db.query<File[][]>(`
+  const files = (await db.query<DBFile[][]>(`
     SELECT * FROM array::map($ids, |$id| type::thing($id))
     WHERE !shared_with OR type::thing($user_id) IN shared_with OR author = type::thing($user_id);
   `, {ids, user_id: req.employee?.id}))[0];
@@ -111,7 +111,7 @@ fileRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
   if (!name || !mime_type || !size) 
     throw new FieldsRequiredError();
 
-  const file = (await db.query<File[]>(`
+  const file = (await db.query<DBFile[]>(`
     CREATE ONLY file CONTENT {
       author: type::thing($user_id),
       name: $name,

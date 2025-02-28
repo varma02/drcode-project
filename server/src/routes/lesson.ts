@@ -4,7 +4,7 @@ import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import type { Lesson } from '../database/models';
+import type { DBLesson } from '../database/models';
 import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const lessonRouter = express.Router();
@@ -20,7 +20,7 @@ lessonRouter.get('/between_dates', errorHandler(async (req, res) => {
   if (!start && !end) 
     throw new FieldsRequiredError();
 
-  const lessons = (await db.query<Lesson[][]>(`
+  const lessons = (await db.query<DBLesson[][]>(`
     SELECT * FROM lesson WHERE
     ${start ? "start >= type::datetime($start)" : "true"}
     AND
@@ -51,7 +51,7 @@ lessonRouter.get('/get', errorHandler(async (req, res) => {
     if (include.has("students_attended")) selection.push("<-attended<-student as students_attended");
     if (include.has("students_replaced")) selection.push("<-replaced<-student as students_replaced");
   }
-  const lessons = (await db.query<Lesson[][]>(`
+  const lessons = (await db.query<DBLesson[][]>(`
     SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
   `, {ids}))[0];
 

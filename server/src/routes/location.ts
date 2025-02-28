@@ -4,7 +4,7 @@ import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import type { Location } from '../database/models';
+import type { DBLocation } from '../database/models';
 import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const locationsRouter = express.Router();
@@ -28,7 +28,7 @@ locationsRouter.get('/get', errorHandler(async (req, res) => {
   //   const include = new Set((req.query.include as string).trim().split(","));
   //   if (include.has("something")) selection.push("some_query");
   // }
-  const locations = (await db.query<Location[][]>(`
+  const locations = (await db.query<DBLocation[][]>(`
     SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
   `, {ids}))[0];
 

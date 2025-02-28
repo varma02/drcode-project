@@ -4,7 +4,7 @@ import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
 import ensureAuth from '../middleware/ensureauth';
 import errorHandler from '../lib/errorHandler';
 import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import type { Subject } from '../database/models';
+import type { DBSubject } from '../database/models';
 import { addAllGetter, addRemover } from '../lib/defaultCRUD';
 
 const studentRouter = express.Router();
@@ -28,7 +28,7 @@ studentRouter.get('/get', errorHandler(async (req, res) => {
     const include = new Set((req.query.include as string).trim().split(","));
     if (include.has("enroled")) selection.push("->enroled.* as enroled");
   }
-  const students = (await db.query<Subject[][]>(`
+  const students = (await db.query<DBSubject[][]>(`
     SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
   `, {ids}))[0];
 

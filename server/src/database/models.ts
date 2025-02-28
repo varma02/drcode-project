@@ -4,9 +4,10 @@ export interface JWTData {
   user_agent: string,
 }
 
-export type Role = 
-  "administrator" |
-  "teacher";
+export enum Role {
+  Admin = "administrator",
+  Teacher = "teacher"
+};
 
 export interface Employee {
   id: string,

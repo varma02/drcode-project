@@ -81,7 +81,7 @@ export default function EmployeeDetails() {
     },
     {
       displayName: "Dátum",
-      accessorKey: "start",
+      accessorKey: "date",
       header: ({ column }) => column.columnDef.displayName,
       cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
     },
@@ -142,7 +142,7 @@ export default function EmployeeDetails() {
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Jelenléti Ív</h3>
-        <DataTable className="-mt-4" columns={workColumns} data={employee.unpaid_work} />
+        <DataTable className="-mt-4" columns={workColumns} data={employee.unpaid_work || []} />
       </div>
     </div>
   )

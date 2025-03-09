@@ -17,7 +17,7 @@ export function Combobox({data, displayName, placeholder = "Válassz...", value,
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-[200px] justify-between overflow-x-hidden text-ellipsis"
         >
           { value ? data.find(e => e.id === value)?.[displayName] : placeholder }
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

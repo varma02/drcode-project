@@ -5,8 +5,8 @@ import { Button } from './ui/button'
 import { Card, CardContent, CardHeader } from './ui/card'
 import { ScrollArea } from './ui/scroll-area'
 
-export const GroupComboBox = ({data, displayName, title, placeholder = "Válassz...", className, name}) => {
-  const [values, setValues] = useState([])
+export const GroupComboBox = ({data, displayName, title, placeholder = "Válassz...", className, name, defaultValue = []}) => {
+  const [values, setValues] = useState(defaultValue)
   const [value, setValue] = useState("")
 
   useEffect(() => {

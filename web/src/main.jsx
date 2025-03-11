@@ -30,6 +30,7 @@ const GroupDetails = lazy(() => import('@/routes/GroupDetails'))
 const Lessons = lazy(() => import('@/routes/Lessons'))
 const LessonDetails = lazy(() => import('@/routes/LessonDetails'))
 const Subjects = lazy(() => import('@/routes/Subjects'))
+const SubjectDetails = lazy(() => import('@/routes/SubjectDetails'))
 const Students = lazy(() => import('@/routes/Students'))
 const StudentDetails = lazy(() => import('@/routes/StudentDetails'))
 const AddNewLocation = lazy(() => import('@/routes/AddLocation'))
@@ -90,6 +91,7 @@ const router = createBrowserRouter([
       {path: "/locations/:id", element: <LocationDetails />},
       {path: "/locations/add", element: <AddNewLocation />},
       {path: "/subjects", element: <Subjects />},
+      {path: "/subjects/:id", element: <SubjectDetails />},
       {path: "/subjects/add", element: <AddNewSubject />},
       {path: "/students", element: <Students />},
       {path: "/students/add", element: <AddStudent/>},

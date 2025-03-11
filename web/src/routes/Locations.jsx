@@ -8,10 +8,11 @@ import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function Locations() {
   const auth = useAuth()
+  const navigate = useNavigate()
   const [locations, setLocations] = useState([])
   const [rowSelection, setRowSelection] = useState({})
 
@@ -111,7 +112,7 @@ export default function Locations() {
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Helyszínek</h1>
 
-      <DataTable data={locations} columns={columns}
+      <DataTable data={locations} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("location:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={<div className='flex gap-4 pl-4'>
         <AreYouSureAlert onConfirm={handleDelete} />

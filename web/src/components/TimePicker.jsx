@@ -15,7 +15,7 @@ export const TimePicker = ({date, setDate, className, label, name}) => {
     }
     const [hours, minutes] = time.split(":").map((str) => parseInt(str, 10))
     const newSelectedDate = setHours(setMinutes(date, minutes), hours)
-    setDate(newSelectedDate)
+    if (setDate) setDate(newSelectedDate)
     setTimeValue(time)
   }
 

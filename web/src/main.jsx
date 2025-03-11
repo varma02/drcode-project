@@ -9,7 +9,6 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
 import { AuthProvider, useAuth } from '@/lib/api/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
-import LessonDetails from './routes/LessonDetails'
 
 const CommandMenu = lazy(() => import('./components/CommandMenu'))
 
@@ -25,9 +24,11 @@ const AddCalendarEvent = lazy(() => import('@/routes/AddCalendarEvent'))
 const LoginPage = lazy(() => import('@/routes/Login'))
 const RegisterPage = lazy(() => import('@/routes/Register'))
 const Locations = lazy(() => import('@/routes/Locations'))
+const LocationDetails = lazy(() => import('@/routes/LocationDetails'))
 const Groups = lazy(() => import('@/routes/Groups'))
 const GroupDetails = lazy(() => import('@/routes/GroupDetails'))
 const Lessons = lazy(() => import('@/routes/Lessons'))
+const LessonDetails = lazy(() => import('@/routes/LessonDetails'))
 const Subjects = lazy(() => import('@/routes/Subjects'))
 const Students = lazy(() => import('@/routes/Students'))
 const StudentDetails = lazy(() => import('@/routes/StudentDetails'))
@@ -86,6 +87,7 @@ const router = createBrowserRouter([
       {path: "/lessons", element: <Lessons />},
       {path: "/lessons/:id", element: <LessonDetails />},
       {path: "/locations", element: <Locations />},
+      {path: "/locations/:id", element: <LocationDetails />},
       {path: "/locations/add", element: <AddNewLocation />},
       {path: "/subjects", element: <Subjects />},
       {path: "/subjects/add", element: <AddNewSubject />},

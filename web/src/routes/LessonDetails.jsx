@@ -1,17 +1,12 @@
-import { Combobox } from "@/components/ComboBox"
-import { GroupComboBox } from "@/components/GroupComboBox"
 import { TimePicker } from "@/components/TimePicker"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { getAllEmployees, getAllGroups, getAllLocations, getEmployee, getGroup, getLesson } from "@/lib/api/api"
+import { getAllEmployees, getAllGroups, getAllLocations, getEmployee, getLesson, updateLesson } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
-import { format } from "date-fns"
-import { hu } from "date-fns/locale"
-import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save } from "lucide-react"
+import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 
 export default function LessonDetails() {
   const auth = useAuth()
@@ -45,7 +40,7 @@ export default function LessonDetails() {
   useEffect(() => {
     if (allGroups.length == 0) return
     // if (allGroups == undefined) return
-    setSelectedGroup(allGroups.find(e => e.id == lesson.group).id)
+    setSelectedGroup(allGroups.find(e => e.id == lesson.group))
     setLocation(allGroups.find(e => e.id == lesson.group).location)
   }, [allGroups])
 
@@ -78,22 +73,23 @@ export default function LessonDetails() {
       name: data.get("lessonName"),
       start: data.get("lessonStart"),
       end: data.get("lessonEnd"),
-      location: data.get("lessonLocation"),
-      teachers: data.get("lessonTeachers").split(","),
-      group: data.get("lessonGroup"),
+      // location: data.get("lessonLocation"),
+      // teachers: data.get("lessonTeachers").split(","),
+      // group: data.get("lessonGroup"),
       notes: data.get("notes"),
     };
     console.log("AAAA: ", lessonData)
-    // updateLesson(auth.token, lessonData)
-    // .then((v) => {
-    //   setLesson((o) => ({...o, ...v.data.lesson}));
-    //   toast.success("Óra mentve");
-    // }).catch(() => toast.error("Hiba történt mentés közben!"))
-    // .finally(() => setSaveLoading(false))
+    updateLesson(auth.token, lessonData)
+    .then((v) => {
+      setLesson((o) => ({...o, ...v.data.lesson}));
+      toast.success("Óra mentve");
+    }).catch(() => toast.error("Hiba történt mentés közben!"))
+    .finally(() => setSaveLoading(false))
     setSaveLoading(false)
   }
 
-  console.log(lesson)
+  // console.log(lesson)
+  // console.log("GGGGGGGG", selectedGroup)
 
   const [editName, setEditName] = useState(false)
   if (!lesson) return (
@@ -101,88 +97,6 @@ export default function LessonDetails() {
       <LoaderCircle className='animate-spin ' />
     </div>
   )
-
-  const columns = [
-    {
-      id: "select",
-      ignoreClickEvent: true,
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          className="float-left"
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          className="float-left"
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      displayName: "Csoport neve",
-      accessorKey: "out",
-      cell: ({ row }) => groups?.find(g => g.id === row.getValue("out"))?.name || "n/a",
-      header: ({ column }) => {
-        return (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            {column.columnDef.displayName}
-            {!column.getIsSorted() ? <ArrowUpDown /> 
-            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
-          </Button>
-        )
-      },
-    },
-    {
-      displayName: "Tanult tárgy",
-      accessorKey: "subject",
-      cell: ({ row }) => subjects?.find(s => s.id === row.getValue("subject"))?.name || "n/a",
-      header: ({ column }) => {
-        return (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            {column.columnDef.displayName}
-            {!column.getIsSorted() ? <ArrowUpDown /> 
-            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
-          </Button>
-        )
-      },
-    },
-    {
-      displayName: "Ár",
-      header: "Ár",
-      accessorKey: "price",
-    },
-    {
-      displayName: "Megjegyzés",
-      header: "Megjegyzés",
-      accessorKey: "notes",
-    },
-    {
-      displayName: "Beiratkozás",
-      header: "Beiratkozás",
-      accessorKey: "created",
-      cell: ({ row }) => (
-        <div className="capitalize text-center">{format(new Date(row.getValue("created")), "PPP", {locale: hu} )}</div>
-      ),
-    },
-  ]
 
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
@@ -200,7 +114,21 @@ export default function LessonDetails() {
         </Button>
       </div>
 
-      <GroupComboBox data={allTeachers} title={"Oktatók"} name={"lessonTeachers"} displayName={"name"} defaultValue={teachers} />
+      <div className="flex flex-col gap-2">
+        <h3 className='font-bold'>Tanárok</h3>
+        {/* <GroupComboBox data={allTeachers} title={"Oktatók"} name={"lessonTeachers"} displayName={"name"} defaultValue={teachers} /> */}
+        <div className="flex gap-2">
+          { selectedGroup &&
+            selectedGroup.teachers.map(e => 
+              <Link to={`/employee/${e.replace("employee:", "")}`} key={e}>
+                <Button variant='outline' className='flex items-center gap-2'>
+                  {allTeachers.find(t => t.id == e).name} <SquareArrowOutUpRight />
+                </Button>
+              </Link>
+            )
+          }
+        </div>
+      </div>
       
       <div className="flex flex-wrap gap-12 py-4">
         <div>
@@ -213,8 +141,14 @@ export default function LessonDetails() {
         </div>
         <div>
           <h3 className='font-bold'>Helyszín</h3>
-          <Combobox data={allLocations} name={"lessonLocation"} displayName={"name"} value={location} setValue={setLocation} />
-          {/* <Input defaultValue={lesson.parent?.name} placeholder="nincs megadva" type="text" name="parentName" /> */}
+          {/* <Combobox data={allLocations} name={"lessonLocation"} displayName={"name"} value={location} setValue={setLocation} /> */}
+          { selectedGroup &&
+            <Link to={`/locations/${selectedGroup.location.id.replace("location:", "")}`} key={selectedGroup.location.id}>
+              <Button variant='outline' className='flex items-center gap-2'>
+                {selectedGroup.location.name} <SquareArrowOutUpRight />
+              </Button>
+            </Link>
+          }
         </div>
         <div>
           <h3 className='font-bold'>Szülő E-mail címe</h3>
@@ -233,16 +167,13 @@ export default function LessonDetails() {
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Csoport</h3>
-        <Combobox data={allGroups} value={selectedGroup} name={"lessonGroup"} displayName={"name"} setValue={setSelectedGroup} />
-        {/* {student.enroled.length > 0 ? (
-          <DataTable data={student.enroled} columns={columns}
-          className="-mt-14"
-          headerAfter={<div className='flex gap-4 pl-4'>
-            <AreYouSureAlert />
-          </div>} />
-        ) : (
-          <p>Ez a tanuló még nem tagja egy csoportnak sem</p>
-        )} */}
+        { selectedGroup &&
+          <Link to={`/groups/${selectedGroup.id.replace("group:", "")}`} key={selectedGroup.id}>
+            <Button variant='outline' className='flex items-center gap-2'>
+              {selectedGroup.name} <SquareArrowOutUpRight />
+            </Button>
+          </Link>
+        }
       </div>
     </form>
   )

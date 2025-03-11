@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/api/AuthProvider"
 import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
+import { toast } from "sonner"
 
 export default function LessonDetails() {
   const auth = useAuth()

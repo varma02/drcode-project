@@ -54,7 +54,7 @@ fileRouter.get('/get', errorHandler(async (req, res) => {
   if (!req.query.ids) {
     const token = jwt.sign(
       {
-        employee_id: req.employee?.id,
+        employee_id: req.user?.id,
         user_agent: req.headers['user-agent'],
         ip: req.ip,
         upload: false,
@@ -80,11 +80,11 @@ fileRouter.get('/get', errorHandler(async (req, res) => {
   const files = (await db.query<DBFile[][]>(`
     SELECT * FROM array::map($ids, |$id| type::thing($id))
     WHERE !shared_with OR type::thing($user_id) IN shared_with OR author = type::thing($user_id);
-  `, {ids, user_id: req.employee?.id}))[0];
+  `, {ids, user_id: req.user?.id}))[0];
 
   const token = jwt.sign(
       {
-        employee_id: req.employee?.id,
+        employee_id: req.user?.id,
         user_agent: req.headers['user-agent'],
         ip: req.ip,
         upload: false,
@@ -119,11 +119,11 @@ fileRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
       shared_with: array::map($shared_with, |$id| type::thing($id)),
       size: $size,
     };
-  `, { name, mime_type, shared_with, size, user_id: req.employee?.id }))[0];
+  `, { name, mime_type, shared_with, size, user_id: req.user?.id }))[0];
 
   const token = jwt.sign(
     {
-      employee_id: req.employee?.id,
+      employee_id: req.user?.id,
       user_agent: req.headers['user-agent'],
       ip: req.ip,
       files: [file.id],

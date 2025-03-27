@@ -61,7 +61,7 @@ DEFINE FIELD notes ON TABLE student TYPE string ASSERT string::len($value) <= 20
 DEFINE TABLE location SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE location TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD name ON TABLE location TYPE option<string> ASSERT string::len($value) <= 256;
+DEFINE FIELD name ON TABLE location TYPE string ASSERT string::len($value) <= 256;
 DEFINE FIELD notes ON TABLE location TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD address ON TABLE location TYPE string ASSERT string::len($value) <= 256;
 DEFINE FIELD contact_email ON TABLE location TYPE string ASSERT string::is::email($value);
@@ -119,34 +119,6 @@ DEFINE FIELD notes ON TABLE worked_at TYPE string ASSERT string::len($value) <= 
 DEFINE FIELD start ON TABLE worked_at TYPE datetime DEFAULT out.start;
 DEFINE FIELD end ON TABLE worked_at TYPE datetime DEFAULT out.end;
 
-
-DEFINE TABLE message SCHEMAFULL CHANGEFEED 4w;
-
-DEFINE FIELD created ON TABLE message TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD author ON TABLE message TYPE record<employee> READONLY ASSERT $value.exists();
-DEFINE FIELD recipient ON TABLE message TYPE option<record<employee>> READONLY ASSERT $value.exists();
-DEFINE FIELD text ON TABLE message TYPE string ASSERT string::len($value) <= 4096;
-DEFINE FIELD reply_to ON TABLE message TYPE option<record<message>> ASSERT $value.exists();
--- DEFINE FIELD attachents ON TABLE message TYPE set<record<lesson | knowledge | file>> DEFAULT [] ASSERT $value.exists();
-
-
--- DEFINE TABLE assigned_to SCHEMAFULL TYPE RELATION IN employee OUT group | lesson CHANGEFEED 4w;
-
--- DEFINE FIELD created ON TABLE assigned_to TYPE datetime DEFAULT time::now() READONLY;
--- DEFINE FIELD notes ON TABLE assigned_to TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
-
-
--- DEFINE TABLE event SCHEMAFULL CHANGEFEED 4w;
-
--- DEFINE FIELD created ON TABLE event TYPE datetime DEFAULT time::now() READONLY;
--- DEFINE FIELD author ON TABLE event TYPE record<employee> READONLY ASSERT $value.exists();
--- DEFINE FIELD location ON TABLE event TYPE option<record<location>> ASSERT $value.exists();
--- DEFINE FIELD name ON TABLE event TYPE string ASSERT string::len($value) <= 48;
--- DEFINE FIELD notes ON TABLE event TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
--- DEFINE FIELD signups ON TABLE event TYPE set<record<employee>> DEFAULT [] ASSERT array::len($value) <= signup_limit AND array::all($value, |$v| $v.exists());
--- DEFINE FIELD signup_limit ON TABLE event TYPE int DEFAULT 0;
--- DEFINE FIELD start ON TABLE event TYPE datetime;
--- DEFINE FIELD end ON TABLE event TYPE datetime;
 
 
 -- COMMIT TRANSACTION;

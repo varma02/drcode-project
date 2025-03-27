@@ -62,7 +62,7 @@ export interface DBStudent {
 export interface DBLocation {
   id: string,
   created: Date,
-  name?: string,
+  name: string,
   notes: string,
   address: string,
   contact_email: string,

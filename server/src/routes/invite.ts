@@ -21,7 +21,7 @@ inviteRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
     throw new FieldsRequiredError();
 
   const invite = (await db.query("CREATE ONLY invite SET author = $author, roles = $roles", 
-    { author: req.employee?.id, roles: [...roles.keys()] }))[0];
+    { author: req.user?.id, roles: [...roles.keys()] }))[0];
 
   res.status(200).json({
     code: "success",

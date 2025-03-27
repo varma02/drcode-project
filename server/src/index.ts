@@ -11,7 +11,6 @@ import inviteRouter from './routes/invite';
 import subjectRouter from './routes/subject';
 import studentRouter from './routes/student';
 import fileRouter from './routes/file';
-import messagesRouter from './routes/messages';
 import { isDev } from './lib/utils';
 
 export const app = express();
@@ -59,7 +58,6 @@ export async function setup(): Promise<string | null> {
   app.use('/invite', inviteRouter);
   app.use('/subject', subjectRouter);
   app.use('/student', studentRouter);
-  app.use('/message', messagesRouter);
   app.use('/file', fileRouter);
   
   app.use((req, res, next) => {

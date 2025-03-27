@@ -74,7 +74,7 @@ userRouter.post('/register', errorHandler(async (req, res) => {
 
   delete employee.password;
   delete employee.session_key;
-  res.status(200).json({
+  res.status(201).json({
     code: "success",
     message: 'Employee registered',
   });
@@ -82,8 +82,8 @@ userRouter.post('/register', errorHandler(async (req, res) => {
 
 userRouter.use(ensureAuth);
 
-userRouter.post('/clear_sessions', errorHandler(async (req, res) => {
-  await db.query("UPDATE type::thing($employee) SET session_key = rand::string(32);", { employee: req.employee?.id });
+userRouter.post('/clear-sessions', errorHandler(async (req, res) => {
+  await db.query("UPDATE type::thing($employee) SET session_key = rand::string(32);", { employee: req.user?.id });
 
   res.status(200).json({
     code: "success",
@@ -96,7 +96,7 @@ userRouter.get('/me', errorHandler(async (req, res) => {
     code: "success",
     message: "Employee data retrieved",
     data: {
-      employee: req.employee,
+      employee: req.user,
     },
   });
 }));
@@ -119,7 +119,7 @@ userRouter.post('/update', errorHandler(async (req, res) => {
 
     const updatedUser = (await db.query<DBEmployee[]>(
       `UPDATE ONLY type::thing($employee) SET ${updates.join(", ")} WHERE crypto::argon2::compare(password, $old_password)`,
-      { employee: req.employee!.id, name, email, new_password, old_password }
+      { employee: req.user!.id, name, email, new_password, old_password }
     ))[0];
 
     if (!updatedUser || !updatedUser.name) 
@@ -136,10 +136,10 @@ userRouter.post('/update', errorHandler(async (req, res) => {
     });
 }));
 
-userRouter.post('/replace_profile_picture', errorHandler(async (req, res) => {
+userRouter.post('/replace-profile-picture', errorHandler(async (req, res) => {
   const token = jwt.sign(
     {
-      employee_id: req.employee?.id,
+      employee_id: req.user?.id,
       user_agent: req.headers['user-agent'],
       ip: req.ip,
       upload: "profile_picture",
@@ -153,7 +153,7 @@ userRouter.post('/replace_profile_picture', errorHandler(async (req, res) => {
     message: "Profile picture token",
     data: {
       token,
-      path: "/" + req.employee?.id + "/profile_picture.webp",
+      path: "/" + req.user?.id + "/profile_picture.webp",
     },
   });
 }));

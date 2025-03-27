@@ -2,7 +2,7 @@ import type { RequestHandler, Request } from 'express';
 
 export const isAdmin = (req: Request): boolean => {
   try {
-    if (!req.employee || !req.employee.roles.includes("administrator")) {
+    if (!req.user || !req.user.roles.includes("administrator")) {
       throw new Error("unauthorized");
     }
     return true;

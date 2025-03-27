@@ -15,7 +15,7 @@ const ensureAuth: RequestHandler = async (req, res, next) => {
   
     delete employee.session_key;
     delete employee.password;
-    req.employee = employee;
+    req.user = employee;
     next();
 
   } catch (error) {

@@ -4,7 +4,7 @@ import { BadRequestError, FieldsInvalidError, FieldsRequiredError, NotFoundError
 import db from '../database/connection';
 
 interface Permissions {
-  getAll: string;
+  getAll: string;   // !array::is_empty(array::intersect($user.roles, ["admin"]))
   getById: string;
   delete: string;
   create: string;
@@ -38,9 +38,13 @@ export class Thing {
   public create() {
     errorHandler(async (req, res) => {
       const result = (await db.query(`
-        CREATE ONLY type::table($table) CONTENT {
-          ${Object.entries(this.fields).filter(v => req.body[v[0]] !== undefined).map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`).join(",")}
-        };
+        IF ${this.permissions.create} {
+          RETURN CREATE ONLY type::table($table) CONTENT {
+            ${Object.entries(this.fields).filter(v => req.body[v[0]] !== undefined).map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`).join(",")}
+          };
+        } ELSE {
+          THROW "permission-denied"
+        }
       `, { table: this.table, fields: req.body }))[0];
     
       res.status(200).json({
@@ -103,9 +107,14 @@ export class Thing {
         throw new FieldsInvalidError();
     
       const result = await db.query<any[]>(`
-        UPDATE ONLY type::thing($id) MERGE {
-          ${Object.entries(this.fields).filter(v => updated[v[0]] !== undefined && v[1].updatable).map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`).join(",")}
-        };`, { id, fields: updated });
+        IF ${this.permissions.update} {
+          UPDATE ONLY type::thing($id) MERGE {
+            ${Object.entries(this.fields).filter(v => updated[v[0]] !== undefined && v[1].updatable).map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`).join(",")}
+          }; 
+        } ELSE {
+          THROW "permission-denied";
+        }
+        `, { id, fields: updated });
     
       if (!result?.[0]?.email)
         throw new BadRequestError();
@@ -133,7 +142,7 @@ export class Thing {
         } ELSE {
           THROW "permission-denied";
         }
-      `, { ids, user: req.user }))[0];
+        `, { ids, user: req.user }))[0];
   
       if (!deleted || !deleted.length)
         throw new NotFoundError();

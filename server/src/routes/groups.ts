@@ -45,7 +45,7 @@ groupsRouter.get('/get', errorHandler(async (req, res) => {
 }));
 
 groupsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, location, teachers, notes, lessons } = req.body;
+  const { name, location, teachers, lessons } = req.body;
   if (!name || !location || !teachers)
     throw new FieldsRequiredError();
 
@@ -55,7 +55,6 @@ groupsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
       name: $name,
       location: type::thing($location),
       teachers: array::map($teachers, |$v| type::thing($v)),
-      notes: $notes
     };
     ${lessons?.length > 0 ? `
       FOR $lesson IN $lessons {
@@ -68,7 +67,7 @@ groupsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
     ` : ""}
     RETURN $group;
     COMMIT TRANSACTION;
-  `, {name, location, teachers, notes, lessons}))[0];
+  `, {name, location, teachers, lessons}))[0];
   
   res.status(200).json({
     code: "success",
@@ -79,7 +78,7 @@ groupsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
 }));
 
 groupsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, location, notes, teachers, archived  } = req.body;
+  const { id, name, location, teachers, archived  } = req.body;
   if (!id)
     throw new FieldsRequiredError();
   if (!id.startsWith("group:"))
@@ -88,12 +87,11 @@ groupsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   const group = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
       ${name ? "name: $name," : ""}
-      ${notes ? "notes: $notes," : ""}
       ${location ? "location: type::thing($location)," : ""}
       ${teachers ? "teachers: array::map($teachers, |$v| type::thing($v))," : ""}
       ${archived ? "archived: $archived," : ""}
     };
-  `, { id, name, location, notes, teachers, archived }))[0];
+  `, { id, name, location, teachers, archived }))[0];
 
   res.status(200).json({
     code: "success",

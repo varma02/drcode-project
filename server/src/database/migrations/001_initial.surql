@@ -8,7 +8,6 @@ DEFINE TABLE employee SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE employee TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE employee TYPE string ASSERT string::len($value) <= 48;
-DEFINE FIELD notes ON TABLE employee TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD email ON TABLE employee TYPE string ASSERT string::is::email($value);
 DEFINE FIELD password ON TABLE employee TYPE string;
 DEFINE FIELD roles ON TABLE employee TYPE set<"teacher" | "administrator">;
@@ -41,7 +40,7 @@ DEFINE TABLE subject SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE subject TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE subject TYPE string ASSERT string::len($value) <= 48;
-DEFINE FIELD notes ON TABLE subject TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
+DEFINE FIELD description ON TABLE subject TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 
 
 DEFINE TABLE student SCHEMAFULL CHANGEFEED 4w;
@@ -55,14 +54,12 @@ DEFINE FIELD parent.email ON TABLE student TYPE string ASSERT string::len($value
 DEFINE FIELD parent.phone ON TABLE student TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD email ON TABLE student TYPE option<string> ASSERT string::is::email($value);
 DEFINE FIELD phone ON TABLE student TYPE option<string> ASSERT string::len($value) <= 48;
-DEFINE FIELD notes ON TABLE student TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 
 
 DEFINE TABLE location SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE location TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE location TYPE string ASSERT string::len($value) <= 256;
-DEFINE FIELD notes ON TABLE location TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD address ON TABLE location TYPE string ASSERT string::len($value) <= 256;
 DEFINE FIELD contact_email ON TABLE location TYPE string ASSERT string::is::email($value);
 DEFINE FIELD contact_phone ON TABLE location TYPE string ASSERT string::len($value) <= 48;
@@ -73,7 +70,6 @@ DEFINE TABLE group SCHEMAFULL CHANGEFEED 4w;
 DEFINE FIELD created ON TABLE group TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD name ON TABLE group TYPE string ASSERT string::len($value) <= 48;
 DEFINE FIELD location ON TABLE group TYPE record<location> ASSERT $value.exists();
-DEFINE FIELD notes ON TABLE group TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD teachers ON TABLE group TYPE set<record<employee>> ASSERT array::all($value, |$v| $v.exists());
 DEFINE FIELD archived ON TABLE group TYPE bool DEFAULT false;
 
@@ -83,14 +79,12 @@ DEFINE TABLE enroled SCHEMAFULL TYPE RELATION IN student OUT group CHANGEFEED 4w
 DEFINE FIELD created ON TABLE enroled TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD subject ON TABLE enroled TYPE record<subject> ASSERT $value.exists();
 DEFINE FIELD price ON TABLE enroled TYPE int;
-DEFINE FIELD notes ON TABLE enroled TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 
 
 DEFINE TABLE lesson SCHEMAFULL CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE lesson TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD group ON TABLE lesson TYPE option<record<group>> ASSERT $value.exists();
-DEFINE FIELD notes ON TABLE lesson TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD name ON TABLE lesson TYPE option<string> ASSERT string::len($value) <= 48;
 DEFINE FIELD location ON TABLE lesson TYPE option<record<location>> ASSERT $value.exists();
 DEFINE FIELD teachers ON TABLE lesson TYPE option<set<record<employee>>> ASSERT array::all($value, |$v| $v.exists());
@@ -101,7 +95,6 @@ DEFINE FIELD end ON TABLE lesson TYPE datetime;
 DEFINE TABLE replaced SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE replaced TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD notes ON TABLE replaced TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD replacement ON TABLE replaced TYPE record<lesson> ASSERT $value.exists();
 
 
@@ -115,7 +108,6 @@ DEFINE TABLE worked_at SCHEMAFULL TYPE RELATION IN employee OUT lesson CHANGEFEE
 
 DEFINE FIELD created ON TABLE worked_at TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD paid ON TABLE worked_at TYPE bool DEFAULT false;
-DEFINE FIELD notes ON TABLE worked_at TYPE string ASSERT string::len($value) <= 2048 DEFAULT "";
 DEFINE FIELD start ON TABLE worked_at TYPE datetime DEFAULT out.start;
 DEFINE FIELD end ON TABLE worked_at TYPE datetime DEFAULT out.end;
 

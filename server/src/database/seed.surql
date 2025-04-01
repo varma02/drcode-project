@@ -56,17 +56,17 @@ $varma = CREATE ONLY employee:varadimarcell CONTENT {
 
 $scratch = CREATE ONLY subject:scratch CONTENT {
   name: "Scratch kezdő",
-  notes: "Legózás után első lépés a programozás felé"
+  description: "Legózás után első lépés a programozás felé"
 };
 
 $kodular = CREATE ONLY subject:kodular CONTENT {
   name: "Kodular",
-  notes: "Scratch-nél nehezebb, telefonos alkalmazás fejlesztés"
+  description: "Scratch-nél nehezebb, telefonos alkalmazás fejlesztés"
 };
 
 $lego1 = CREATE ONLY subject:legowedo CONTENT {
   name: "Lego WeDo 1.0",
-  notes: "Belépő szintű kurzus, legozás 3-4. évfolyamnak"
+  description: "Belépő szintű kurzus, legozás 3-4. évfolyamnak"
 };
 
 $fohadiszallas = CREATE ONLY location:fohadiszallas CONTENT {

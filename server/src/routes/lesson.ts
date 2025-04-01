@@ -66,21 +66,20 @@ lessonRouter.get('/get', errorHandler(async (req, res) => {
 }));
 
 lessonRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, group, notes, location, teachers, start, end } = req.body;
+  const { name, group, location, teachers, start, end } = req.body;
   if (!start || !end) 
     throw new FieldsRequiredError();
 
   const lesson = (await db.query(`
     CREATE ONLY lesson CONTENT {
       ${name ? "name: $name," : ""}
-      ${notes ? "notes: $notes," : ""}
       ${location ? "location: type::thing($location)," : ""}
       ${teachers ? "teachers: array::map($teachers, |$v| type::thing($v))," : ""}
       ${group ? "group: type::thing($group)," : ""}
       start: type::datetime($start),
       end: type::datetime($end)
     };
-  `, {name, group, notes, location, teachers, start, end}))[0];
+  `, {name, group, location, teachers, start, end}))[0];
   res.status(200).json({
     code: "success",
     message: "Lesson created",
@@ -89,7 +88,7 @@ lessonRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
 }));
 
 lessonRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, group, notes, location, teachers, start, end } = req.body;
+  const { id, name, group, location, teachers, start, end } = req.body;
   if (!id)
     throw new FieldsRequiredError();
   if (!id.startsWith("lesson:")) 
@@ -98,14 +97,13 @@ lessonRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   const lesson = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
       ${name ? "name: $name," : ""}
-      ${notes ? "notes: $notes," : ""}
       ${location ? "location: type::thing($location)," : ""}
       ${teachers ? "teachers: array::map($teachers, |$v| type::thing($v))," : ""}
       ${group ? "group: type::thing($group)," : ""}
       ${start ? "start: type::datetime($start)," : ""}
       ${end ? "end: type::datetime($end)," : ""}
     };
-  `, { id, name, group, notes, location, teachers, start, end }))[0];
+  `, { id, name, group, location, teachers, start, end }))[0];
 
   res.status(200).json({
     code: "success",

@@ -43,19 +43,18 @@ locationsRouter.get('/get', errorHandler(async (req, res) => {
 }));
 
 locationsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, notes, address, contact_email, contact_phone } = req.body;
+  const { name, address, contact_email, contact_phone } = req.body;
   if (!name || !address || !contact_email || !contact_phone) 
     throw new FieldsRequiredError();
 
   const location = (await db.query(`
     CREATE ONLY location CONTENT {
       name: $name,
-      ${notes ? "notes: $notes," : ""}
       address: $address,
       contact_email: $contact_email,
       contact_phone: $contact_phone
     };
-  `, { name, notes, address, contact_email, contact_phone }))[0];
+  `, { name, address, contact_email, contact_phone }))[0];
 
   res.status(200).json({
     code: "success",
@@ -65,7 +64,7 @@ locationsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
 }));
 
 locationsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, notes, address, contact_email, contact_phone } = req.body;
+  const { id, name, address, contact_email, contact_phone } = req.body;
   if (!id) 
     throw new FieldsRequiredError();
   if (!id.startsWith("location:")) 
@@ -74,12 +73,11 @@ locationsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
   const location = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
       ${name ? "name: $name," : ""}
-      ${notes ? "notes: $notes," : ""}
       ${address ? "address: $address," : ""}
       ${contact_email ? "contact_email: $contact_email," : ""}
       ${contact_phone ? "contact_phone: $contact_phone," : ""}
     };
-  `, { id, name, notes, address, contact_email, contact_phone }))[0];
+  `, { id, name, address, contact_email, contact_phone }))[0];
 
   res.status(200).json({
     code: "success",

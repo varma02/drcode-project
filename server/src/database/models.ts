@@ -41,7 +41,6 @@ export interface DBSubject {
   id: string,
   created: Date,
   name: string,
-  notes: string,
 }
 
 export interface DBStudent {
@@ -56,14 +55,12 @@ export interface DBStudent {
   email?: string,
   phone?: string,
   extra_fields: {[key: string]: string},
-  notes: string,
 }
 
 export interface DBLocation {
   id: string,
   created: Date,
   name: string,
-  notes: string,
   address: string,
   contact_email: string,
   contact_phone: string,
@@ -73,7 +70,6 @@ export interface DBGroup {
   id: string,
   created: Date,
   location: DBLocation,
-  notes: string,
   teachers: string[] | DBEmployee[],
   archived: boolean,
 }
@@ -85,7 +81,6 @@ export interface DBRelationEnroled {
   created: Date,
   subject: string | DBSubject,
   price: number,
-  notes: string,
 }
 
 export interface DBLesson {
@@ -94,7 +89,6 @@ export interface DBLesson {
   name?: string
   group?: string | DBGroup,
   location?: string | DBLocation,
-  notes: string,
   teachers?: string[] | DBEmployee[],
   start: Date,
   end: Date,
@@ -105,7 +99,6 @@ export interface DBRelationReplaced {
   in: string | DBStudent,
   out: string | DBLesson,
   created: Date,
-  notes: string,
   replacement: string | DBLesson,
 }
 
@@ -123,7 +116,6 @@ export interface DBRelationWorkedAt {
   out: string | DBLesson,
   created: Date,
   paid: boolean,
-  notes: string,
   start?: Date,
   end?: Date,
 }

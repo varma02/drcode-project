@@ -43,16 +43,16 @@ subjectRouter.get('/get', errorHandler(async (req, res) => {
 }));
 
 subjectRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, notes } = req.body;
+  const { name, description } = req.body;
   if (!name) 
     throw new FieldsRequiredError();
   
   const subject = (await db.query(`
     CREATE ONLY subject CONTENT {
-      ${notes ? "notes: $notes," : ""}
+      ${description ? "description: $description," : ""}
       name: $name,
     };
-  `, { name, notes }))[0];
+  `, { name, description }))[0];
   res.status(200).json({
     code: "success",
     message: "Subject created",
@@ -61,7 +61,7 @@ subjectRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
 }));
 
 subjectRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, notes } = req.body;
+  const { id, name, description } = req.body;
   if (!id)
     throw new FieldsRequiredError();
   if (!id.startsWith("subject:"))
@@ -69,10 +69,10 @@ subjectRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
 
   const subject = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
-      ${notes ? "notes: $notes," : ""}
+      ${description ? "description: $description," : ""}
       ${name ? "name: $name," : ""}
     };
-  `, { id, name, notes }))[0];
+  `, { id, name, description }))[0];
 
   res.status(200).json({
     code: "success",

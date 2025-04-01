@@ -43,20 +43,19 @@ studentRouter.get('/get', errorHandler(async (req, res) => {
 }));
 
 studentRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, email, phone, notes, parent, grade } = req.body;
+  const { name, email, phone, parent, grade } = req.body;
   if (!name)
     throw new FieldsRequiredError();
   
   const student = (await db.query(`
     CREATE ONLY student CONTENT {
-      ${notes ? "notes: $notes," : ""}
       ${email ? "email: $email," : ""}
       ${phone ? "phone: $phone," : ""}
       ${parent ? "parent: $parent," : ""}
       grade: $grade,
       name: $name,
     };
-  `, { name, email, phone, notes, parent, grade }))[0];
+  `, { name, email, phone, parent, grade }))[0];
   res.status(200).json({
     code: "success",
     message: "Student created",
@@ -65,7 +64,7 @@ studentRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
 }));
 
 studentRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, email, phone, notes, parent } = req.body;
+  const { id, name, email, phone, parent } = req.body;
   if (!id)
     throw new FieldsRequiredError();
   if (!id.startsWith("student:"))
@@ -73,13 +72,12 @@ studentRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
 
   const student = (await db.query(`
     UPDATE ONLY type::thing($id) MERGE {
-      notes: ${notes ? "$notes" : "\"\""},
       email: ${email ? "$email" : "NONE"},
       phone: ${phone ? "$phone" : "NONE"},
       parent: ${parent ? "$parent" : ""},
       name: ${name ? "$name" : "\"\""},
     };
-  `, { id, name, email, notes, parent }))[0];
+  `, { id, name, email, parent }))[0];
 
   res.status(200).json({
     code: "success",

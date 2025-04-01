@@ -15,6 +15,9 @@ paths:
       tags:
         - auth
       summary: Get the logged in user
+      description: Retrieves the properties of the authorized user
+      security:
+        - BearerJwt: []
       responses:
         "200":
           content:
@@ -40,7 +43,6 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
       parameters: []
-      description: Retrieves the properties of the authorized user
       operationId: getTheLoggedInUser
   /auth/login:
     post:
@@ -107,6 +109,8 @@ paths:
       tags:
         - auth
       summary: Update account
+      security:
+        - BearerJwt: []
       responses:
         "200":
           content:
@@ -217,6 +221,79 @@ paths:
                   example: invite:1234
         required: true
         description: The request body for registering a new user/employee.
+  /auth/clear-sessions:
+    post:
+      tags:
+        - auth
+      summary: Logout the user from all devices
+      security:
+        - BearerJwt: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: LogoutTheUserFromAllDevicesOk
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Logged out of all sessions
+          description: The request was successful, and the sessions were cleared.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters: []
+      description: Given an authorization token, this endpoint updates a user's session key therefor logging them out from all active devices
+      operationId: logoutTheUserFromAllDevices
+  /auth/replace-profile-picture:
+    post:
+      tags:
+        - auth
+      summary: Update profile picture
+      security:
+        - BearerJwt: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: UpdateProfilePictureOk
+                required:
+                  - code
+                  - data
+                properties:
+                  code:
+                    enum:
+                      - success
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    required:
+                      - token
+                      - path
+                    properties:
+                      path:
+                        type: string
+                        format: uri
+                        example: /employee:1234/profile_picture.webp
+                        pattern: ^/employee:.+/profile_picture\.webp$
+                      token:
+                        type: string
+                        example: w2C62kvqCHv7g3mnHY67
+          description: The request was successful, the user can now upload their new profile picture with the provided token and path. See more at /upload
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters: []
+      description: Get the nessesary token and file path to be able to upload a new profile picture.
+      operationId: updateProfilePicture
   # # # # # # # # # #
   # EMPLOYEE ROUTES #
   # # # # # # # # # #
@@ -417,75 +494,6 @@ paths:
                     $ref: "#/components/schemas/Role"
         required: true
         description: ""
-  /auth/clear-sessions:
-    post:
-      tags:
-        - auth
-      summary: Logout the user from all devices
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: object
-                title: LogoutTheUserFromAllDevicesOk
-                required:
-                  - code
-                  - message
-                properties:
-                  code:
-                    type: string
-                    example: success
-                  message:
-                    type: string
-                    example: Logged out of all sessions
-          description: The request was successful, and the sessions were cleared.
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      parameters: []
-      description: Given an authorization token, this endpoint updates a user's session key therefor logging them out from all active devices
-      operationId: logoutTheUserFromAllDevices
-  /auth/replace-profile-picture:
-    post:
-      tags:
-        - auth
-      summary: Update profile picture
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: object
-                title: UpdateProfilePictureOk
-                required:
-                  - code
-                  - data
-                properties:
-                  code:
-                    enum:
-                      - success
-                    type: string
-                    example: success
-                  data:
-                    type: object
-                    required:
-                      - token
-                      - path
-                    properties:
-                      path:
-                        type: string
-                        format: uri
-                        example: /employee:1234/profile_picture.webp
-                        pattern: ^/employee:.+/profile_picture\.webp$
-                      token:
-                        type: string
-                        example: w2C62kvqCHv7g3mnHY67
-          description: The request was successful, the user can now upload their new profile picture with the provided token and path. See more at /upload
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-      parameters: []
-      description: Get the nessesary token and file path to be able to upload a new profile picture.
-      operationId: updateProfilePicture
   # # # # # # # # # #
   # LOCATION ROUTES #
   # # # # # # # # # #

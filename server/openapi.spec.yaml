@@ -1,0 +1,984 @@
+openapi: 3.0.2
+info:
+  title: DR.CODE Project
+  version: 0.0.0
+  description: This is the API documentation for DR.CODE Kecskemét's management application
+servers:
+  - url: http://127.0.0.1:3000
+    description: localhost
+paths:
+  # # # # # # # #
+  # AUTH ROUTES #
+  # # # # # # # #
+  /auth/me:
+    get:
+      tags:
+        - auth
+      summary: Get the logged in user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: GetTheLoggedInUserOk
+                required:
+                  - code
+                  - data
+                properties:
+                  code:
+                    enum: 
+                      - success
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      employee:
+                        $ref: "#/components/schemas/Employee"
+          description: The request succeeded, user data can be found in the response.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters: []
+      description: Retrieves the properties of the authorized user
+      operationId: getTheLoggedInUser
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Login with email and password
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: LoginWithEmailAndPasswordOk
+                required:
+                  - data
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    required:
+                      - token
+                      - employee
+                    properties:
+                      token:
+                        type: string
+                        example: IJOFf87VizgIUZGIU762Vtuv2IUGIU288
+                      employee:
+                        $ref: "#/components/schemas/Employee"
+                  message:
+                    type: string
+                    example: An unexpexted error occured
+          description: The login was successful. A token was created and sent in the response along with the account data.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+      parameters: []
+      description: This endpoint is used for logging in employees of the company via email and password authentication. It is accessible without any prior authorization.
+      operationId: loginWithEmailAndPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - remember
+              properties:
+                email:
+                  type: string
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  example: verysecurepassword1234
+                remember:
+                  type: boolean
+        required: true
+        description: The required JSON request body for logging in a user.
+  /auth/update:
+    post:
+      tags:
+        - auth
+      summary: Update account
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: UpdateAccountOk
+                required:
+                  - data
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    required:
+                      - employee
+                    properties:
+                      employee:
+                        $ref: "#/components/schemas/Employee"
+                  message:
+                    type: string
+                    example: Employee updated
+          description: The request was successful, and the user was updated.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters: []
+      description: Update parameters on the logged in user. (eg. name)
+      operationId: updateAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - new_password
+              properties:
+                id:
+                  type: string
+                  example: employee:1234
+                name:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  example: john.doe@example.com
+                new_password:
+                  type: string
+                  example: w2C62kvqCHv7g3mnHY67
+                old_password:
+                  type: string
+                  example: w2C62kvqCHv7g3mnHY67
+        required: true
+        description: The employee's id and any other updatable properties
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Create a new user with an invite
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: CreateANewUserWithAnInviteCreated
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Employee registered
+          description: The request was successful, and a new employee was created.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+      parameters: []
+      description: This endpoint registers a new employee given a valid invite.
+      operationId: createANewUserWithAnInvite
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - invite_id
+                - name
+                - password
+                - email
+              properties:
+                name:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  example: Password1234#
+                invite_id:
+                  type: string
+                  example: invite:1234
+        required: true
+        description: The request body for registering a new user/employee.
+  # # # # # # # # # #
+  # EMPLOYEE ROUTES #
+  # # # # # # # # # #
+  /employee/all:
+    get:
+      tags:
+        - employee
+      summary: Get all employees
+      security:
+        - BearerJwt: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: GetAllEmployeesOk
+                required:
+                  - data
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    required:
+                      - employees
+                    properties:
+                      employees:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Employee"
+                  message:
+                    type: string
+                    example: All employees retrieved
+          description: The request was successful, and the server has returned the employees in the response body.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters: []
+      description: Retrieves a list of all employee records. Only accessible to
+        administrators.
+      operationId: getAllEmployees
+  /employee/get:
+    get:
+      tags:
+        - employee
+      summary: Get employees by id
+      security:
+        - BearerJwt: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: GetEmployeesByIdOk
+                required:
+                  - data
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Employee"
+                  message:
+                    type: string
+                    example: Employees retrieved
+          description: The request was successful, and the server has returned the requested employees in the response body.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters:
+        - $ref: "#/components/parameters/ids"
+      description: Get one or more employees with the ability to fetch record links.
+      operationId: getEmployeesById
+  /employee/remove:
+    post:
+      tags:
+        - employee
+      summary: Remove employees
+      security:
+        - BearerJwt: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: RemoveEmployeesOk
+                required:
+                  - data
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    required:
+                      - employees
+                    properties:
+                      employees:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Employee"
+                  message:
+                    type: string
+                    example: Employees removed
+          description: The request was successful, the requested employees were deleted.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      description: This endpoint is used for removing or deleting employee(s) from the database. Only administrators can make these requests.
+      operationId: removeEmployees
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+                    example: employee:1234
+                  description: The ids of the employees you want to delete
+        required: true
+        description: Request body for deleting an employee or multiple employees
+  /employee/update:
+    post:
+      tags:
+        - employee
+      summary: Update an employee
+      security:
+        - BearerJwt: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: UpdateAnEmployeeOk
+                required:
+                  - data
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    required:
+                      - employee
+                    properties:
+                      employee:
+                        $ref: "#/components/schemas/Employee"
+                  message:
+                    type: string
+                    example: Employee updated
+          description: The request was successful, and the employee was updated.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters: []
+      description: This endpoint can be used to update an employee as an administrator. It is different from the account update in that it can also change an employee's assigned roles.
+      operationId: updateAnEmployee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - name
+                - email
+                - roles
+              properties:
+                id:
+                  type: string
+                  example: employee:1234
+                name:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  example: john.doe@example.com
+                roles:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Role"
+        required: true
+        description: ""
+  /auth/clear-sessions:
+    post:
+      tags:
+        - auth
+      summary: Logout the user from all devices
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: LogoutTheUserFromAllDevicesOk
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Logged out of all sessions
+          description: The request was successful, and the sessions were cleared.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters: []
+      description: Given an authorization token, this endpoint updates a user's session key therefor logging them out from all active devices
+      operationId: logoutTheUserFromAllDevices
+  /auth/replace-profile-picture:
+    post:
+      tags:
+        - auth
+      summary: Update profile picture
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: UpdateProfilePictureOk
+                required:
+                  - code
+                  - data
+                properties:
+                  code:
+                    enum:
+                      - success
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    required:
+                      - token
+                      - path
+                    properties:
+                      path:
+                        type: string
+                        format: uri
+                        example: /employee:1234/profile_picture.webp
+                        pattern: ^/employee:.+/profile_picture\.webp$
+                      token:
+                        type: string
+                        example: w2C62kvqCHv7g3mnHY67
+          description: The request was successful, the user can now upload their new profile picture with the provided token and path. See more at /upload
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters: []
+      description: Get the nessesary token and file path to be able to upload a new profile picture.
+      operationId: updateProfilePicture
+  # # # # # # # # # #
+  # LOCATION ROUTES #
+  # # # # # # # # # #
+  /location/all:
+    get:
+      tags:
+        - location
+      summary: List all locations
+      security:
+        - BearerJwt: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: ListAllLocationsOk
+                required:
+                  - data
+                  - code
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Location"
+          description: The request was successful and locations were retrieved
+      parameters: []
+      description: This endpoint is used to list all locations. Only available to admins.
+      operationId: listAllLocations
+  /location/get:
+    get:
+      summary: Get locations by id
+      description: Get one or more location(s) with the ability to fetch record links.
+      tags:
+        - location
+      security:
+        - BearerJwt: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                title: GetLocationsByIdOk
+                required:
+                  - data
+                  - code
+                properties:
+                  code:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Location"
+          description: The request was successful and the requested locations were retrieved.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+      parameters:
+        - $ref: "#/components/parameters/ids"
+      operationId: getLocationsById
+components:
+  schemas:
+    Employee:
+      type: object
+      description: Employee information
+      required:
+        - id
+        - created
+        - name
+        - email
+        - roles
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        name:
+          type: string
+          example: John Doe
+          maxLength: 48
+          description: Full name of the employee
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+          description: Email address of the employee
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
+          example:
+            - teacher
+            - administrator
+          description: Roles assigned to the employee
+        created:
+          $ref: "#/components/schemas/Datetime"
+    Location:
+      type: object
+      description: A location object
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        name:
+          type: string
+          description: The name of the location
+          example: Kecskeméti Kodály Zoltán Ének-Zenei Általános Iskola
+        address:
+          type: string
+          description: The address of the location
+          example: 6000 Kecskemét, Dózsa György út 22.
+        contact_email:
+          $ref: "#/components/schemas/Email"
+        contact_phone:
+          $ref: "#/components/schemas/PhoneNumber"
+      required:
+        - id
+        - created
+        - name
+        - address
+        - contact_email
+        - contact_phone
+    Invite:
+      type: object
+      description: An invite object
+      required:
+        - id
+        - created
+        - author
+        - roles
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        author:
+          anyOf:
+            - $ref: "#/components/schemas/ID"
+            - $ref: "#/components/schemas/Employee"
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
+          example:
+            - teacher
+            - administrator
+          description: Roles assigned to the employee
+    Subject:
+      type: object
+      description: A subject object
+      required:
+        - id
+        - created
+        - name
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        name:
+          type: string
+          description: The name of the subject
+          example: Scratch
+    Group:
+      type: object
+      description: A group object
+      required:
+        - id
+        - created
+        - location
+        - archived
+        - teachers
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        location:
+          $ref: "#/components/schemas/Location"
+        archived:
+          type: boolean
+          description: Whether the group is archived or not
+          example: false
+        teachers:
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/ID"
+              - $ref: "#/components/schemas/Employee"
+          description: The teachers assigned to the group
+    Student:
+      type: object
+      description: A student object
+      required:
+        - id
+        - created
+        - name
+        - parent
+        - email
+        - phone
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        name:
+          type: string
+          description: The name of the student
+          example: John Doe
+        parent:
+          type: object
+          description: The name of the parent or guardian
+          required:
+            - name
+            - email
+            - phone
+          properties:
+            name:
+              type: string
+              description: The name of the parent or guardian
+              example: Jane Doe
+            email:
+              $ref: "#/components/schemas/Email"
+            phone:
+              $ref: "#/components/schemas/PhoneNumber"
+        email:
+          $ref: "#/components/schemas/Email"
+        phone:
+          $ref: "#/components/schemas/PhoneNumber"
+    File:
+      type: object
+      description: A file object
+      required:
+        - id
+        - created
+        - author
+        - name
+        - mime_type
+        - size
+        - path
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        author:
+          anyOf:
+            - $ref: "#/components/schemas/ID"
+            - $ref: "#/components/schemas/Employee"
+        name:
+          type: string
+          description: The name of the file
+          example: profile_picture.webp
+        mime_type:
+          type: string
+          description: The MIME type of the file
+          example: image/webp
+        size:
+          type: integer
+          description: The size of the file in bytes
+          example: 123456
+        path:
+          type: string
+          description: The path to the file on the server
+          example: /uploads/profile_picture.webp
+    EnroledRelation:
+      type: object
+      description: A relation object for the Enroled table
+      required:
+        - id
+        - created
+        - in
+        - out
+        - subject
+        - price
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        in:
+          $ref: "#/components/schemas/Student"
+        out:
+          $ref: "#/components/schemas/Group"
+        subject:
+          $ref: "#/components/schemas/Subject"
+        price:
+          type: number
+          description: The price of the course
+          example: 10000
+    Lesson:
+      type: object
+      description: A lesson object
+      required:
+        - id
+        - created
+        - name
+        - group
+        - location
+        - teachers
+        - start
+        - end
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        name:
+          type: string
+          description: The name of the lesson
+          example: Scratch lesson 1
+        group:
+          $ref: "#/components/schemas/Group"
+        location:
+          $ref: "#/components/schemas/Location"
+        teachers:
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/ID"
+              - $ref: "#/components/schemas/Employee"
+        start:
+          $ref: "#/components/schemas/Datetime"
+        end:
+          $ref: "#/components/schemas/Datetime"
+    ReplacedRelation:
+      type: object
+      description: A student replaced a lesson with another one to make up for a missed lesson
+      required:
+        - id
+        - created
+        - in
+        - out
+        - replacement
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        in:
+          $ref: "#/components/schemas/Student"
+        out:
+          $ref: "#/components/schemas/Lesson"
+        replacement:
+          $ref: "#/components/schemas/Lesson"
+    AttendedRelation:
+      type: object
+      description: A student attended a lesson
+      required:
+        - id
+        - created
+        - in
+        - out
+        - paid
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        in:
+          $ref: "#/components/schemas/Student"
+        out:
+          $ref: "#/components/schemas/Lesson"
+        paid: 
+          type: boolean
+          description: Whether the lesson was paid for or not
+          example: true
+    WorksheetRelation:
+      type: object
+      description: An employee worked somewhere
+      required:
+        - id
+        - created
+        - in
+        - out
+        - paid
+        - start
+        - end
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        created:
+          $ref: "#/components/schemas/Datetime"
+        in:
+          $ref: "#/components/schemas/Student"
+        out:
+          $ref: "#/components/schemas/Lesson"
+        paid:
+          type: boolean
+          description: Whether the lesson was paid for or not
+          example: true
+        start:
+          $ref: "#/components/schemas/Datetime"
+        end:
+          $ref: "#/components/schemas/Datetime"
+    Email:
+      type: string
+      format: email
+      description: A string in email address format.
+    PhoneNumber:
+      type: string
+      format: telephone
+      description: A telephone number starting with country code (eg. +36301131313)
+    ID:
+      type: string
+      description: A surrealdb id in the format `table:id`
+      example: employee:1234
+    Role:
+      type: string
+      description: A role is a string that can either be "administrator" or "teacher". More roles may be added in the future.
+      enum:
+        - administrator
+        - teacher
+      example: administrator
+    Datetime:
+      type: string
+      description: ISO 8601 date-time string
+      format: date-time
+      example: 2023-10-15T14:30:00Z
+  responses:
+    BadRequest:
+      description: Something is missing or incorrect in the client's request, so the server cannot process it.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+              - code
+            properties:
+              code:
+                enum:
+                  - server_error
+                  - bad_request
+                  - not_found
+                  - unauthorized
+                  - invalid_credentials
+                  - invalid_request_body
+                  - fields_required
+                  - fields_invalid
+                  - password_too_weak
+                  - email_in_use
+                  - invalid_invite
+                type: string
+                example: bad_request
+              message:
+                type: string
+                example: Some error message...
+    Unauthorized:
+      description: Authentication is required to access the requested resource. The client must include the appropriate credentials.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+              - code
+            properties:
+              code:
+                enum: 
+                  - unauthorized
+                type: string
+                example: unauthorized
+              message:
+                type: string
+                example: You are not authorized to perform this action
+  parameters: 
+    ids:
+      name: ids
+      description: Ids in surrealdb format (table:id) separated by commas
+      in: query
+      style: form
+      schema:
+        $ref: "#/components/schemas/ID"
+      explode: true
+      required: true
+      allowReserved: false
+  securitySchemes:
+    BearerJwt:
+      type: http
+      scheme: bearer
+      description: This is the token used for authenticating users
+      bearerFormat: Json Web Token (JWT)
+tags:
+  - name: auth
+    description: Endpoints related to user authentication and account management
+  - name: employee
+    description: Endpoints for managing employees
+  - name: location
+    description: Endpoints for managing locations.

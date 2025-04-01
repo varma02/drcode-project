@@ -39,7 +39,8 @@
 				"esbenp.prettier-vscode",
 				"surrealdb.surrealql",
 				"formulahendry.auto-rename-tag",
-				"unjinjang.rest-api-client"
+				"donjayamanne.githistory",
+				"AndrewButson.vscode-openapi-viewer"
 			]
 		}
 	}

@@ -2,13 +2,20 @@ import express from 'express';
 import errorHandler from './errorHandler';
 import { BadRequestError, FieldsInvalidError, FieldsRequiredError, NotFoundError } from './errors';
 import db from '../database/connection';
+import ensureAuth from '../middleware/ensureauth';
+
+export enum PermissionDefaults {
+  everyone = `TRUE`,
+  noone = `FALSE`,
+  adminOnly = `!array::is_empty(array::intersect($user.roles, ["administrator"]))`
+}
 
 interface Permissions {
-  getAll: string;   // !array::is_empty(array::intersect($user.roles, ["admin"]))
-  getById: string;
-  delete: string;
-  create: string;
-  update: string;
+  getAll: string;   // default: !array::is_empty(array::intersect($user.roles, ["administrator"]))
+  getById: string;  // default: TRUE
+  remove: string;   // default: -- isadmin again --
+  create: string;   // default: -- isadmin again --
+  update: string;   // default: -- isadmin again --
   [key: string]: string;
 }
 
@@ -16,7 +23,7 @@ interface Fields {
   [key: string]: {
     SELECT?: string;
     required?: boolean;
-    updatable?: boolean;
+    writable?: boolean;
     CONVERTER?: string;
   }
 }
@@ -35,8 +42,20 @@ export class Thing {
     this.router = express.Router();
   }
 
+  public addDefaults(
+    {auth = true, create = true, getAll = true, getById = true, update = true, remove = true}
+    : {auth?: boolean, create?: boolean, getAll?: boolean, getById?: boolean, update?: boolean, remove?: boolean}
+  ) {
+    if (auth) this.router.use(ensureAuth);
+    if (create) this.router.post("/create", this.create());
+    if (getAll) this.router.get("/all", this.getAll());
+    if (getById) this.router.get("/get", this.get());
+    if (update) this.router.post("/update", this.update());
+    if (remove) this.router.post("/remove", this.remove());
+  }
+
   public create() {
-    errorHandler(async (req, res) => {
+    return errorHandler(async (req, res) => {
       const result = (await db.query(`
         IF ${this.permissions.create} {
           RETURN CREATE ONLY type::table($table) CONTENT {
@@ -45,7 +64,7 @@ export class Thing {
         } ELSE {
           THROW "permission-denied"
         }
-      `, { table: this.table, fields: req.body }))[0];
+      `, { user: req.user, table: this.table, fields: req.body }))[0];
     
       res.status(200).json({
         code: "success",
@@ -62,7 +81,7 @@ export class Thing {
         } ELSE {
           THROW "permission-denied"
         }
-      `, { table: this.table, user: req.user }))[0];
+      `, { user: req.user, table: this.table }))[0];
       res.status(200).json({
         code: "success",
         data: { [`${this.table}s`]: result },
@@ -73,19 +92,24 @@ export class Thing {
   public get() {
     return errorHandler(async (req, res) => {
       const ids = (req.query.ids as string).trim().split(",");
-      if (!ids || !Array.isArray(ids) || ids.length == 0)
-        throw new FieldsRequiredError();
-      if (!ids.every(id => id.startsWith(`${this.table}:`))) 
-        throw new FieldsInvalidError();
-      const selectedFields = new Set((req.query.fields as string).trim().split(","));
+      if (!ids)
+        throw new FieldsRequiredError("The `ids` field is required.");
+      if (!Array.isArray(ids) || ids.length == 0 ||!ids.every(id => id.startsWith(`${this.table}:`))) 
+        throw new FieldsInvalidError("The `ids` field is invalid.");
+      const selectedFields = req.query.fields ? new Set((req.query.fields as string).trim().split(",")) : undefined;
       
       const result = (await db.query<any[][]>(`
         IF ${this.permissions.getById} {
-          RETURN SELECT ${Object.entries(this.fields).filter(v => selectedFields ? selectedFields.has(v[0]) : !v[1].SELECT).map(v => v[1].SELECT || v[0]).join(",")} FROM array::map($ids, |$id| type::thing($id));
+          RETURN SELECT ${
+            Object.entries(this.fields)
+            .filter(v => selectedFields ? selectedFields.has(v[0]) : !v[1].SELECT)
+            .map(v => v[1].SELECT || v[0])
+            .join(",")
+          } FROM array::map($ids, |$id| type::thing($id));
         } ELSE {
           THROW "permission-denied";
         }
-      `, { ids, user: req.user }))[0];
+      `, { user: req.user, ids }))[0];
     
       if (!result || !result.length)
         throw new NotFoundError();
@@ -108,48 +132,51 @@ export class Thing {
     
       const result = await db.query<any[]>(`
         IF ${this.permissions.update} {
-          UPDATE ONLY type::thing($id) MERGE {
-            ${Object.entries(this.fields).filter(v => updated[v[0]] !== undefined && v[1].updatable).map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`).join(",")}
+          RETURN UPDATE ONLY type::thing($id) MERGE {
+            ${
+              Object.entries(this.fields)
+              .filter(v => updated[v[0]] !== undefined && v[1].writable)
+              .map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`)
+              .join(",")
+            }
           }; 
         } ELSE {
           THROW "permission-denied";
         }
-        `, { id, fields: updated });
-    
-      if (!result?.[0]?.email)
-        throw new BadRequestError();
-    
-      delete result[0].password;
-      delete result[0].session_key;
+        `, { user: req.user, id, fields: updated });
+
+      for (const field of new Set(Object.keys(result[0])).difference(new Set(Object.keys(this.fields)))) {
+        delete result[0][field];
+      }
       res.status(200).json({
         code: "success",
-        data: { [`${this.table}s`]: result },
+        data: { [`${this.table}`]: result[0] },
       });
     });
   }
 
-  public delete() {
+  public remove() {
     return errorHandler(async (req, res) => {
       const { ids } = req.body;
-      if (!ids || !Array.isArray(ids) || ids.length == 0)
-        throw new FieldsRequiredError();
-      if (!ids.every(id => id.startsWith(`${this.table}:`))) 
-        throw new FieldsInvalidError();
+      if (!ids)
+        throw new FieldsRequiredError("The `ids` field is required.");
+      if (!Array.isArray(ids) || ids.length == 0 || !ids.every(id => id.startsWith(`${this.table}:`))) 
+        throw new FieldsInvalidError("The `ids` field is invalid.");
 
-      const deleted = (await db.query<any[][]>(`
-        IF ${this.permissions.delete} {
-          RETURN DELETE array::map($ids, |$v| type::thing($v)) WHERE ${this.permissions.DELETE} RETURN BEFORE;
+      const removed = (await db.query<any[][]>(`
+        IF ${this.permissions.remove} {
+          RETURN DELETE array::map($ids, |$v| type::thing($v)) RETURN BEFORE;
         } ELSE {
           THROW "permission-denied";
         }
-        `, { ids, user: req.user }))[0];
+        `, { user: req.user, ids }))[0];
   
-      if (!deleted || !deleted.length)
+      if (!removed || !removed.length)
         throw new NotFoundError();
     
       res.status(200).json({
         code: "success",
-        data: { [`${this.table}s`]: deleted },
+        data: { [`${this.table}s`]: removed.map(v => v.id) },
       });
     });
   }

@@ -1494,10 +1494,6 @@ paths:
             schema:
               type: object
               required:
-                - name
-                - group
-                - location
-                - teachers
                 - start
                 - end
               properties:
@@ -1505,9 +1501,9 @@ paths:
                   type: string
                   example: Scratch lesson 1
                 group:
-                  $ref: "#/components/schemas/Group"
+                  $ref: "#/components/schemas/ID"
                 location:
-                  $ref: "#/components/schemas/Location"
+                  $ref: "#/components/schemas/ID"
                 teachers:
                   type: array
                   items:
@@ -1893,7 +1889,7 @@ paths:
                   type: string
                   example: Kodály 16:00 Scratch
                 location:
-                  $ref: "#/components/schemas/Location"
+                  $ref: "#/components/schemas/ID"
                 teachers:
                   type: array
                   items:

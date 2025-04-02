@@ -36,6 +36,7 @@ const StudentDetails = lazy(() => import('@/routes/StudentDetails'))
 const AddNewLocation = lazy(() => import('@/routes/AddLocation'))
 const AddNewSubject = lazy(() => import('@/routes/AddSubject'))
 const AddStudent = lazy(() => import('@/routes/AddStudent'))
+const AddLesson = lazy(() => import('@/routes/AddLesson'))
 
 
 function SidebarWrapper() {
@@ -87,6 +88,7 @@ const router = createBrowserRouter([
       {path: "/groups/:id", element: <GroupDetails />},
       {path: "/lessons", element: <Lessons />},
       {path: "/lessons/:id", element: <LessonDetails />},
+      {path: "/lessons/add", element: <AddLesson />},
       {path: "/locations", element: <Locations />},
       {path: "/locations/:id", element: <LocationDetails />},
       {path: "/locations/add", element: <AddNewLocation />},

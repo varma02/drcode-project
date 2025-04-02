@@ -1,89 +1,25 @@
-import express from 'express';
-import db from '../database/connection';
-import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
-import ensureAuth from '../middleware/ensureauth';
-import errorHandler from '../lib/errorHandler';
-import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import type { DBLocation } from '../database/models';
-import { addAllGetter, addRemover } from '../lib/defaultCRUD';
+import { PermissionDefaults, Thing } from '../lib/thing';
 
-const locationsRouter = express.Router();
+const location = new Thing({
+  table: "location",
+  permissions: {
+    create: PermissionDefaults.adminOnly,
+    getAll: PermissionDefaults.adminOnly,
+    getById: PermissionDefaults.everyone,
+    update: PermissionDefaults.adminOnly,
+    remove: PermissionDefaults.adminOnly,
+  },
+  fields: {
+    id: {required: true},
+    created: {required: true},
+    name: {required: true, writable: true},
+    address: {required: true, writable: true},
+    contact_email: {required: true, writable: true},
+    contact_phone: {required: true, writable: true},
+    groups: {SELECT: "(SELECT VALUE id FROM group WHERE type::thing($parent.id) IN location) AS groups"},
+  }
+})
 
-locationsRouter.use(ensureAuth);
+location.addDefaults({});
 
-addRemover(locationsRouter, "location");
-
-addAllGetter(locationsRouter, "location");
-
-locationsRouter.get('/get', errorHandler(async (req, res) => {
-  const ids = (req.query.ids as string).trim().split(",");
-  if (ids.length === 0)
-    throw new FieldsRequiredError();
-  if (ids.every(id => !id.startsWith("location:")))
-    throw new FieldsInvalidError();
-
-  const selection = [];
-  selection.push("*");
-  // if (req.query.include) {
-  //   const include = new Set((req.query.include as string).trim().split(","));
-  //   if (include.has("something")) selection.push("some_query");
-  // }
-  const locations = (await db.query<DBLocation[][]>(`
-    SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
-  `, {ids}))[0];
-
-  if (!locations || !locations.length)
-    throw new NotFoundError();
-
-  res.status(200).json({
-    code: "success",
-    message: "Location(s) retrieved",
-    data: { locations },
-  });
-}));
-
-locationsRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, address, contact_email, contact_phone } = req.body;
-  if (!name || !address || !contact_email || !contact_phone) 
-    throw new FieldsRequiredError();
-
-  const location = (await db.query(`
-    CREATE ONLY location CONTENT {
-      name: $name,
-      address: $address,
-      contact_email: $contact_email,
-      contact_phone: $contact_phone
-    };
-  `, { name, address, contact_email, contact_phone }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Location created",
-    data: { location },
-  });
-}));
-
-locationsRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, address, contact_email, contact_phone } = req.body;
-  if (!id) 
-    throw new FieldsRequiredError();
-  if (!id.startsWith("location:")) 
-    throw new FieldsInvalidError();
-
-  const location = (await db.query(`
-    UPDATE ONLY type::thing($id) MERGE {
-      ${name ? "name: $name," : ""}
-      ${address ? "address: $address," : ""}
-      ${contact_email ? "contact_email: $contact_email," : ""}
-      ${contact_phone ? "contact_phone: $contact_phone," : ""}
-    };
-  `, { id, name, address, contact_email, contact_phone }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Location updated",
-    data: { location },
-  });
-}));
-
-export default locationsRouter;
+export default location.router;

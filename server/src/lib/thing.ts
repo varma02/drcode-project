@@ -4,10 +4,10 @@ import { BadRequestError, FieldsInvalidError, FieldsRequiredError, NotFoundError
 import db from '../database/connection';
 import ensureAuth from '../middleware/ensureauth';
 
-export const PermissionDefaults: {[key:string]:Permission} = {
-  everyone: {general: `TRUE`},
-  noone: {general: `FALSE`},
-  adminOnly: {general: `!array::is_empty(array::intersect($user.roles, ["administrator"]))`},
+export const PermissionDefaults = {
+  everyone: {general: `TRUE`} as Permission,
+  noone: {general: `FALSE`} as Permission,
+  adminOnly: {general: `!array::is_empty(array::intersect($user.roles, ["administrator"]))`} as Permission,
 }
 
 type Permission = {general: string, perRecord?: string};
@@ -27,6 +27,7 @@ interface Fields {
     required?: boolean;
     writable?: boolean;
     CONVERTER?: string;
+    default?: string;
   }
 }
 
@@ -63,13 +64,17 @@ export class Thing {
           RETURN CREATE ONLY type::table($table) CONTENT {
             ${
               Object.entries(this.fields)
-              .filter(v => req.body[v[0]] !== undefined)
-              .map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`)
+              .filter(v => req.body[v[0]] !== undefined || v[1].default !== undefined)
+              .map(v => `${v[0]}: ${
+                req.body[v[0]] && v[1].writable
+                  ? v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`
+                  : v[1].default
+                }`)
               .join(",")
             }
           };
         } ELSE {
-          THROW "permission-denied"
+          THROW "permission-denied";
         }
       `, { user: req.user, table: this.table, fields: req.body }))[0];
     
@@ -84,9 +89,15 @@ export class Thing {
     return errorHandler(async (req, res) => {      
       const result = (await db.query(`
         IF ${this.permissions.getAll.general} {
-          RETURN SELECT ${Object.entries(this.fields).filter(v => v[1].SELECT === undefined).map(v => v[0]).join(",")} FROM type::table($table)
+          RETURN SELECT ${
+            Object.entries(this.fields)
+            .filter(v => v[1].SELECT === undefined)
+            .map(v => v[0])
+            .join(",")
+          } ${this.permissions.getAll.perRecord ? `WHERE ${this.permissions.getAll.perRecord}` : ""}
+          FROM type::table($table);
         } ELSE {
-          THROW "permission-denied"
+          THROW "permission-denied";
         }
       `, { user: req.user, table: this.table }))[0];
       res.status(200).json({
@@ -112,7 +123,8 @@ export class Thing {
             .filter(v => selectedFields ? selectedFields.has(v[0]) : !v[1].SELECT)
             .map(v => v[1].SELECT || v[0])
             .join(",")
-          } FROM array::map($ids, |$id| type::thing($id));
+          } ${this.permissions.getById.perRecord ? `WHERE ${this.permissions.getById.perRecord}` : ""}
+          FROM array::map($ids, |$id| type::thing($id));
         } ELSE {
           THROW "permission-denied";
         }
@@ -146,7 +158,7 @@ export class Thing {
               .map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`)
               .join(",")
             }
-          }; 
+          } ${this.permissions.update.perRecord ? `WHERE ${this.permissions.update.perRecord}` : ""};
         } ELSE {
           THROW "permission-denied";
         }
@@ -172,7 +184,9 @@ export class Thing {
 
       const removed = (await db.query<any[][]>(`
         IF ${this.permissions.remove.general} {
-          RETURN DELETE array::map($ids, |$v| type::thing($v)) RETURN BEFORE;
+          RETURN DELETE array::map($ids, |$v| type::thing($v))
+          ${this.permissions.remove.perRecord ? `WHERE ${this.permissions.remove.perRecord}` : ""} 
+          RETURN BEFORE;
         } ELSE {
           THROW "permission-denied";
         }

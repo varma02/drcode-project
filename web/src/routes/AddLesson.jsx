@@ -28,22 +28,22 @@ export default function AddNewSubject() {
     event.preventDefault()
     const formData = new FormData(event.target)
     console.log(formData)
-    createLesson(auth.token, formData.get("name"), formData.get("note")).then(
-      () => { 
-        toast.success("Óra sikeresen létrehozva!")
-      },
-      (error) => { 
-        console.error(error)
-        switch (error.response?.data?.code) {
-          case "fields_required":
-            return toast.error("Valamelyik mező üres!")
-          case "unauthorized":
-            return toast.error("Ehhez hincs jogosultsága!")
-          default:
-            return toast.error("Ismeretlen hiba történt!")
-        }
-      }
-    )
+    // createLesson(auth.token, formData.get("name"), formData.get("note")).then(
+    //   () => { 
+    //     toast.success("Óra sikeresen létrehozva!")
+    //   },
+    //   (error) => { 
+    //     console.error(error)
+    //     switch (error.response?.data?.code) {
+    //       case "fields_required":
+    //         return toast.error("Valamelyik mező üres!")
+    //       case "unauthorized":
+    //         return toast.error("Ehhez hincs jogosultsága!")
+    //       default:
+    //         return toast.error("Ismeretlen hiba történt!")
+    //     }
+    //   }
+    // )
   }
 
   console.log(teachers)
@@ -54,16 +54,16 @@ export default function AddNewSubject() {
       <div className='flex gap-4 items-end'>
         <Input type="text" placeholder="Név" name="name" />
         <div className='flex gap-4 items-end'>
-          <TimePicker name={"start"} label={"Kezdés"} date={startDate} setDate={setStartDate} />
+          <TimePicker name={"start"} />
           <p className='mb-2'>-</p>
-          <TimePicker name={"end"} label={"Befejezés"} date={endDate} setDate={setEndDate} />
+          <TimePicker name={"end"} />
         </div>
       </div>
 
       <div className='flex gap-4'>
-        <Combobox data={groups} displayName={"name"} name={"group"} />
-        <Combobox data={locations} displayName={"address"} name={"location"} />
-        <Combobox data={teachers} displayName={"name"} name={"teachers"} />
+        <Combobox data={groups} displayName={"name"} name={"group"} placeholder='Válassz csoportot...' />
+        <Combobox data={locations} displayName={"address"} name={"location"} placeholder='Válassz helyszínt...' />
+        <Combobox data={teachers} displayName={"name"} name={"teachers"} placeholder='Válassz oktatót...' />
       </div>
 
 

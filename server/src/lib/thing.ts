@@ -7,7 +7,7 @@ import ensureAuth from '../middleware/ensureauth';
 export const PermissionDefaults: {[key:string]:Permission} = {
   everyone: {general: `TRUE`},
   noone: {general: `FALSE`},
-  adminOnly: {general: `!array::is_empty(array::intersect(user.roles, ["administrator"]))`},
+  adminOnly: {general: `!array::is_empty(array::intersect($user.roles, ["administrator"]))`},
 }
 
 type Permission = {general: string, perRecord?: string};
@@ -61,7 +61,12 @@ export class Thing {
       const result = (await db.query(`
         IF ${this.permissions.create.general} {
           RETURN CREATE ONLY type::table($table) CONTENT {
-            ${Object.entries(this.fields).filter(v => req.body[v[0]] !== undefined).map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`).join(",")}
+            ${
+              Object.entries(this.fields)
+              .filter(v => req.body[v[0]] !== undefined)
+              .map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`)
+              .join(",")
+            }
           };
         } ELSE {
           THROW "permission-denied"

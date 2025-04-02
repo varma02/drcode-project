@@ -4,19 +4,21 @@ import { BadRequestError, FieldsInvalidError, FieldsRequiredError, NotFoundError
 import db from '../database/connection';
 import ensureAuth from '../middleware/ensureauth';
 
-export enum PermissionDefaults {
-  everyone = `TRUE`,
-  noone = `FALSE`,
-  adminOnly = `!array::is_empty(array::intersect($user.roles, ["administrator"]))`
+export const PermissionDefaults: {[key:string]:Permission} = {
+  everyone: {general: `TRUE`},
+  noone: {general: `FALSE`},
+  adminOnly: {general: `!array::is_empty(array::intersect(user.roles, ["administrator"]))`},
 }
 
+type Permission = {general: string, perRecord?: string};
+
 interface Permissions {
-  getAll: string;   // default: !array::is_empty(array::intersect($user.roles, ["administrator"]))
-  getById: string;  // default: TRUE
-  remove: string;   // default: -- isadmin again --
-  create: string;   // default: -- isadmin again --
-  update: string;   // default: -- isadmin again --
-  [key: string]: string;
+  getAll: Permission;
+  getById: Permission;
+  remove: Permission;
+  create: Permission;
+  update: Permission;
+  [key: string]: Permission;
 }
 
 interface Fields {
@@ -57,7 +59,7 @@ export class Thing {
   public create() {
     return errorHandler(async (req, res) => {
       const result = (await db.query(`
-        IF ${this.permissions.create} {
+        IF ${this.permissions.create.general} {
           RETURN CREATE ONLY type::table($table) CONTENT {
             ${Object.entries(this.fields).filter(v => req.body[v[0]] !== undefined).map(v => `${v[0]}: ${v[1].CONVERTER?.replace("$field", `$fields.${v[0]}`) || `$fields.${v[0]}`}`).join(",")}
           };
@@ -76,7 +78,7 @@ export class Thing {
   public getAll() {
     return errorHandler(async (req, res) => {      
       const result = (await db.query(`
-        IF ${this.permissions.getAll} {
+        IF ${this.permissions.getAll.general} {
           RETURN SELECT ${Object.entries(this.fields).filter(v => v[1].SELECT === undefined).map(v => v[0]).join(",")} FROM type::table($table)
         } ELSE {
           THROW "permission-denied"
@@ -99,7 +101,7 @@ export class Thing {
       const selectedFields = req.query.fields ? new Set((req.query.fields as string).trim().split(",")) : undefined;
       
       const result = (await db.query<any[][]>(`
-        IF ${this.permissions.getById} {
+        IF ${this.permissions.getById.general} {
           RETURN SELECT ${
             Object.entries(this.fields)
             .filter(v => selectedFields ? selectedFields.has(v[0]) : !v[1].SELECT)
@@ -131,7 +133,7 @@ export class Thing {
         throw new FieldsInvalidError();
     
       const result = await db.query<any[]>(`
-        IF ${this.permissions.update} {
+        IF ${this.permissions.update.general} {
           RETURN UPDATE ONLY type::thing($id) MERGE {
             ${
               Object.entries(this.fields)
@@ -164,7 +166,7 @@ export class Thing {
         throw new FieldsInvalidError("The `ids` field is invalid.");
 
       const removed = (await db.query<any[][]>(`
-        IF ${this.permissions.remove} {
+        IF ${this.permissions.remove.general} {
           RETURN DELETE array::map($ids, |$v| type::thing($v)) RETURN BEFORE;
         } ELSE {
           THROW "permission-denied";

@@ -95,10 +95,10 @@ DEFINE FIELD end ON TABLE lesson TYPE datetime;
 DEFINE TABLE replaced SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE replaced TYPE datetime DEFAULT time::now() READONLY;
-DEFINE FIELD replacement ON TABLE replaced TYPE record<lesson> ASSERT $value.exists();
+DEFINE FIELD original ON TABLE replaced TYPE record<lesson> ASSERT $value.exists();
 
 
-DEFINE TABLE attended SCHEMAFULL TYPE RELATION IN student OUT lesson | replaced CHANGEFEED 4w;
+DEFINE TABLE attended SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 4w;
 
 DEFINE FIELD created ON TABLE attended TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD paid ON TABLE attended TYPE bool DEFAULT false;

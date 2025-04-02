@@ -116,7 +116,7 @@ export default function LessonDetails() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <h3 className='font-bold'>Tanárok</h3>
+        <h3 className='font-bold'>Oktatók</h3>
         {/* <GroupComboBox data={allTeachers} title={"Oktatók"} name={"lessonTeachers"} displayName={"name"} defaultValue={teachers} /> */}
         <div className="flex gap-2">
           { selectedGroup &&

@@ -99,7 +99,7 @@ export default function Groups() {
       cell: ({ row }) => (row.getValue("location")?.name || "N/A"),
     },
     {
-      displayName: "Tanárok",
+      displayName: "Oktatók",
       accessorKey: "teachers",
       header: ({ column }) => column.columnDef.displayName,
       cell: ({ row }) => row.getValue("teachers")?.map(e => teachers[e]).join(", ") || "N/A",

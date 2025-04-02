@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export const role_map = {
   "administrator" : "Adminisztrátor",
-  "teacher" : "Tanár",
+  "teacher" : "Oktató",
 }
 
 export function getTopRole(roles: string[] | Set<string>): string {

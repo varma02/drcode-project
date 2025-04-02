@@ -127,7 +127,7 @@ export default function GroupDetails() {
 
       <div className="flex flex-col lg:flex-row lg:gap-10">
         <div className="flex flex-col gap-2 py-4">
-          <h3 className='font-bold'>Tanárok</h3>
+          <h3 className='font-bold'>Oktatók</h3>
           {teachers?.length > 0 ? (
             <ScrollArea className='pb-2 overflow-x-auto'>
               <div className='flex w-max gap-4 pb-1'>
@@ -142,7 +142,7 @@ export default function GroupDetails() {
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
           ) : teachers ? (
-            <p>Ehhez a csoporthoz még nem tartoznak tanárok.</p>
+            <p>Ehhez a csoporthoz még nem tartoznak oktatók.</p>
           ) : (
             <LoaderCircle className='animate-spin ' />
           )}

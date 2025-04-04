@@ -10,6 +10,7 @@ services:
 
   db:
     image: surrealdb/surrealdb:latest
+    user: "${UID}:${GID}"
     volumes:
       - ../data.dev/surrealdb:/surrealdb:rw
     entrypoint:
@@ -24,6 +25,7 @@ services:
 
   nginx:
     image: nginx:alpine
+    user: "${UID}:${GID}"
     volumes:
       - ../data.dev/nginx:/app/static:rw
       - ../web/dist:/app/www:ro

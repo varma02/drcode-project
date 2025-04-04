@@ -3,9 +3,9 @@ import Surreal from "surrealdb";
 const db = new Surreal();
 
 export async function db_connect(): Promise<boolean> {
-  if (db.ready) return true;
+  // if (db.ready) return true;
   try {
-    await db.connect(process.env.DB_URL || "ws://localhost:8000/rpc", {
+    await db.connect(process.env.DB_URL || "ws://db:8000/rpc", {
       namespace: process.env.DB_NAMESPACE || "DRCODE",
       database: process.env.DB_DATABASE || "main",
       auth: {

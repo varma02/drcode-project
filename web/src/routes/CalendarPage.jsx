@@ -2,6 +2,8 @@ import { DatePicker } from '@/components/DatePicker'
 import { LessonCardItem } from '@/components/LessonCardItem'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { getAllLessonsBetweenDates, getEmployee, getGroup, getLocation } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
@@ -56,9 +58,10 @@ export default function CalendarPage() {
     getAllLessonsBetweenDates(auth.token, getWeek(selectedDate).start, getWeek(selectedDate).end).then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
   }, [selectedDate])
 
-  console.log("Groups: ", groups)
+  // console.log("Groups: ", groups)
   // console.log("Techers: ", teachers)
   // console.log("Locations: ", locations)
+  console.log("Lessons: ", lessons)
 
   useEffect(() => {
     setRows([])
@@ -147,7 +150,7 @@ export default function CalendarPage() {
           </PopoverContent>
         </Popover>
       </div>
-      <Table>
+      {/* <Table>
         <TableHeader>
           <TableRow>
             {days.map(e => <TableHead key={e} className="text-center">{e}</TableHead>)}
@@ -156,7 +159,27 @@ export default function CalendarPage() {
         <TableBody>
           { rows }
         </TableBody>
-      </Table>
+      </Table> */}
+      { 
+        days.map((day, i) => 
+          <>
+            <Separator />
+            <p className='w-full text-left text-3xl'>{day}</p>
+            <div className="flex flex-wrap w-full gap-2 py-2 mb-4 ml-8">
+              {
+                lessons.filter(l => new Date(l.start).getDay()-1 == i).length == 0 ?
+                <p>Nincs Esemény</p>
+                :
+                lessons.filter(l => new Date(l.start).getDay()-1 == i).map(j => 
+                  <>
+                    <LessonCardItem location={"Főhadiszállás"} time_start={format(new Date(j.start), "p").split(" ")[0]} time_end={format(new Date(j.end), "p").split(" ")[0]} />
+                  </>
+                ) 
+              }
+            </div>
+          </>
+        )
+      }
     </div>
   )
 }

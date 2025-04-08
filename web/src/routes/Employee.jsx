@@ -181,10 +181,10 @@ export default function Employee() {
         </ScrollArea>
       </>)}
 
-      <DataTable data={employees} columns={columns}
+      <DataTable data={employees} columns={columns} hideColumns={["created", "roles"]}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
       rowOnClick={(v)=>navigate(v.original.id.replace("employee:", ""))}
-      headerAfter={<div className='flex gap-4 pl-4'>
+      headerAfter={<div className='flex gap-4'>
         <AreYouSureAlert onConfirm={handleDelete} />
         <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
           <DialogTrigger asChild onClick={() => setSelectedInvite(null)}>

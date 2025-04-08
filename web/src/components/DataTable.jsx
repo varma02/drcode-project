@@ -27,10 +27,10 @@ import {
 } from "@/components/ui/table"
 import { useState } from "react"
 
-export default function DataTable({ columns, data, hasFooter = false, className, headerAfter, rowOnClick, rowSelection = [], setRowSelection }) {
+export default function DataTable({ columns, data, hasFooter = false, className, headerAfter, rowOnClick, rowSelection = [], setRowSelection, hideColumns = ["created"] }) {
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
-  const [columnVisibility, setColumnVisibility] = useState({})
+  const [columnVisibility, setColumnVisibility] = useState(Object.fromEntries(hideColumns.map(e => [e, false])))
 
   const table = useReactTable({
     data,
@@ -61,7 +61,7 @@ export default function DataTable({ columns, data, hasFooter = false, className,
 
   return (
     <div className={className}>
-      <div className="flex items-center py-4">
+      <div className="flex items-start md:items-center py-4 flex-col md:flex-row gap-4">
         { table.getAllColumns().find((v) => v.id === "name") && (
           <Input
             placeholder="Szűrés Névre..."
@@ -74,7 +74,7 @@ export default function DataTable({ columns, data, hasFooter = false, className,
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto" type="button">
+            <Button variant="outline" className="md:ml-auto" type="button">
               Oszlopok <ChevronDown />
             </Button>
           </DropdownMenuTrigger>

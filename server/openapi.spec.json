@@ -1,0 +1,3850 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "DR.CODE Project",
+    "version": "0.0.1",
+    "description": "This is the API documentation for DR.CODE Kecskemét's management application"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:3000",
+      "description": "localhost"
+    }
+  ],
+  "paths": {
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Get the logged in user",
+        "description": "Retrieves the properties of the authorized user",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetTheLoggedInUserOk",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "success"
+                      ],
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "employee": {
+                          "$ref": "#/components/schemas/Employee"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request succeeded, user data can be found in the response."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "getTheLoggedInUser"
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login with email and password",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "LoginWithEmailAndPasswordOk",
+                  "required": [
+                    "data",
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "token",
+                        "employee"
+                      ],
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "example": "IJOFf87VizgIUZGIU762Vtuv2IUGIU288"
+                        },
+                        "employee": {
+                          "$ref": "#/components/schemas/Employee"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpexted error occured"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The login was successful. A token was created and sent in the response along with the account data."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "parameters": [],
+        "description": "This endpoint is used for logging in employees of the company via email and password authentication. It is accessible without any prior authorization.",
+        "operationId": "loginWithEmailAndPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "remember"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "verysecurepassword1234"
+                  },
+                  "remember": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": "The required JSON request body for logging in a user."
+        }
+      }
+    },
+    "/auth/update": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Update account",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateAccountOk",
+                  "required": [
+                    "data",
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "employee"
+                      ],
+                      "properties": {
+                        "employee": {
+                          "$ref": "#/components/schemas/Employee"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Employee updated"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful, and the user was updated."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "description": "Update parameters on the logged in user. (eg. name)",
+        "operationId": "updateAccount",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "old_password"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "employee:1234"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "new_password": {
+                    "type": "string",
+                    "example": "w2C62kvqCHv7g3mnHY67"
+                  },
+                  "old_password": {
+                    "type": "string",
+                    "example": "w2C62kvqCHv7g3mnHY67"
+                  }
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": "The employee's id and any other updatable properties"
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Create a new user with an invite",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateANewUserWithAnInviteCreated",
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Employee registered"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful, and a new employee was created."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "parameters": [],
+        "description": "This endpoint registers a new employee given a valid invite.",
+        "operationId": "createANewUserWithAnInvite",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "invite_id",
+                  "name",
+                  "password",
+                  "email"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "Password1234#"
+                  },
+                  "invite_id": {
+                    "type": "string",
+                    "example": "invite:1234"
+                  }
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": "The request body for registering a new user/employee."
+        }
+      }
+    },
+    "/auth/clear-sessions": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logout the user from all devices",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "LogoutTheUserFromAllDevicesOk",
+                  "required": [
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Logged out of all sessions"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful, and the sessions were cleared."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "description": "Given an authorization token, this endpoint updates a user's session key therefor logging them out from all active devices",
+        "operationId": "logoutTheUserFromAllDevices"
+      }
+    },
+    "/auth/replace-profile-picture": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Update profile picture",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateProfilePictureOk",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "success"
+                      ],
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "token",
+                        "path"
+                      ],
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "format": "uri",
+                          "example": "/employee:1234/profile_picture.webp",
+                          "pattern": "^/employee:.+/profile_picture\\.webp$"
+                        },
+                        "token": {
+                          "type": "string",
+                          "example": "w2C62kvqCHv7g3mnHY67"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful, the user can now upload their new profile picture with the provided token and path. See more at /upload"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "description": "Get the nessesary token and file path to be able to upload a new profile picture.",
+        "operationId": "updateProfilePicture"
+      }
+    },
+    "/employee/all": {
+      "get": {
+        "tags": [
+          "employee"
+        ],
+        "summary": "Get all employees",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetAllEmployeesOk",
+                  "required": [
+                    "data",
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "employees"
+                      ],
+                      "properties": {
+                        "employees": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Employee"
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "All employees retrieved"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful, and the server has returned the employees in the response body."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "description": "Retrieves a list of all employee records. Only accessible to administrators.",
+        "operationId": "getAllEmployees"
+      }
+    },
+    "/employee/get": {
+      "get": {
+        "tags": [
+          "employee"
+        ],
+        "summary": "Get employees by id",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetEmployeesByIdOk",
+                  "required": [
+                    "data",
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Employee"
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Employees retrieved"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful, and the server has returned the requested employees in the response body."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ids"
+          }
+        ],
+        "description": "Get one or more employees with the ability to fetch record links.",
+        "operationId": "getEmployeesById"
+      }
+    },
+    "/employee/remove": {
+      "post": {
+        "tags": [
+          "employee"
+        ],
+        "summary": "Remove employees",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveEmployeesOk",
+                  "required": [
+                    "data",
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "employees"
+                      ],
+                      "properties": {
+                        "employees": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Employee"
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Employees removed"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful, the requested employees were deleted."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "description": "This endpoint is used for removing or deleting employee(s) from the database. Only administrators can make these requests.",
+        "operationId": "removeEmployees",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "employee:1234"
+                    },
+                    "description": "The ids of the employees you want to delete"
+                  }
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": "Request body for deleting an employee or multiple employees"
+        }
+      }
+    },
+    "/employee/update": {
+      "post": {
+        "tags": [
+          "employee"
+        ],
+        "summary": "Update an employee",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateAnEmployeeOk",
+                  "required": [
+                    "data",
+                    "code",
+                    "message"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "employee"
+                      ],
+                      "properties": {
+                        "employee": {
+                          "$ref": "#/components/schemas/Employee"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Employee updated"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful, and the employee was updated."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "description": "This endpoint can be used to update an employee as an administrator. It is different from the account update in that it can also change an employee's assigned roles.",
+        "operationId": "updateAnEmployee",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "employee:1234"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Role"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true,
+          "description": ""
+        }
+      }
+    },
+    "/location/all": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "summary": "List all locations",
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "ListAllLocationsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Location"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful and locations were retrieved"
+          }
+        },
+        "parameters": [],
+        "description": "This endpoint is used to list all locations. Only available to admins.",
+        "operationId": "listAllLocations"
+      }
+    },
+    "/location/get": {
+      "get": {
+        "summary": "Get locations by id",
+        "description": "Get one or more location(s) with the ability to fetch record links.",
+        "tags": [
+          "location"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetLocationsByIdOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Location"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful and the requested locations were retrieved."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ids"
+          }
+        ],
+        "operationId": "getLocationsById"
+      }
+    },
+    "/location/remove": {
+      "post": {
+        "summary": "Remove locations",
+        "description": "This endpoint is used for removing or deleting location(s) from the database. Only administrators can make these requests.",
+        "tags": [
+          "location"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested locations were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveLocationsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "locations"
+                      ],
+                      "properties": {
+                        "locations": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Location"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "removeLocations",
+        "requestBody": {
+          "required": true,
+          "description": "Request body for deleting a location or multiple locations",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the locations you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/location/update": {
+      "post": {
+        "summary": "Update a location",
+        "description": "This endpoint can be used to update a location as an administrator.",
+        "tags": [
+          "location"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the location was updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateALocationOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "location"
+                      ],
+                      "properties": {
+                        "location": {
+                          "$ref": "#/components/schemas/Location"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "updateALocation",
+        "requestBody": {
+          "description": "The request body for updating a location.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Kecskeméti Kodály Zoltán Ének-Zenei Általános Iskola"
+                  },
+                  "address": {
+                    "type": "string",
+                    "example": "6000 Kecskemét, Dózsa György út 22."
+                  },
+                  "contact_email": {
+                    "$ref": "#/components/schemas/Email"
+                  },
+                  "contact_phone": {
+                    "$ref": "#/components/schemas/PhoneNumber"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/location/create": {
+      "post": {
+        "summary": "Create a new location",
+        "description": "This endpoint is used to create a new location. Only available to admins.",
+        "tags": [
+          "location"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The request was successful, and the location was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateALocationCreated",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "location"
+                      ],
+                      "properties": {
+                        "location": {
+                          "$ref": "#/components/schemas/Location"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createALocation",
+        "requestBody": {
+          "description": "The request body for creating a new location.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "address",
+                  "contact_email",
+                  "contact_phone"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Kecskeméti Kodály Zoltán Ének-Zenei Általános Iskola"
+                  },
+                  "address": {
+                    "type": "string",
+                    "example": "6000 Kecskemét, Dózsa György út 22."
+                  },
+                  "contact_email": {
+                    "$ref": "#/components/schemas/Email"
+                  },
+                  "contact_phone": {
+                    "$ref": "#/components/schemas/PhoneNumber"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subject/all": {
+      "get": {
+        "summary": "List all subjects",
+        "description": "This endpoint is used to list all subjects. Only available to admins.",
+        "tags": [
+          "subject"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "ListAllSubjectsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Subject"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The request was successful and subjects were retrieved"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "listAllSubjects"
+      }
+    },
+    "/subject/get": {
+      "get": {
+        "summary": "Get subjects by id",
+        "description": "Get one or more subject(s) with the ability to fetch record links.",
+        "tags": [
+          "subject"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and the requested subjects were retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetSubjectsByIdOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Subject"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ids"
+          }
+        ],
+        "operationId": "getSubjectsById"
+      }
+    },
+    "/subject/remove": {
+      "post": {
+        "summary": "Remove subjects",
+        "description": "This endpoint is used for removing or deleting subject(s) from the database. Only administrators can make these requests.",
+        "tags": [
+          "subject"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested subjects were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveSubjectsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "subjects"
+                      ],
+                      "properties": {
+                        "subjects": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Subject"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "removeSubjects",
+        "requestBody": {
+          "description": "Request body for deleting a subject or multiple subjects",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the subjects you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subject/update": {
+      "post": {
+        "summary": "Update a subject",
+        "description": "This endpoint can be used to update a subject as an administrator.",
+        "tags": [
+          "subject"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the subject was updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateASubjectOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "subject"
+                      ],
+                      "properties": {
+                        "subject": {
+                          "$ref": "#/components/schemas/Subject"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "updateASubject",
+        "requestBody": {
+          "description": "The request body for updating a subject.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Scratch 1",
+                    "description": "The name of the subject"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subject/create": {
+      "post": {
+        "summary": "Create a new subject",
+        "description": "This endpoint is used to create a new subject. Only available to admins.",
+        "tags": [
+          "subject"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The request was successful, and the subject was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateASubjectCreated",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "subject"
+                      ],
+                      "properties": {
+                        "subject": {
+                          "$ref": "#/components/schemas/Subject"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createASubject",
+        "requestBody": {
+          "description": "The request body for creating a new subject.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Scratch 1",
+                    "description": "The name of the subject"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/all": {
+      "get": {
+        "summary": "List all students",
+        "description": "This endpoint is used to list all students. Only available to admins.",
+        "tags": [
+          "student"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and students were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "ListAllStudentsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Student"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "listAllStudents"
+      }
+    },
+    "/student/get": {
+      "get": {
+        "summary": "Get students by id",
+        "description": "Get one or more student(s) with the ability to fetch record links.",
+        "tags": [
+          "student"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and the requested students were retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetStudentsByIdOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Student"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ids"
+          }
+        ],
+        "operationId": "getStudentsById"
+      }
+    },
+    "/student/remove": {
+      "post": {
+        "summary": "Remove students",
+        "description": "This endpoint is used for removing or deleting student(s) from the database. Only administrators can make these requests.",
+        "tags": [
+          "student"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested students were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveStudentsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "students"
+                      ],
+                      "properties": {
+                        "students": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Student"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "removeStudents",
+        "requestBody": {
+          "description": "Request body for deleting a student or multiple students",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the students you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/update": {
+      "post": {
+        "summary": "Update a student",
+        "description": "This endpoint can be used to update a student as an administrator.",
+        "tags": [
+          "student"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the student was updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateAStudentOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "student"
+                      ],
+                      "properties": {
+                        "student": {
+                          "$ref": "#/components/schemas/Student"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "updateAStudent",
+        "requestBody": {
+          "description": "The request body for updating a student.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "parent": {
+                    "type": "object",
+                    "description": "The name of the parent or guardian",
+                    "required": [
+                      "name",
+                      "email",
+                      "phone"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "Jane Doe"
+                      },
+                      "email": {
+                        "$ref": "#/components/schemas/Email"
+                      },
+                      "phone": {
+                        "$ref": "#/components/schemas/PhoneNumber"
+                      }
+                    }
+                  },
+                  "email": {
+                    "$ref": "#/components/schemas/Email"
+                  },
+                  "phone": {
+                    "$ref": "#/components/schemas/PhoneNumber"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/student/create": {
+      "post": {
+        "summary": "Create a new student",
+        "description": "This endpoint is used to create a new student. Only available to admins.",
+        "tags": [
+          "student"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The request was successful, and the student was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateAStudentCreated",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "student"
+                      ],
+                      "properties": {
+                        "student": {
+                          "$ref": "#/components/schemas/Student"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createAStudent",
+        "requestBody": {
+          "description": "The request body for creating a new student.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "parent",
+                  "email",
+                  "phone"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "parent": {
+                    "type": "object",
+                    "description": "The name of the parent or guardian",
+                    "required": [
+                      "name",
+                      "email",
+                      "phone"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "Jane Doe"
+                      },
+                      "email": {
+                        "$ref": "#/components/schemas/Email"
+                      },
+                      "phone": {
+                        "$ref": "#/components/schemas/PhoneNumber"
+                      }
+                    }
+                  },
+                  "email": {
+                    "$ref": "#/components/schemas/Email"
+                  },
+                  "phone": {
+                    "$ref": "#/components/schemas/PhoneNumber"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lesson/all": {
+      "get": {
+        "summary": "List all lessons",
+        "description": "This endpoint is used to list all lessons. Only available to admins.",
+        "tags": [
+          "lesson"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and lessons were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "ListAllLessonsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Lesson"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "listAllLessons"
+      }
+    },
+    "/lesson/get": {
+      "get": {
+        "summary": "Get lessons by id",
+        "description": "Get one or more lesson(s) with the ability to fetch record links.",
+        "tags": [
+          "lesson"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and the requested lessons were retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetLessonsByIdOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Lesson"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ids"
+          }
+        ],
+        "operationId": "getLessonsById"
+      }
+    },
+    "/lesson/between_dates": {
+      "get": {
+        "summary": "Get lessons between two dates",
+        "description": "Get the lessons starting between two dates.",
+        "tags": [
+          "lesson"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and the requested lessons were retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetLessonsByIdOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Lesson"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "description": "The start date of the range",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-04-01T00:00:00.000Z"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "The end date of the range",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-04-10T23:59:59.000Z"
+            }
+          }
+        ],
+        "operationId": "getLessonsBetweenDates"
+      }
+    },
+    "/lesson/remove": {
+      "post": {
+        "summary": "Remove lessons",
+        "description": "This endpoint is used for removing or deleting lesson(s) from the database. Only administrators can make these requests.",
+        "tags": [
+          "lesson"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested lessons were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveLessonsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "lessons"
+                      ],
+                      "properties": {
+                        "lessons": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Lesson"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "removeLessons",
+        "requestBody": {
+          "description": "Request body for deleting a lesson or multiple lessons",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the lessons you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lesson/update": {
+      "post": {
+        "summary": "Update a lesson",
+        "description": "This endpoint can be used to update a lesson as an administrator.",
+        "tags": [
+          "lesson"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the lesson was updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateALessonOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "lesson"
+                      ],
+                      "properties": {
+                        "lesson": {
+                          "$ref": "#/components/schemas/Lesson"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "updateALesson",
+        "requestBody": {
+          "description": "The request body for updating a lesson.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Scratch lesson 1"
+                  },
+                  "group": {
+                    "$ref": "#/components/schemas/Group"
+                  },
+                  "location": {
+                    "$ref": "#/components/schemas/Location"
+                  },
+                  "teachers": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    }
+                  },
+                  "start": {
+                    "$ref": "#/components/schemas/Datetime"
+                  },
+                  "end": {
+                    "$ref": "#/components/schemas/Datetime"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lesson/create": {
+      "post": {
+        "summary": "Create a new lesson",
+        "description": "This endpoint is used to create a new lesson. Only available to admins.",
+        "tags": [
+          "lesson"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The request was successful, and the lesson was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateALessonCreated",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "lesson"
+                      ],
+                      "properties": {
+                        "lesson": {
+                          "$ref": "#/components/schemas/Lesson"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createALesson",
+        "requestBody": {
+          "description": "The request body for creating a new lesson.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "start",
+                  "end"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Scratch lesson 1"
+                  },
+                  "group": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "location": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "teachers": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    }
+                  },
+                  "start": {
+                    "$ref": "#/components/schemas/Datetime"
+                  },
+                  "end": {
+                    "$ref": "#/components/schemas/Datetime"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invite/all": {
+      "get": {
+        "summary": "List all invites",
+        "description": "This endpoint is used to list all invites. Only available to admins.",
+        "tags": [
+          "invite"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and invites were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "ListAllInvitesOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Invite"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "listAllInvites"
+      }
+    },
+    "/invite/remove": {
+      "post": {
+        "summary": "Remove invites",
+        "description": "This endpoint is used for removing or deleting invite(s) from the database. Only administrators can make these requests.",
+        "tags": [
+          "invite"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested invites were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveInvitesOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "invites"
+                      ],
+                      "properties": {
+                        "invites": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Invite"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "removeInvites",
+        "requestBody": {
+          "description": "Request body for deleting an invite or multiple invites",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the invites you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invite/create": {
+      "post": {
+        "summary": "Create a new invite",
+        "description": "This endpoint is used to create a new invite. Only available to admins.",
+        "tags": [
+          "invite"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The request was successful, and the invite was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateAInviteCreated",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "invite"
+                      ],
+                      "properties": {
+                        "invite": {
+                          "$ref": "#/components/schemas/Invite"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createAInvite",
+        "requestBody": {
+          "description": "The request body for creating a new invite.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "roles"
+                ],
+                "properties": {
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Role"
+                    },
+                    "example": [
+                      "teacher",
+                      "administrator"
+                    ],
+                    "description": "Roles assigned to the new employee"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/group/all": {
+      "get": {
+        "summary": "List all groups",
+        "description": "This endpoint is used to list all groups. Only available to admins.",
+        "tags": [
+          "group"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and groups were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "ListAllGroupsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Group"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "listAllGroups"
+      }
+    },
+    "/group/get": {
+      "get": {
+        "summary": "Get groups by id",
+        "description": "Get one or more group(s) with the ability to fetch record links.",
+        "tags": [
+          "group"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and the requested groups were retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetGroupsByIdOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Group"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ids"
+          }
+        ],
+        "operationId": "getGroupsById"
+      }
+    },
+    "/group/remove": {
+      "post": {
+        "summary": "Remove groups",
+        "description": "This endpoint is used for removing or deleting group(s) from the database. Only administrators can make these requests.",
+        "tags": [
+          "group"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested groups were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveGroupsOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "groups"
+                      ],
+                      "properties": {
+                        "groups": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Group"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "removeGroups",
+        "requestBody": {
+          "description": "Request body for deleting a group or multiple groups",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the groups you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/group/update": {
+      "post": {
+        "summary": "Update a group",
+        "description": "This endpoint can be used to update a group as an administrator.",
+        "tags": [
+          "group"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the group was updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateAGroupOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "group"
+                      ],
+                      "properties": {
+                        "group": {
+                          "$ref": "#/components/schemas/Group"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "updateAGroup",
+        "requestBody": {
+          "description": "The request body for updating a group.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Kodály 16:00 Scratch"
+                  },
+                  "location": {
+                    "$ref": "#/components/schemas/Location"
+                  },
+                  "archived": {
+                    "type": "boolean",
+                    "description": "Whether the group is archived or not",
+                    "example": false
+                  },
+                  "teachers": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/group/create": {
+      "post": {
+        "summary": "Create a new group",
+        "description": "This endpoint is used to create a new group. Only available to admins.",
+        "tags": [
+          "group"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The request was successful, and the group was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateAGroupCreated",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "group"
+                      ],
+                      "properties": {
+                        "group": {
+                          "$ref": "#/components/schemas/Group"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createAGroup",
+        "requestBody": {
+          "description": "The request body for creating a new group.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "location",
+                  "teachers"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Kodály 16:00 Scratch"
+                  },
+                  "location": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "teachers": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    }
+                  },
+                  "lessons": {
+                    "type": "array",
+                    "description": "Optionally you can create lessons along with a group",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "start",
+                        "end"
+                      ],
+                      "properties": {
+                        "start": {
+                          "$ref": "#/components/schemas/Datetime"
+                        },
+                        "end": {
+                          "$ref": "#/components/schemas/Datetime"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file/get": {
+      "get": {
+        "summary": "Get files by id",
+        "description": "Get one or more file(s). Only the metadata is returned, along with a file path.",
+        "tags": [
+          "file"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful and the requested files were retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "GetFilesByIdOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/File"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ids"
+          }
+        ],
+        "operationId": "getFilesById"
+      }
+    },
+    "/file/remove": {
+      "post": {
+        "summary": "Remove files",
+        "description": "This endpoint is used for deleting file(s) from the server. Only uploaders of the file can remove them.",
+        "tags": [
+          "file"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested files were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveFilesOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "files"
+                      ],
+                      "properties": {
+                        "files": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/File"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "removeFiles",
+        "requestBody": {
+          "description": "Request body for deleting a file or multiple files",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the files you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file/create": {
+      "post": {
+        "summary": "Create a new file",
+        "description": "This endpoint is used to create a new file.",
+        "tags": [
+          "file"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The request was successful, and the file was created. Now you can upload the file to the server.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateAFileCreated",
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "file",
+                        "token"
+                      ],
+                      "properties": {
+                        "file": {
+                          "$ref": "#/components/schemas/File"
+                        },
+                        "token": {
+                          "type": "string",
+                          "description": "The token to upload the file with.",
+                          "example": "1234567890abcdef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createAFile",
+        "requestBody": {
+          "description": "The request body for creating a new file.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "mime_type",
+                  "size"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "profile_picture.webp"
+                  },
+                  "mime_type": {
+                    "type": "string",
+                    "description": "The MIME type of the file",
+                    "example": "image/webp"
+                  },
+                  "size": {
+                    "type": "integer",
+                    "description": "The size of the file in bytes",
+                    "example": 123456
+                  },
+                  "shared_with": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the users the file is shared with"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file/update": {
+      "post": {
+        "summary": "Update a file",
+        "description": "This endpoint can be used to update a file as an uploader.",
+        "tags": [
+          "file"
+        ],
+        "security": [
+          {
+            "BearerJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the file was updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateAFileOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "$ref": "#/components/schemas/File"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "updateAFile",
+        "requestBody": {
+          "description": "The request body for updating a file.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/ID"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "profile_picture.webp"
+                  },
+                  "shared_with": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ID"
+                    },
+                    "description": "The ids of the users the file is shared with"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Employee": {
+        "type": "object",
+        "description": "Employee information",
+        "required": [
+          "id",
+          "created",
+          "name",
+          "email",
+          "roles"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "maxLength": 48,
+            "description": "Full name of the employee"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com",
+            "description": "Email address of the employee"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            },
+            "example": [
+              "teacher",
+              "administrator"
+            ],
+            "description": "Roles assigned to the employee"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "description": "A location object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the location",
+            "example": "Kecskeméti Kodály Zoltán Ének-Zenei Általános Iskola"
+          },
+          "address": {
+            "type": "string",
+            "description": "The address of the location",
+            "example": "6000 Kecskemét, Dózsa György út 22."
+          },
+          "contact_email": {
+            "$ref": "#/components/schemas/Email"
+          },
+          "contact_phone": {
+            "$ref": "#/components/schemas/PhoneNumber"
+          }
+        },
+        "required": [
+          "id",
+          "created",
+          "name",
+          "address",
+          "contact_email",
+          "contact_phone"
+        ]
+      },
+      "Invite": {
+        "type": "object",
+        "description": "An invite object",
+        "required": [
+          "id",
+          "created",
+          "author",
+          "roles"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ID"
+              },
+              {
+                "$ref": "#/components/schemas/Employee"
+              }
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            },
+            "example": [
+              "teacher",
+              "administrator"
+            ],
+            "description": "Roles assigned to the employee"
+          }
+        }
+      },
+      "Subject": {
+        "type": "object",
+        "description": "A subject object",
+        "required": [
+          "id",
+          "created",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the subject",
+            "example": "Scratch"
+          }
+        }
+      },
+      "Group": {
+        "type": "object",
+        "description": "A group object",
+        "required": [
+          "id",
+          "created",
+          "location",
+          "archived",
+          "teachers"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Whether the group is archived or not",
+            "example": false
+          },
+          "teachers": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ID"
+                },
+                {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              ]
+            },
+            "description": "The teachers assigned to the group"
+          }
+        }
+      },
+      "Student": {
+        "type": "object",
+        "description": "A student object",
+        "required": [
+          "id",
+          "created",
+          "name",
+          "parent",
+          "email",
+          "phone"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the student",
+            "example": "John Doe"
+          },
+          "parent": {
+            "type": "object",
+            "description": "The name of the parent or guardian",
+            "required": [
+              "name",
+              "email",
+              "phone"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the parent or guardian",
+                "example": "Jane Doe"
+              },
+              "email": {
+                "$ref": "#/components/schemas/Email"
+              },
+              "phone": {
+                "$ref": "#/components/schemas/PhoneNumber"
+              }
+            }
+          },
+          "email": {
+            "$ref": "#/components/schemas/Email"
+          },
+          "phone": {
+            "$ref": "#/components/schemas/PhoneNumber"
+          }
+        }
+      },
+      "File": {
+        "type": "object",
+        "description": "A file object",
+        "required": [
+          "id",
+          "created",
+          "author",
+          "name",
+          "mime_type",
+          "size",
+          "path"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ID"
+              },
+              {
+                "$ref": "#/components/schemas/Employee"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the file",
+            "example": "profile_picture.webp"
+          },
+          "mime_type": {
+            "type": "string",
+            "description": "The MIME type of the file",
+            "example": "image/webp"
+          },
+          "size": {
+            "type": "integer",
+            "description": "The size of the file in bytes",
+            "example": 123456
+          },
+          "path": {
+            "type": "string",
+            "description": "The path to the file on the server",
+            "example": "/uploads/profile_picture.webp"
+          }
+        }
+      },
+      "EnroledRelation": {
+        "type": "object",
+        "description": "A relation object for the Enroled table",
+        "required": [
+          "id",
+          "created",
+          "in",
+          "out",
+          "subject",
+          "price"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "in": {
+            "$ref": "#/components/schemas/Student"
+          },
+          "out": {
+            "$ref": "#/components/schemas/Group"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/Subject"
+          },
+          "price": {
+            "type": "number",
+            "description": "The price of the course",
+            "example": 10000
+          }
+        }
+      },
+      "Lesson": {
+        "type": "object",
+        "description": "A lesson object",
+        "required": [
+          "id",
+          "created",
+          "name",
+          "group",
+          "location",
+          "teachers",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the lesson",
+            "example": "Scratch lesson 1"
+          },
+          "group": {
+            "$ref": "#/components/schemas/Group"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "teachers": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ID"
+                },
+                {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              ]
+            }
+          },
+          "start": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "end": {
+            "$ref": "#/components/schemas/Datetime"
+          }
+        }
+      },
+      "ReplacedRelation": {
+        "type": "object",
+        "description": "A student replaced a lesson with another one to make up for a missed lesson",
+        "required": [
+          "id",
+          "created",
+          "in",
+          "out",
+          "replacement"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "in": {
+            "$ref": "#/components/schemas/Student"
+          },
+          "out": {
+            "$ref": "#/components/schemas/Lesson"
+          },
+          "replacement": {
+            "$ref": "#/components/schemas/Lesson"
+          }
+        }
+      },
+      "AttendedRelation": {
+        "type": "object",
+        "description": "A student attended a lesson",
+        "required": [
+          "id",
+          "created",
+          "in",
+          "out",
+          "paid"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "in": {
+            "$ref": "#/components/schemas/Student"
+          },
+          "out": {
+            "$ref": "#/components/schemas/Lesson"
+          },
+          "paid": {
+            "type": "boolean",
+            "description": "Whether the lesson was paid for or not",
+            "example": true
+          }
+        }
+      },
+      "WorksheetRelation": {
+        "type": "object",
+        "description": "An employee worked somewhere",
+        "required": [
+          "id",
+          "created",
+          "in",
+          "out",
+          "paid",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ID"
+          },
+          "created": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "in": {
+            "$ref": "#/components/schemas/Student"
+          },
+          "out": {
+            "$ref": "#/components/schemas/Lesson"
+          },
+          "paid": {
+            "type": "boolean",
+            "description": "Whether the lesson was paid for or not",
+            "example": true
+          },
+          "start": {
+            "$ref": "#/components/schemas/Datetime"
+          },
+          "end": {
+            "$ref": "#/components/schemas/Datetime"
+          }
+        }
+      },
+      "Email": {
+        "type": "string",
+        "format": "email",
+        "description": "A string in email address format."
+      },
+      "PhoneNumber": {
+        "type": "string",
+        "format": "telephone",
+        "example": "+36301131313",
+        "description": "A telephone number starting with country code"
+      },
+      "ID": {
+        "type": "string",
+        "description": "A surrealdb id in the format `table:id`",
+        "example": "sometable:1234"
+      },
+      "Role": {
+        "type": "string",
+        "description": "A role is a string that can either be \"administrator\" or \"teacher\". More roles may be added in the future.",
+        "enum": [
+          "administrator",
+          "teacher"
+        ],
+        "example": "administrator"
+      },
+      "Datetime": {
+        "type": "string",
+        "description": "ISO 8601 date-time string",
+        "format": "date-time",
+        "example": "2023-10-15T14:30:00.000Z"
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "The requested resource was not found on the server.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "message",
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "enum": [
+                    "not_found"
+                  ],
+                  "type": "string",
+                  "example": "not_found"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Some error message..."
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Something is missing or incorrect in the client's request, so the server cannot process it.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "message",
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "enum": [
+                    "server_error",
+                    "bad_request",
+                    "unauthorized",
+                    "invalid_credentials",
+                    "invalid_request_body",
+                    "fields_required",
+                    "fields_invalid",
+                    "password_too_weak",
+                    "email_in_use",
+                    "invalid_invite"
+                  ],
+                  "type": "string",
+                  "example": "bad_request"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Some error message..."
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication is required to access the requested resource. The client must include the appropriate credentials.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "message",
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "enum": [
+                    "unauthorized"
+                  ],
+                  "type": "string",
+                  "example": "unauthorized"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "You are not authorized to perform this action"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "ids": {
+        "name": "ids",
+        "description": "Ids in surrealdb format (table:id) separated by commas",
+        "in": "query",
+        "style": "form",
+        "schema": {
+          "$ref": "#/components/schemas/ID"
+        },
+        "explode": true,
+        "required": true,
+        "allowReserved": false
+      }
+    },
+    "securitySchemes": {
+      "BearerJwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "This is the token used for authenticating users",
+        "bearerFormat": "Json Web Token (JWT)"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Endpoints related to user authentication and account management"
+    },
+    {
+      "name": "employee",
+      "description": "Endpoints for managing employees"
+    },
+    {
+      "name": "location",
+      "description": "Endpoints for managing locations."
+    },
+    {
+      "name": "subject",
+      "description": "Endpoints for managing subjects."
+    }
+  ]
+}

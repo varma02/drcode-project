@@ -48,7 +48,7 @@ export const MultiSelect = forwardRef((props, ref) => {
   const {
     name,
     options,
-    onValueChange,
+    onValueChange = () => {},
     variant,
     defaultValue = [],
     placeholder = "Select options",
@@ -128,12 +128,12 @@ export const MultiSelect = forwardRef((props, ref) => {
           {selectedValues.length > 0 ? (
             <div className="flex justify-between items-center w-full">
               <div className="flex flex-wrap items-center">
-                {selectedValues.slice(0, maxCount).map((value) => {
+                {selectedValues.slice(0, maxCount).map((value, indx) => {
                   const option = options.find((o) => o.value === value);
                   const IconComponent = option?.icon;
                   return (
                     <Badge
-                      key={value}
+                      key={"badge-value"+indx}
                       className={cn(
                         isAnimating ? "animate-bounce" : "",
                         multiSelectVariants({ variant })
@@ -229,12 +229,12 @@ export const MultiSelect = forwardRef((props, ref) => {
                 </div>
                 <span>(Select All)</span>
               </CommandItem>
-              {options.map((option) => {
+              {options.map((option, indx) => {
                 const isSelected = selectedValues.includes(option.value);
                 const IconComponent = option.icon;
                 return (
                   <CommandItem
-                    key={option.value}
+                    key={"option-value"+indx}
                     onSelect={() => toggleOption(option.value)}
                     className="cursor-pointer"
                   >

@@ -46,6 +46,7 @@ const multiSelectVariants = cva("m-1", {
 
 export const MultiSelect = forwardRef((props, ref) => {
   const {
+    name,
     options,
     onValueChange,
     variant,
@@ -113,6 +114,7 @@ export const MultiSelect = forwardRef((props, ref) => {
       onOpenChange={setIsPopoverOpen}
       modal={modalPopover}
     >
+      <input type="text" name={name} value={selectedValues.map(e => e.id)} onChange={() => {}} className="hidden" />
       <PopoverTrigger asChild>
         <Button
           ref={ref}

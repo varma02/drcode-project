@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from './ui/command'
+import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command'
 import { useNavigate } from 'react-router-dom'
 import { getAllEmployees, getAllGroups, getAllInvites, getAllLessons, getAllLocations, getAllStudents, getAllSubjects } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
-import { ScrollArea } from './ui/scroll-area'
 
 export default function CommandMenu() {
   const auth = useAuth()
@@ -80,6 +79,10 @@ export default function CommandMenu() {
       {
         title: "Log Lessons",
         func: (value) => getAllLessons(auth.token).then(data => console.log(data.data.lessons)),
+      },
+      {
+        title: "Copy Auth Token",
+        func: (value) => navigator.clipboard.writeText(auth.token),
       },
     ]
   }

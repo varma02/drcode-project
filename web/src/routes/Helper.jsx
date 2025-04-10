@@ -1,9 +1,4 @@
 import React, { useState, useRef } from "react";
-import legoIcon from "../assets/lego.png";
-import scratchIcon from "../assets/scratch.png";
-import youtubeIcon from "../assets/youtube.png";
-import webIcon from "../assets/web.png";
-import unityIcon from "../assets/unity.png";
 
 const Helper = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -13,11 +8,11 @@ const Helper = () => {
   const [editingFileIndex, setEditingFileIndex] = useState(null);
 
   const courses = [
-    { id: "lego", name: "Lego® Wedo", icon: legoIcon },
-    { id: "scratch", name: "Scratch", icon: scratchIcon },
-    { id: "youtube", name: "YouTube Sztár", icon: youtubeIcon },
-    { id: "web", name: "Webfejlesztés", icon: webIcon },
-    { id: "unity", name: "Unity", icon: unityIcon },
+    { id: "lego", name: "Lego® Wedo" },
+    { id: "scratch", name: "Scratch" },
+    { id: "youtube", name: "YouTube Sztár" },
+    { id: "web", name: "Webfejlesztés" },
+    { id: "unity", name: "Unity" },
   ];
 
   const allGroups = {
@@ -41,7 +36,7 @@ const Helper = () => {
     ],
     lego: [
       {
-        level: "Lego Wedo 1",
+        level: "Lego Wedo 1.0",
         sessions: [
           "Szivárvány Általános Iskola\nHétfőnként\n14:30 – Kovács Gábor – 6 gyerek",
           "Napraforgó Óvoda\nSzerdánként\n10:00 – Tóth Kitti – 4 gyerek",
@@ -49,7 +44,7 @@ const Helper = () => {
         ],
       },
       {
-        level: "Lego Wedo 2",
+        level: "Lego Wedo 2.0",
         sessions: [
           "Kölcsey Iskola\nKeddenként\n15:30 – Jakab Kata – 4 gyerek",
           "Kőrösi Csoma Iskola\nCsütörtökönként\n14:00 – Fekete László – 3 gyerek",
@@ -142,145 +137,95 @@ const Helper = () => {
           }, 0);
         }, 0);
         const totalSchools = new Set(groups.flatMap((group) => group.sessions.map((s) => s.split("\n")[0]))).size;
-        const totalFiles = uploadedFiles[course.id] ? Object.values(uploadedFiles[course.id]).flat().length : 0;
-        const totalInstructors = new Set(
-          groups.flatMap((group) =>
-            group.sessions.map((s) => {
-              const match = s.match(/–\s*(.+?)\s*–/);
-              return match ? match[1].trim() : null;
-            }).filter(Boolean)
-          )
-        ).size;
-
+        const totalFiles = uploadedFiles[course.id] ? uploadedFiles[course.id].length : 0;
         return {
-          name: course.name,
+          course,
           totalSessions,
           totalStudents,
           totalSchools,
           totalFiles,
-          totalSubCourses: groups.length,
-          totalInstructors,
         };
       }),
     };
   };
-
-  const stats = calculateStats();
-
-  const renderCourseDetails = (courseId) => {
-    const groups = allGroups[courseId] || [];
-    return (
-      <div className="flex flex-col items-center p-4">
-        <h1 className="text-4xl font-bold mb-8 text-white">
-          {courses.find((c) => c.id === courseId)?.name}
-        </h1>
-        <div className="flex gap-6 flex-wrap justify-center">
-          {groups.map((group, groupIdx) => {
-            const groupKey = groupIdx.toString();
-            const files = uploadedFiles[courseId]?.[groupKey] || [];
-            const stats = calculateGroupStats(group, files);
-            return (
-              <div key={groupIdx} className="bg-gray-200 p-6 rounded-2xl max-w-sm">
-                <h2 className="text-xl font-bold mb-4">{group.level}</h2>
-                <div className="space-y-2 mb-4">
-                  {group.sessions.map((session, i) => (
-                    <p key={i} className="border-b pb-2 whitespace-pre-line">
-                      {session}
-                    </p>
-                  ))}
-                </div>
-                <h3 className="font-bold text-lg mb-2">Segédletek</h3>
-                <ul className="mb-2 space-y-1">
-                  {files.map((file, idx) => (
-                    <li key={idx} className="flex items-center justify-between">
-                      <a
-                        href={URL.createObjectURL(file)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline text-sm"
-                      >
-                        {file.name}
-                      </a>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEditFile(groupKey, idx)}
-                          className="text-xs px-2 py-1 bg-yellow-500 text-white rounded"
-                        >
-                          Módosítás
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFile(groupKey, idx)}
-                          className="text-xs px-2 py-1 bg-red-600 text-white rounded"
-                        >
-                          Törlés
-                        </button>
-                      </div>
-                    </li>
+  return (
+    <div className="flex justify-center items-start min-h-screen p-8">
+      <div className="w-full max-w-4xl mx-auto">
+        <h2 className="text-3xl font-semibold mb-6 text-center text-white">Kurzusok</h2>
+        <div className="flex gap-6 mb-8 justify-center">
+          {courses.map((course) => (
+            <div
+              key={course.id}
+              className={`flex flex-col items-center gap-2 p-4 border border-gray-300 rounded-md cursor-pointer text-white 
+                ${selectedCourse === course.id ? 'bg-gray-300 text-black' : 'hover:bg-gray-300 hover:text-black'}`}
+              
+              onClick={() => setSelectedCourse(course.id)}
+            >
+              <span
+                className={`text-xl font-semibold ${selectedCourse === course.id ? 'text-black' : 'text-white'}`}
+              >
+                {course.name}
+              </span>
+              <div
+                className={`text-sm mt-2 ${selectedCourse === course.id ? 'text-black' : 'text-white'} `}
+              >
+                <p>Összes óra: {calculateStats().coursesDetails.find(c => c.course.id === course.id).totalSessions}</p>
+                <p>Összes diák: {calculateStats().coursesDetails.find(c => c.course.id === course.id).totalStudents}</p>
+                <p>Összes iskola: {calculateStats().coursesDetails.find(c => c.course.id === course.id).totalSchools}</p>
+                <p>Összes fájl: {calculateStats().coursesDetails.find(c => c.course.id === course.id).totalFiles}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+  
+        {selectedCourse && (
+          <div className="space-y-6">
+            {allGroups[selectedCourse].map((group, groupIndex) => (
+              <div key={groupIndex} className="p-4 border border-gray-300 rounded-md">
+                <h3 className="text-2xl font-semibold text-white">{group.level}</h3>
+                <ul className="mt-4 space-y-2 text-white">
+                  {group.sessions.map((session, index) => (
+                    <li key={index} className="whitespace-pre-line">{session}</li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => handleAddFile(groupKey)}
-                  className="bg-green-600 text-white px-4 py-1 rounded"
-                >
-                  Segédlet feltöltése
-                </button>
-                <div className="mt-4 text-sm text-gray-600">
-                  <p>Iskolák száma: {stats.totalSchools}</p>
-                  <p>Diákok száma: {stats.totalStudents}</p>
-                  <p>Órák száma: {stats.totalSessions}</p>
-                  <p>Feltöltött fájlok: {stats.totalFiles}</p>
+                <div className="mt-4 flex gap-4">
+                  <button
+                    onClick={() => handleAddFile(group.level)}
+                    className="px-4 py-2 border border-gray-300 text-white rounded-md hover:bg-gray-300 hover:text-black"
+                  >
+                    Fájl hozzáadása
+                  </button>
+                  {uploadedFiles[selectedCourse] && uploadedFiles[selectedCourse][group.level] && (
+                    <div className="flex gap-2">
+                      {uploadedFiles[selectedCourse][group.level].map((file, fileIndex) => (
+                        <div
+                          key={fileIndex}
+                          className="flex items-center gap-2 p-2 border border-gray-300 rounded-md bg-gray-100"
+                        >
+                          <span>{file.name}</span>
+                          <button
+                            onClick={() => handleDeleteFile(group.level, fileIndex)}
+                            className="text-red-500"
+                          >
+                            X
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-            );
-          })}
-        </div>
-        <button
-          onClick={() => setSelectedCourse(null)}
-          className="mt-8 px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          Vissza
-        </button>
+            ))}
+          </div>
+        )}
         <input
-          type="file"
           ref={fileInputRef}
-          style={{ display: "none" }}
+          type="file"
+          multiple
+          className="hidden"
           onChange={(e) => handleFileChange(e, editingGroupKey)}
         />
       </div>
-    );
-  };
-
-  return (
-    <div className="flex flex-col items-center p-8 text-black">
-      {!selectedCourse ? (
-        <>
-          <h1 className="text-5xl font-bold mb-10 text-white">Kurzusok</h1>
-          <div className="flex gap-6 flex-wrap justify-center">
-            {courses.map((course) => {
-              const courseStats = stats.coursesDetails.find(s => s.name === course.name);
-              return (
-                <div
-                  key={course.id}
-                  onClick={() => setSelectedCourse(course.id)}
-                  className="flex flex-col items-center bg-gray-200 p-6 rounded-2xl cursor-pointer hover:bg-gray-300"
-                >
-                  <img src={course.icon} alt={course.name} className="w-20 h-20 mb-4" />
-                  <h3 className="text-xl font-bold">{course.name}</h3>
-                  <div className="mt-2 text-sm">
-                    <p>Kurzusok száma: {courseStats?.totalSubCourses || 0}</p>
-                    <p>Órák száma: {courseStats?.totalSessions || 0}</p>
-                    <p>Diákok száma: {courseStats?.totalStudents || 0}</p>
-                    <p>Iskolák száma: {courseStats?.totalSchools || 0}</p>
-                    <p>Feltöltött fájlok: {courseStats?.totalFiles || 0}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      ) : (
-        renderCourseDetails(selectedCourse)
-      )}
     </div>
   );
 };

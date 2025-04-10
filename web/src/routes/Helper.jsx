@@ -88,61 +88,72 @@ const Helper = () => {
       },
     ],
   };
-  
+
+  const calculateStats = () => {
+    const stats = {
+      totalCourses: courses.length,
+      coursesDetails: courses.map((course) => {
+        const groups = allGroups[course.id] || [];
+        const totalSessions = groups.reduce((acc, group) => acc + group.sessions.length, 0);
+        const totalStudents = groups.reduce((acc, group) => {
+          return acc + group.sessions.reduce((sessionAcc, session) => {
+            const studentCount = session.match(/(\d+)\s*gyerek/);
+            if (studentCount && studentCount[1]) {
+              return sessionAcc + parseInt(studentCount[1], 10);
+            }
+            return sessionAcc;
+          }, 0);
+        }, 0);
+        const totalSchools = new Set(
+          groups.reduce((acc, group) => {
+            return acc.concat(group.sessions.map((session) => session.split("\n")[0]));
+          }, [])
+        ).size;
+
+        return {
+          name: course.name,
+          totalSessions,
+          totalStudents,
+          totalSchools,
+          totalFiles: uploadedFiles[course.id] ? Object.values(uploadedFiles[course.id]).flat().length : 0,
+          totalSubCourses: groups.length,
+        };
+      }),
+    };
+    return stats;
+  };
+
+  const stats = calculateStats();
+
+  const handleFileChange = (e, groupKey) => {
+    const files = e.target.files;
+    const newUploadedFiles = { ...uploadedFiles };
+    if (!newUploadedFiles[selectedCourse]) {
+      newUploadedFiles[selectedCourse] = {};
+    }
+    if (!newUploadedFiles[selectedCourse][groupKey]) {
+      newUploadedFiles[selectedCourse][groupKey] = [];
+    }
+    newUploadedFiles[selectedCourse][groupKey] = [
+      ...newUploadedFiles[selectedCourse][groupKey],
+      ...Array.from(files),
+    ];
+    setUploadedFiles(newUploadedFiles);
+  };
 
   const handleAddFile = (groupKey) => {
-    setEditingGroupKey(groupKey);
-    setEditingFileIndex(null);
     fileInputRef.current.click();
   };
 
-  const handleEditFile = (groupKey, index) => {
+  const handleEditFile = (groupKey, fileIndex) => {
     setEditingGroupKey(groupKey);
-    setEditingFileIndex(index);
-    fileInputRef.current.click();
+    setEditingFileIndex(fileIndex);
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setUploadedFiles((prev) => {
-      const courseFiles = prev[selectedCourse] || {};
-      const groupFiles = courseFiles[editingGroupKey] || [];
-
-      if (editingFileIndex !== null) {
-        groupFiles[editingFileIndex] = file;
-      } else {
-        groupFiles.push(file);
-      }
-
-      return {
-        ...prev,
-        [selectedCourse]: {
-          ...courseFiles,
-          [editingGroupKey]: [...groupFiles],
-        },
-      };
-    });
-
-    setEditingGroupKey(null);
-    setEditingFileIndex(null);
-    e.target.value = "";
-  };
-
-  const handleDeleteFile = (groupKey, index) => {
-    setUploadedFiles((prev) => {
-      const courseFiles = prev[selectedCourse] || {};
-      const groupFiles = [...(courseFiles[groupKey] || [])];
-      groupFiles.splice(index, 1);
-      return {
-        ...prev,
-        [selectedCourse]: {
-          ...courseFiles,
-          [groupKey]: groupFiles,
-        },
-      };
-    });
+  const handleDeleteFile = (groupKey, fileIndex) => {
+    const newUploadedFiles = { ...uploadedFiles };
+    newUploadedFiles[selectedCourse][groupKey].splice(fileIndex, 1);
+    setUploadedFiles(newUploadedFiles);
   };
 
   const renderCourseDetails = (courseId) => {
@@ -166,7 +177,7 @@ const Helper = () => {
                     </p>
                   ))}
                 </div>
-                <h3 className="font-bold text-lg mb-2">Feltöltött fájlok</h3>
+                <h3 className="font-bold text-lg mb-2">Segédletek</h3>
                 <ul className="mb-2 space-y-1">
                   {files.map((file, idx) => (
                     <li key={idx} className="flex items-center justify-between">
@@ -199,7 +210,7 @@ const Helper = () => {
                   onClick={() => handleAddFile(groupKey)}
                   className="bg-green-600 text-white px-4 py-1 rounded"
                 >
-                  Új fájl feltöltése
+                  Segédlet feltöltése
                 </button>
               </div>
             );
@@ -215,7 +226,7 @@ const Helper = () => {
           type="file"
           ref={fileInputRef}
           style={{ display: "none" }}
-          onChange={handleFileChange}
+          onChange={(e) => handleFileChange(e, editingGroupKey)}
         />
       </div>
     );
@@ -235,6 +246,12 @@ const Helper = () => {
               >
                 <img src={course.icon} alt={course.name} className="h-20 mb-2" />
                 <span className="text-center font-medium">{course.name}</span>
+                <div className="mt-4 text-sm text-gray-600">
+                  <p>Iskolák száma: {stats.coursesDetails.find(s => s.name === course.name)?.totalSchools}</p>
+                  <p>Diákok száma: {stats.coursesDetails.find(s => s.name === course.name)?.totalStudents}</p>
+                  <p>Órák száma: {stats.coursesDetails.find(s => s.name === course.name)?.totalSessions}</p>
+                  <p>Alkurzusok száma: {stats.coursesDetails.find(s => s.name === course.name)?.totalSubCourses}</p>
+                </div>
               </div>
             ))}
           </div>

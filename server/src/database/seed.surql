@@ -1,29 +1,22 @@
 -- BEGIN TRANSACTION;
 
-$constemployee1 = CREATE ONLY employee:12345 CONTENT {
-  name: "Const Id For Testing",
-  email: "12345@example.com", 
-  password: crypto::argon2::generate("1234"),
-  roles: ["administrator"]
-};
-
-$constemployee2 = CREATE ONLY employee:54321 CONTENT {
-  name: "Const Id For Testing",
-  email: "54321@example.com", 
-  password: crypto::argon2::generate("1234"),
-  roles: ["teacher"]
-};
-
-$constinvite1 = CREATE ONLY invite:1234 CONTENT {
-  author: $constemployee1.id,
-  roles: ["teacher", "administrator"],
-};
-
 $defadmin = CREATE ONLY employee:defadmin CONTENT {
   name: "Default Administrator",
   email: "admin@example.com", 
   password: crypto::argon2::generate("1234"),
   roles: ["administrator"]
+};
+
+$deftchr = CREATE ONLY employee:deftchr CONTENT {
+  name: "Default Teacher",
+  email: "teacher@example.com", 
+  password: crypto::argon2::generate("1234"),
+  roles: ["teacher"]
+};
+
+$invite1 = CREATE ONLY invite:1234 CONTENT {
+  author: $defadmin.id,
+  roles: ["teacher", "administrator"],
 };
 
 $ivett = CREATE ONLY employee:ivettvirag CONTENT {

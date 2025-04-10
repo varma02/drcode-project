@@ -119,6 +119,23 @@ const Helper = () => {
     e.target.value = "";
   };
 
+  const handleDeleteFile = (courseId, groupKey, fileIndex) => {
+    setUploadedFiles((prev) => {
+      const courseFiles = prev[courseId] || {};
+      const groupFiles = courseFiles[groupKey] || [];
+
+      groupFiles.splice(fileIndex, 1);
+
+      return {
+        ...prev,
+        [courseId]: {
+          ...courseFiles,
+          [groupKey]: groupFiles,
+        },
+      };
+    });
+  };
+
   const renderCourseDetails = (courseId) => {
     const groups = allGroups[courseId] || [];
     return (
@@ -153,6 +170,12 @@ const Helper = () => {
                         >
                           {file.name}
                         </a>
+                        <button
+                          onClick={() => handleDeleteFile(courseId, groupKey, idx)}
+                          className="text-red-500 ml-2"
+                        >
+                          Törlés
+                        </button>
                       </li>
                     ))
                   ) : (

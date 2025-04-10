@@ -9,6 +9,8 @@ const Helper = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState({});
   const fileInputRef = useRef(null);
+  const [editingGroupKey, setEditingGroupKey] = useState(null);
+  const [editingFileIndex, setEditingFileIndex] = useState(null);
 
   const courses = [
     { id: "lego", name: "Lego® Wedo", icon: legoIcon },
@@ -86,49 +88,56 @@ const Helper = () => {
       },
     ],
   };
+  
 
   const handleAddFile = (groupKey) => {
+    setEditingGroupKey(groupKey);
+    setEditingFileIndex(null);
     fileInputRef.current.click();
-    setUploadedFiles((prev) => ({
-      ...prev,
-      groupKey: groupKey,
-    }));
+  };
+
+  const handleEditFile = (groupKey, index) => {
+    setEditingGroupKey(groupKey);
+    setEditingFileIndex(index);
+    fileInputRef.current.click();
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const groupKey = uploadedFiles.groupKey;
-
     setUploadedFiles((prev) => {
       const courseFiles = prev[selectedCourse] || {};
-      const groupFiles = courseFiles[groupKey] || [];
+      const groupFiles = courseFiles[editingGroupKey] || [];
 
-      groupFiles.push(file);
+      if (editingFileIndex !== null) {
+        groupFiles[editingFileIndex] = file;
+      } else {
+        groupFiles.push(file);
+      }
 
       return {
         ...prev,
         [selectedCourse]: {
           ...courseFiles,
-          [groupKey]: [...groupFiles],
+          [editingGroupKey]: [...groupFiles],
         },
       };
     });
 
+    setEditingGroupKey(null);
+    setEditingFileIndex(null);
     e.target.value = "";
   };
 
-  const handleDeleteFile = (courseId, groupKey, fileIndex) => {
+  const handleDeleteFile = (groupKey, index) => {
     setUploadedFiles((prev) => {
-      const courseFiles = prev[courseId] || {};
-      const groupFiles = courseFiles[groupKey] || [];
-
-      groupFiles.splice(fileIndex, 1);
-
+      const courseFiles = prev[selectedCourse] || {};
+      const groupFiles = [...(courseFiles[groupKey] || [])];
+      groupFiles.splice(index, 1);
       return {
         ...prev,
-        [courseId]: {
+        [selectedCourse]: {
           ...courseFiles,
           [groupKey]: groupFiles,
         },
@@ -159,28 +168,32 @@ const Helper = () => {
                 </div>
                 <h3 className="font-bold text-lg mb-2">Feltöltött fájlok</h3>
                 <ul className="mb-2 space-y-1">
-                  {files.length > 0 ? (
-                    files.map((file, idx) => (
-                      <li key={idx} className="flex items-center justify-between">
-                        <a
-                          href={URL.createObjectURL(file)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline text-sm"
-                        >
-                          {file.name}
-                        </a>
+                  {files.map((file, idx) => (
+                    <li key={idx} className="flex items-center justify-between">
+                      <a
+                        href={URL.createObjectURL(file)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline text-sm"
+                      >
+                        {file.name}
+                      </a>
+                      <div className="flex gap-2">
                         <button
-                          onClick={() => handleDeleteFile(courseId, groupKey, idx)}
-                          className="text-red-500 ml-2"
+                          onClick={() => handleEditFile(groupKey, idx)}
+                          className="text-xs px-2 py-1 bg-yellow-500 text-white rounded"
+                        >
+                          Módosítás
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFile(groupKey, idx)}
+                          className="text-xs px-2 py-1 bg-red-600 text-white rounded"
                         >
                           Törlés
                         </button>
-                      </li>
-                    ))
-                  ) : (
-                    <p>Nincs feltöltött fájl.</p>
-                  )}
+                      </div>
+                    </li>
+                  ))}
                 </ul>
                 <button
                   onClick={() => handleAddFile(groupKey)}

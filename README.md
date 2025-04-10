@@ -18,29 +18,30 @@ DR.CODE Kecskemét provides interactive, hands-on programming courses for kids. 
 
 This guide assumes that you have `git` and `Docker` already on your system.
 
-1. **Clone the repository:**
+1. **Clone the repository:**  
 	Open a terminal in a directory of your chosing on you machine and type:
 	```bash
 	git clone https://github.com/varma02/drcode-project
 	```
 	 
-3. **Navigate to the project directory:**
+3. **Navigate to the project directory:**   
+	You can do this by running the following command:
 	```bash
 	cd drcode-project
 	```
 
-4. **Make the necessary configurations**  
+5. **Make the necessary configurations**   
 	Edit enviornment variables in the `docker-compose.yml` file (line 31-37)
 
-5. **Run docker-compose:**
-	Make sure that the 80 and 443 port is not occupied on your machine.
+6. **Run docker-compose:**  
+	Make sure that the 80 and 443 port is not occupied on your machine. And run:
 	```bash
 	docker-compose up -d
 	```
 
 ### Developer Documentation
 
-The developer documentation is currently under construction, if you need information about the API endpoints please consult the [`openapi.spec.json`](https://github.com/varma02/drcode-project/blob/main/server/openapi.spec.json) file.
+The developer documentation is currently under construction, if you need information about the API endpoints please consult the [`openapi.spec.json`](https://github.com/varma02/drcode-project/blob/main/server/openapi.spec.json) file.  
 ~~For more detailed information about the architecture, API endpoints, and how to contribute to the development of this project, please refer to the [Developer Documentation](https://github.com/varma02/drcode-project/blob/main/docs/dev.md).~~
 
 ### Authors
@@ -51,8 +52,8 @@ The developer documentation is currently under construction, if you need informa
 - **Váradi Marcell** – Back-end developer  
 	[varma02@GitHub](https://github.com/varma02)
 
-- **Nagy Bianka Rebeka**
-	[Bianka191122@Github]([https://github.com/Bianka191122)
+- **Nagy Bianka Rebeka**  
+	[Bianka191122@Github](https://github.com/Bianka191122)
 
 ---
 

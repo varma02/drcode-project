@@ -89,51 +89,22 @@ const Helper = () => {
     ],
   };
 
-  const calculateStats = () => {
-    const stats = {
-      totalCourses: courses.length,
-      coursesDetails: courses.map((course) => {
-        const groups = allGroups[course.id] || [];
-        const totalSessions = groups.reduce((acc, group) => acc + group.sessions.length, 0);
-        const totalStudents = groups.reduce((acc, group) => {
-          return acc + group.sessions.reduce((sessionAcc, session) => {
-            const studentCount = session.match(/(\d+)\s*gyerek/);
-            if (studentCount && studentCount[1]) {
-              return sessionAcc + parseInt(studentCount[1], 10);
-            }
-            return sessionAcc;
-          }, 0);
-        }, 0);
-        const totalSchools = new Set(
-          groups.reduce((acc, group) => {
-            return acc.concat(group.sessions.map((session) => session.split("\n")[0]));
-          }, [])
-        ).size;
-
-        return {
-          name: course.name,
-          totalSessions,
-          totalStudents,
-          totalSchools,
-          totalFiles: uploadedFiles[course.id] ? Object.values(uploadedFiles[course.id]).flat().length : 0,
-          totalSubCourses: groups.length,
-        };
-      }),
-    };
-    return stats;
+  const calculateGroupStats = (group, files) => {
+    const totalSessions = group.sessions.length;
+    const totalStudents = group.sessions.reduce((acc, session) => {
+      const studentCount = session.match(/(\d+)\s*gyerek/);
+      return acc + (studentCount ? parseInt(studentCount[1], 10) : 0);
+    }, 0);
+    const totalSchools = new Set(group.sessions.map((s) => s.split("\n")[0])).size;
+    const totalFiles = files.length;
+    return { totalSessions, totalStudents, totalSchools, totalFiles };
   };
-
-  const stats = calculateStats();
 
   const handleFileChange = (e, groupKey) => {
     const files = e.target.files;
     const newUploadedFiles = { ...uploadedFiles };
-    if (!newUploadedFiles[selectedCourse]) {
-      newUploadedFiles[selectedCourse] = {};
-    }
-    if (!newUploadedFiles[selectedCourse][groupKey]) {
-      newUploadedFiles[selectedCourse][groupKey] = [];
-    }
+    if (!newUploadedFiles[selectedCourse]) newUploadedFiles[selectedCourse] = {};
+    if (!newUploadedFiles[selectedCourse][groupKey]) newUploadedFiles[selectedCourse][groupKey] = [];
     newUploadedFiles[selectedCourse][groupKey] = [
       ...newUploadedFiles[selectedCourse][groupKey],
       ...Array.from(files),
@@ -142,12 +113,14 @@ const Helper = () => {
   };
 
   const handleAddFile = (groupKey) => {
+    setEditingGroupKey(groupKey);
     fileInputRef.current.click();
   };
 
   const handleEditFile = (groupKey, fileIndex) => {
     setEditingGroupKey(groupKey);
     setEditingFileIndex(fileIndex);
+    fileInputRef.current.click();
   };
 
   const handleDeleteFile = (groupKey, fileIndex) => {
@@ -155,6 +128,44 @@ const Helper = () => {
     newUploadedFiles[selectedCourse][groupKey].splice(fileIndex, 1);
     setUploadedFiles(newUploadedFiles);
   };
+
+  const calculateStats = () => {
+    return {
+      totalCourses: courses.length,
+      coursesDetails: courses.map((course) => {
+        const groups = allGroups[course.id] || [];
+        const totalSessions = groups.reduce((acc, group) => acc + group.sessions.length, 0);
+        const totalStudents = groups.reduce((acc, group) => {
+          return acc + group.sessions.reduce((sessionAcc, session) => {
+            const studentCount = session.match(/(\d+)\s*gyerek/);
+            return sessionAcc + (studentCount ? parseInt(studentCount[1], 10) : 0);
+          }, 0);
+        }, 0);
+        const totalSchools = new Set(groups.flatMap((group) => group.sessions.map((s) => s.split("\n")[0]))).size;
+        const totalFiles = uploadedFiles[course.id] ? Object.values(uploadedFiles[course.id]).flat().length : 0;
+        const totalInstructors = new Set(
+          groups.flatMap((group) =>
+            group.sessions.map((s) => {
+              const match = s.match(/–\s*(.+?)\s*–/);
+              return match ? match[1].trim() : null;
+            }).filter(Boolean)
+          )
+        ).size;
+
+        return {
+          name: course.name,
+          totalSessions,
+          totalStudents,
+          totalSchools,
+          totalFiles,
+          totalSubCourses: groups.length,
+          totalInstructors,
+        };
+      }),
+    };
+  };
+
+  const stats = calculateStats();
 
   const renderCourseDetails = (courseId) => {
     const groups = allGroups[courseId] || [];
@@ -167,6 +178,7 @@ const Helper = () => {
           {groups.map((group, groupIdx) => {
             const groupKey = groupIdx.toString();
             const files = uploadedFiles[courseId]?.[groupKey] || [];
+            const stats = calculateGroupStats(group, files);
             return (
               <div key={groupIdx} className="bg-gray-200 p-6 rounded-2xl max-w-sm">
                 <h2 className="text-xl font-bold mb-4">{group.level}</h2>
@@ -212,6 +224,12 @@ const Helper = () => {
                 >
                   Segédlet feltöltése
                 </button>
+                <div className="mt-4 text-sm text-gray-600">
+                  <p>Iskolák száma: {stats.totalSchools}</p>
+                  <p>Diákok száma: {stats.totalStudents}</p>
+                  <p>Órák száma: {stats.totalSessions}</p>
+                  <p>Feltöltött fájlok: {stats.totalFiles}</p>
+                </div>
               </div>
             );
           })}
@@ -238,22 +256,26 @@ const Helper = () => {
         <>
           <h1 className="text-5xl font-bold mb-10 text-white">Kurzusok</h1>
           <div className="flex gap-6 flex-wrap justify-center">
-            {courses.map((course) => (
-              <div
-                key={course.id}
-                className="bg-gray-200 rounded-2xl p-4 flex flex-col items-center w-40 cursor-pointer hover:scale-105 transition"
-                onClick={() => setSelectedCourse(course.id)}
-              >
-                <img src={course.icon} alt={course.name} className="h-20 mb-2" />
-                <span className="text-center font-medium">{course.name}</span>
-                <div className="mt-4 text-sm text-gray-600">
-                  <p>Iskolák száma: {stats.coursesDetails.find(s => s.name === course.name)?.totalSchools}</p>
-                  <p>Diákok száma: {stats.coursesDetails.find(s => s.name === course.name)?.totalStudents}</p>
-                  <p>Órák száma: {stats.coursesDetails.find(s => s.name === course.name)?.totalSessions}</p>
-                  <p>Alkurzusok száma: {stats.coursesDetails.find(s => s.name === course.name)?.totalSubCourses}</p>
+            {courses.map((course) => {
+              const courseStats = stats.coursesDetails.find(s => s.name === course.name);
+              return (
+                <div
+                  key={course.id}
+                  onClick={() => setSelectedCourse(course.id)}
+                  className="flex flex-col items-center bg-gray-200 p-6 rounded-2xl cursor-pointer hover:bg-gray-300"
+                >
+                  <img src={course.icon} alt={course.name} className="w-20 h-20 mb-4" />
+                  <h3 className="text-xl font-bold">{course.name}</h3>
+                  <div className="mt-2 text-sm">
+                    <p>Kurzusok száma: {courseStats?.totalSubCourses || 0}</p>
+                    <p>Órák száma: {courseStats?.totalSessions || 0}</p>
+                    <p>Diákok száma: {courseStats?.totalStudents || 0}</p>
+                    <p>Iskolák száma: {courseStats?.totalSchools || 0}</p>
+                    <p>Feltöltött fájlok: {courseStats?.totalFiles || 0}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </>
       ) : (

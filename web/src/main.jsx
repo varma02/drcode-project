@@ -13,7 +13,7 @@ import { Toaster } from '@/components/ui/sonner'
 const CommandMenu = lazy(() => import('./components/CommandMenu'))
 
 const Home = lazy(() => import('@/routes/Home'))
-const Search = lazy(() => import('@/routes/Search'))
+const Helper = lazy(() => import('@/routes/Helper'))
 const CalendarPage = lazy(() => import('@/routes/CalendarPage'))
 const Settings = lazy(() => import('@/routes/Settings'))
 const Inbox = lazy(() => import('@/routes/Inbox'))
@@ -37,7 +37,6 @@ const AddNewLocation = lazy(() => import('@/routes/AddLocation'))
 const AddNewSubject = lazy(() => import('@/routes/AddSubject'))
 const AddStudent = lazy(() => import('@/routes/AddStudent'))
 const AddLesson = lazy(() => import('@/routes/AddLesson'))
-
 
 function SidebarWrapper() {
   const navigate = useNavigate();
@@ -78,7 +77,7 @@ const router = createBrowserRouter([
       {path: "/", element: <Home />},
       {path: "/inbox/:id?", element: <Inbox />},
       {path: "/calendar", element: <CalendarPage />},
-      {path: "/search", element: <Search />},
+      {path: "/helper", element: <Helper />},
       {path: "/settings", element: <Settings />},
       {path: "/employee", element: <Employee />},
       {path: "/employee/:id", element: <EmployeeDetails />},

@@ -43,8 +43,8 @@ export function AppSidebar() {
         icon: Inbox,
       },
       {
-        title: "Segédletek",
-        url: "/search",
+        title: "Statisztika",
+        url: "/helper",
         icon: Search,
       },
     ],

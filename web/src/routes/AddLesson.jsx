@@ -1,4 +1,5 @@
 import { Combobox } from '@/components/ComboBox'
+import { MultiSelect } from '@/components/MultiSelect'
 import { TimePicker } from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -61,9 +62,9 @@ export default function AddNewSubject() {
       </div>
 
       <div className='flex gap-4'>
+        <MultiSelect options={[...teachers.map(e => ({label:e.name, value:e}) )]} name={"teachers"} placeholder='Válassz oktatót...' className="w-fit" />
         <Combobox data={groups} displayName={"name"} name={"group"} placeholder='Válassz csoportot...' />
         <Combobox data={locations} displayName={"address"} name={"location"} placeholder='Válassz helyszínt...' />
-        <Combobox data={teachers} displayName={"name"} name={"teachers"} placeholder='Válassz oktatót...' />
       </div>
 
 

@@ -1,6 +1,7 @@
 import { Combobox } from '@/components/ComboBox'
 import { DatePicker } from '@/components/DatePicker'
 import { GroupComboBox } from '@/components/GroupComboBox'
+import { MultiSelect } from '@/components/MultiSelect'
 import { TimePicker } from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -72,7 +73,7 @@ export default function AddCalendarGroup() {
         <Input type="text" placeholder="Név" name="name" />
         <Combobox data={locations} displayName={"name"} placeholder='Válassz helyszínt...' value={location} setValue={setLocation} className={"w-full"} name="location" />
       </div>
-      <GroupComboBox data={employees} displayName={"name"} placeholder='Válassz oktatót...' title={"Oktatók"} className={"w-full"} name="employees" />
+      <MultiSelect options={[...employees.map(e => ({label:e.name, value:e}) )]} name={"employees"} placeholder='Válassz oktatót...' />
       <Textarea placeholder="Megjegyzés..." name="note" />
 
       <div className='flex gap-4'>

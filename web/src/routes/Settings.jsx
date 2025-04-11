@@ -46,18 +46,18 @@ export default function Settings() {
 
   return (
     <div className='flex flex-col items-center w-full p-4 pt-10'>
-      <div className='max-w-[600px] w-[600px] bg-[#18181b] rounded-xl'>
+      <div className='max-w-[600px] w-full bg-[#18181b] rounded-xl'>
         <h2 className='sr-only'>Beállíások</h2>
         <div className={`${auth.user.roles.includes("administrator") ? "bg-red-500" : "bg-green-500"} px-4 py-2 rounded-t-xl relative h-14`}></div>
-        <form className='text-right min-h-20 flex gap-2 px-4 mb-4' onSubmit={handleSubmit}>
-          <div className='min-w-36 min-h-36 relative'>
+        <form className='text-right min-h-20 flex gap-2 px-4 mb-4 flex-col sm:flex-row' onSubmit={handleSubmit}>
+          <div className='sm:min-w-36 sm:min-h-36 min-h-24 relative'>
             <Avatar className="min-w-36 min-h-36 absolute border-4 border-[#18181b] -top-10">
               <AvatarImage src="https://uploads.dailydot.com/2024/07/wet-owl-1.jpg?auto=compress&fm=pjpg" />
               <AvatarFallback className="text-4xl font-bold">{auth.user.name.split(" ").slice(0, 2).map(v => v[0]).join("")}</AvatarFallback>
             </Avatar>
             <input type="file" className='absolute w-36 h-36 bg-red-500 rounded-full opacity-0 peer cursor-pointer -top-10 left-0' />
             <div className='pointer-events-none absolute min-w-36 min-h-36 flex justify-center items-center peer-hover:bg-black/30 opacity-0 peer-hover:opacity-100 rounded-full transition-all duration-300 -top-10'><Pen /></div>
-            <Button className="absolute bottom-0 left-0 w-full font-bold" type="submit">Mentés</Button>
+            <Button className="hidden sm:block absolute bottom-0 left-0 w-full font-bold" type="submit">Mentés</Button>
           </div>
           <div className='w-full flex flex-col pt-6 p-4 gap-4'>
             <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -82,6 +82,7 @@ export default function Settings() {
               <Input name="new_password_again" type="password" id="new_password_again" />
             </div>
           </div>
+          <Button className="sm:hidden block w-max font-bold mx-4 ml-auto" type="submit">Mentés</Button>
         </form>
       </div>
     </div>

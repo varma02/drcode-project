@@ -108,9 +108,18 @@ const Helper = () => {
       return sum + (match ? parseInt(match[1], 10) : 0);
     }, 0);
     const schools = new Set(sessions.map((s) => s.split("\n")[0])).size;
+
+    const instructors = new Set();
+    sessions.forEach((session) => {
+      const instructor = session.split(" – ")[1].split(" – ")[0];
+      instructors.add(instructor);
+    });
+    const instructorCount = instructors.size;
+
     const files = uploadedFiles[courseId] || {};
     const fileCount = Object.values(files).reduce((acc, f) => acc + f.length, 0);
-    return { sessionCount: sessions.length, students, schools, fileCount };
+    
+    return { sessionCount: sessions.length, students, schools, instructorCount, fileCount };
   };
 
   return (
@@ -131,6 +140,7 @@ const Helper = () => {
                 <p>Órák: {stats.sessionCount}</p>
                 <p>Diákok: {stats.students}</p>
                 <p>Iskolák: {stats.schools}</p>
+                <p>Oktatók: {stats.instructorCount}</p>
                 <p>Segédletek: {stats.fileCount}</p>
               </div>
             </div>

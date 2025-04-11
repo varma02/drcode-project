@@ -4,8 +4,7 @@ const Helper = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState({});
   const fileInputRef = useRef(null);
-  const [editingGroupKey, setEditingGroupKey] = useState(null);
-  const [editingFileIndex, setEditingFileIndex] = useState(null);
+  const [currentGroup, setCurrentGroup] = useState(null);
 
   const courses = [
     { id: "lego", name: "Lego® Wedo" },
@@ -84,152 +83,115 @@ const Helper = () => {
     ],
   };
 
-  const calculateGroupStats = (group, files) => {
-    const totalSessions = group.sessions.length;
-    const totalStudents = group.sessions.reduce((acc, session) => {
-      const studentCount = session.match(/(\d+)\s*gyerek/);
-      return acc + (studentCount ? parseInt(studentCount[1], 10) : 0);
-    }, 0);
-    const totalSchools = new Set(group.sessions.map((s) => s.split("\n")[0])).size;
-    const totalFiles = files.length;
-    return { totalSessions, totalStudents, totalSchools, totalFiles };
-  };
-
-  const handleFileChange = (e, groupKey) => {
+  const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const newUploadedFiles = { ...uploadedFiles };
-    if (!newUploadedFiles[selectedCourse]) newUploadedFiles[selectedCourse] = {};
-    if (!newUploadedFiles[selectedCourse][groupKey]) newUploadedFiles[selectedCourse][groupKey] = [];
-    newUploadedFiles[selectedCourse][groupKey] = [
-      ...newUploadedFiles[selectedCourse][groupKey],
-      ...files,
-    ];
-    setUploadedFiles(newUploadedFiles);
+    if (!selectedCourse || !currentGroup) return;
+    const newFiles = { ...uploadedFiles };
+    if (!newFiles[selectedCourse]) newFiles[selectedCourse] = {};
+    if (!newFiles[selectedCourse][currentGroup]) newFiles[selectedCourse][currentGroup] = [];
+    newFiles[selectedCourse][currentGroup] = [...newFiles[selectedCourse][currentGroup], ...files];
+    setUploadedFiles(newFiles);
     e.target.value = null;
   };
 
-  const handleAddFile = (groupKey) => {
-    setEditingGroupKey(groupKey);
-    setEditingFileIndex(null);
-    fileInputRef.current.click();
-  };
-
   const handleDeleteFile = (groupKey, fileIndex) => {
-    const newUploadedFiles = { ...uploadedFiles };
-    newUploadedFiles[selectedCourse][groupKey].splice(fileIndex, 1);
-    setUploadedFiles(newUploadedFiles);
+    const newFiles = { ...uploadedFiles };
+    newFiles[selectedCourse][groupKey].splice(fileIndex, 1);
+    setUploadedFiles(newFiles);
   };
 
-  const calculateStats = () => {
-    return {
-      totalCourses: courses.length,
-      coursesDetails: courses.map((course) => {
-        const groups = allGroups[course.id] || [];
-        const totalSessions = groups.reduce((acc, group) => acc + group.sessions.length, 0);
-        const totalStudents = groups.reduce((acc, group) => {
-          return acc + group.sessions.reduce((sessionAcc, session) => {
-            const studentCount = session.match(/(\d+)\s*gyerek/);
-            return sessionAcc + (studentCount ? parseInt(studentCount[1], 10) : 0);
-          }, 0);
-        }, 0);
-        const totalSchools = new Set(groups.flatMap((group) => group.sessions.map((s) => s.split("\n")[0]))).size;
-        const groupFiles = uploadedFiles[course.id] || {};
-        const totalFiles = Object.values(groupFiles).reduce((acc, files) => acc + files.length, 0);
-        return {
-          course,
-          totalSessions,
-          totalStudents,
-          totalSchools,
-          totalFiles,
-        };
-      }),
-    };
+  const getCourseStats = (courseId) => {
+    const groups = allGroups[courseId] || [];
+    const sessions = groups.flatMap((g) => g.sessions);
+    const students = sessions.reduce((sum, s) => {
+      const match = s.match(/(\d+)\s*gyerek/);
+      return sum + (match ? parseInt(match[1], 10) : 0);
+    }, 0);
+    const schools = new Set(sessions.map((s) => s.split("\n")[0])).size;
+    const files = uploadedFiles[courseId] || {};
+    const fileCount = Object.values(files).reduce((acc, f) => acc + f.length, 0);
+    return { sessionCount: sessions.length, students, schools, fileCount };
   };
 
   return (
     <div className="max-w-screen-xl mx-auto p-4">
-      <div className="w-full">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-normal mb-6 text-center text-white">
-          Kurzusok
-        </h2>
-        <div className="flex flex-wrap gap-4 sm:gap-6 justify-center mb-8">
-          {courses.map((course) => {
-            const courseDetails = calculateStats().coursesDetails.find(c => c.course.id === course.id);
-            return (
-              <div
-                key={course.id}
-                className={`flex flex-col items-center gap-2 p-3 sm:p-4 border border-zinc-800 rounded-md cursor-pointer text-white w-40 sm:w-48
-                ${selectedCourse === course.id ? 'bg-zinc-900' : 'hover:bg-zinc-900 hover:text-white'}`}
-                onClick={() => setSelectedCourse(course.id)}
-              >
-                <span className="text-sm sm:text-base font-semibold">{course.name}</span>
-                <div className="text-xs sm:text-sm mt-2">
-                  <p>Órák: {courseDetails.totalSessions}</p>
-                  <p>Diákok: {courseDetails.totalStudents}</p>
-                  <p>Iskolák: {courseDetails.totalSchools}</p>
-                  <p>Segédletek: {courseDetails.totalFiles}</p>
-                </div>
+      <h2 className="text-3xl font-normal mb-6 text-center text-white">Kurzusok</h2>
+      <div className="flex flex-wrap gap-4 justify-center mb-8">
+        {courses.map((course) => {
+          const stats = getCourseStats(course.id);
+          return (
+            <div
+              key={course.id}
+              onClick={() => setSelectedCourse(course.id)}
+              className={`flex flex-col items-center gap-2 p-4 border border-zinc-800 rounded-md cursor-pointer text-white w-48
+                ${selectedCourse === course.id ? "bg-zinc-900" : "hover:bg-zinc-900"}`}
+            >
+              <span className="font-semibold">{course.name}</span>
+              <div className="text-sm mt-2">
+                <p>Órák: {stats.sessionCount}</p>
+                <p>Diákok: {stats.students}</p>
+                <p>Iskolák: {stats.schools}</p>
+                <p>Segédletek: {stats.fileCount}</p>
               </div>
-            );
-          })}
-        </div>
-
-        {selectedCourse && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {allGroups[selectedCourse].map((group) => (
-                <div key={group.level} className="p-4 border border-zinc-800 rounded-md">
-                  <h3 className="text-xl sm:text-2xl font-semibold text-white">{group.level}</h3>
-                  <ul className="text-xs sm:text-sm mt-4 space-y-2 text-white">
-                    {group.sessions.map((session, index) => (
-                      <li key={index} className="whitespace-pre-line">
-                        {session}
-                        {index !== group.sessions.length - 1 && (
-                          <div className="border-b border-zinc-800 my-2"></div>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-4 flex flex-col gap-3">
-                    <button
-                      onClick={() => handleAddFile(group.level)}
-                      className="px-3 py-2 text-xs sm:text-sm border border-zinc-800 text-white rounded hover:bg-zinc-900 w-fit"
-                    >
-                      Segédlet feltöltése
-                    </button>
-                    {uploadedFiles[selectedCourse] && uploadedFiles[selectedCourse][group.level] && (
-                      <div className="flex flex-wrap gap-2">
-                        {uploadedFiles[selectedCourse][group.level].map((file, fileIndex) => (
-                          <div
-                            key={fileIndex}
-                            className="flex items-center gap-2 px-3 py-2 border border-zinc-800 rounded-md hover:bg-zinc-900 text-white"
-                          >
-                            <span className="text-xs sm:text-sm truncate max-w-[150px]">{file.name}</span>
-                            <button
-                              onClick={() => handleDeleteFile(group.level, fileIndex)}
-                              className="text-red-500 text-xs sm:text-sm"
-                            >
-                              X
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
             </div>
-          </div>
-        )}
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          className="hidden"
-          onChange={(e) => handleFileChange(e, editingGroupKey)}
-        />
+          );
+        })}
       </div>
+
+      {selectedCourse && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {allGroups[selectedCourse].map((group) => (
+            <div key={group.level} className="p-4 border border-zinc-800 rounded-md text-white">
+              <h3 className="text-2xl font-semibold">{group.level}</h3>
+              <ul className="text-sm mt-4 space-y-2">
+                {group.sessions.map((session, i) => (
+                  <li key={i} className="whitespace-pre-line">
+                    {session}
+                    {i !== group.sessions.length - 1 && <div className="border-b border-zinc-800 my-2" />}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    setCurrentGroup(group.level);
+                    fileInputRef.current.click();
+                  }}
+                  className="px-3 py-2 text-sm border border-zinc-800 rounded hover:bg-zinc-900 w-fit"
+                >
+                  Segédlet feltöltése
+                </button>
+                {uploadedFiles[selectedCourse]?.[group.level] && (
+                  <div className="flex flex-wrap gap-2">
+                    {uploadedFiles[selectedCourse][group.level].map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 px-3 py-2 border border-zinc-800 rounded-md hover:bg-zinc-900"
+                      >
+                        <span className="text-sm truncate max-w-[150px]">{file.name}</span>
+                        <button
+                          onClick={() => handleDeleteFile(group.level, index)}
+                          className="text-red-500 text-sm"
+                        >
+                          X
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={handleFileChange}
+      />
     </div>
   );
 };

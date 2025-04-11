@@ -96,25 +96,21 @@ const Helper = () => {
   };
 
   const handleFileChange = (e, groupKey) => {
-    const files = e.target.files;
+    const files = Array.from(e.target.files);
     const newUploadedFiles = { ...uploadedFiles };
     if (!newUploadedFiles[selectedCourse]) newUploadedFiles[selectedCourse] = {};
     if (!newUploadedFiles[selectedCourse][groupKey]) newUploadedFiles[selectedCourse][groupKey] = [];
     newUploadedFiles[selectedCourse][groupKey] = [
       ...newUploadedFiles[selectedCourse][groupKey],
-      ...Array.from(files),
+      ...files,
     ];
     setUploadedFiles(newUploadedFiles);
+    e.target.value = null;
   };
 
   const handleAddFile = (groupKey) => {
     setEditingGroupKey(groupKey);
-    fileInputRef.current.click();
-  };
-
-  const handleEditFile = (groupKey, fileIndex) => {
-    setEditingGroupKey(groupKey);
-    setEditingFileIndex(fileIndex);
+    setEditingFileIndex(null);
     fileInputRef.current.click();
   };
 
@@ -137,7 +133,8 @@ const Helper = () => {
           }, 0);
         }, 0);
         const totalSchools = new Set(groups.flatMap((group) => group.sessions.map((s) => s.split("\n")[0]))).size;
-        const totalFiles = uploadedFiles[course.id] ? uploadedFiles[course.id].length : 0;
+        const groupFiles = uploadedFiles[course.id] || {};
+        const totalFiles = Object.values(groupFiles).reduce((acc, files) => acc + files.length, 0);
         return {
           course,
           totalSessions,
@@ -148,76 +145,81 @@ const Helper = () => {
       }),
     };
   };
+
   return (
-    <div className="flex justify-center items-start min-h-screen p-8">
+    <div className="max-w-screen-xl md:w-full mx-auto p-4">
       <div className="w-full max-w-4xl mx-auto">
-        <h2 className="text-3xl font-semibold mb-6 text-center text-white">Kurzusok</h2>
+        <h2 className="text-4xl font-normal mb-6 text-center text-white">Kurzusok</h2>
         <div className="flex gap-6 mb-8 justify-center">
-          {courses.map((course) => (
-            <div
-              key={course.id}
-              className={`flex flex-col items-center gap-2 p-4 border border-gray-300 rounded-md cursor-pointer text-white 
-                ${selectedCourse === course.id ? 'bg-gray-300 text-black' : 'hover:bg-gray-300 hover:text-black'}`}
-              
-              onClick={() => setSelectedCourse(course.id)}
-            >
-              <span
-                className={`text-xl font-semibold ${selectedCourse === course.id ? 'text-black' : 'text-white'}`}
-              >
-                {course.name}
-              </span>
+          {courses.map((course) => {
+            const courseDetails = calculateStats().coursesDetails.find(c => c.course.id === course.id);
+            return (
               <div
-                className={`text-sm mt-2 ${selectedCourse === course.id ? 'text-black' : 'text-white'} `}
+                key={course.id}
+                className={`flex flex-col items-center gap-2 p-4 border border-zinc-800 rounded-md cursor-pointer text-white
+                ${selectedCourse === course.id ? 'bg-zinc-900' : 'hover:bg-zinc-900 hover:text-white'}`}
+                onClick={() => setSelectedCourse(course.id)}
               >
-                <p>Összes óra: {calculateStats().coursesDetails.find(c => c.course.id === course.id).totalSessions}</p>
-                <p>Összes diák: {calculateStats().coursesDetails.find(c => c.course.id === course.id).totalStudents}</p>
-                <p>Összes iskola: {calculateStats().coursesDetails.find(c => c.course.id === course.id).totalSchools}</p>
-                <p>Összes fájl: {calculateStats().coursesDetails.find(c => c.course.id === course.id).totalFiles}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-  
-        {selectedCourse && (
-          <div className="space-y-6">
-            {allGroups[selectedCourse].map((group, groupIndex) => (
-              <div key={groupIndex} className="p-4 border border-gray-300 rounded-md">
-                <h3 className="text-2xl font-semibold text-white">{group.level}</h3>
-                <ul className="mt-4 space-y-2 text-white">
-                  {group.sessions.map((session, index) => (
-                    <li key={index} className="whitespace-pre-line">{session}</li>
-                  ))}
-                </ul>
-                <div className="mt-4 flex gap-4">
-                  <button
-                    onClick={() => handleAddFile(group.level)}
-                    className="px-4 py-2 border border-gray-300 text-white rounded-md hover:bg-gray-300 hover:text-black"
-                  >
-                    Fájl hozzáadása
-                  </button>
-                  {uploadedFiles[selectedCourse] && uploadedFiles[selectedCourse][group.level] && (
-                    <div className="flex gap-2">
-                      {uploadedFiles[selectedCourse][group.level].map((file, fileIndex) => (
-                        <div
-                          key={fileIndex}
-                          className="flex items-center gap-2 p-2 border border-gray-300 rounded-md bg-gray-100"
-                        >
-                          <span>{file.name}</span>
-                          <button
-                            onClick={() => handleDeleteFile(group.level, fileIndex)}
-                            className="text-red-500"
-                          >
-                            X
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <span className="text-l font-semibold">{course.name}</span>
+                <div className="text-l mt-2">
+                  <p className="text-sm">Órák száma: {courseDetails.totalSessions}</p>
+                  <p className="text-sm">Diákok száma: {courseDetails.totalStudents}</p>
+                  <p className="text-sm">Iskolák száma: {courseDetails.totalSchools}</p>
+                  <p className="text-sm">Segédletek száma: {courseDetails.totalFiles}</p>
                 </div>
               </div>
-            ))}
+            );
+          })}
+        </div>
+
+        {selectedCourse && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-6">
+              {allGroups[selectedCourse].map((group) => (
+                <div key={group.level} className="p-4 border border-zinc-800 rounded-md">
+                  <h3 className="text-2xl font-semibold text-white">{group.level}</h3>
+                  <ul className="text-sm mt-4 space-y-2 text-white">
+                    {group.sessions.map((session, index) => (
+                      <li key={index} className="whitespace-pre-line">
+                        {session}
+                        {index !== group.sessions.length - 1 && (
+                          <div className="border-b border-zinc-800 my-2"></div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-4 flex flex-col gap-3">
+                    <button
+                      onClick={() => handleAddFile(group.level)}
+                      className="px-3 py-2 text-sm border border-zinc-800 text-white rounded hover:bg-zinc-900 w-fit"
+                    >
+                      Segédlet feltöltése
+                    </button>
+                    {uploadedFiles[selectedCourse] && uploadedFiles[selectedCourse][group.level] && (
+                      <div className="flex flex-wrap gap-2">
+                        {uploadedFiles[selectedCourse][group.level].map((file, fileIndex) => (
+                          <div
+                            key={fileIndex}
+                            className="flex items-center gap-2 px-3 py-2 border border-zinc-800 rounded-md hover:bg-zinc-900 text-white"
+                          >
+                            <span className="text-sm">{file.name}</span>
+                            <button
+                              onClick={() => handleDeleteFile(group.level, fileIndex)}
+                              className="text-red-500 text-sm"
+                            >
+                              X
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
+
         <input
           ref={fileInputRef}
           type="file"

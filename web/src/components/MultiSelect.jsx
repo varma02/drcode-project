@@ -64,6 +64,8 @@ export const MultiSelect = forwardRef((props, ref) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  console.log("selected values:", selectedValues)
+
   const handleInputKeyDown = (event) => {
     if (event.key === "Enter") {
       setIsPopoverOpen(true);
@@ -76,8 +78,8 @@ export const MultiSelect = forwardRef((props, ref) => {
   };
 
   const toggleOption = (option) => {
-    const newSelectedValues = selectedValues.includes(option)
-      ? selectedValues.filter((value) => value !== option)
+    const newSelectedValues = selectedValues.map(e => JSON.stringify(e)).includes(JSON.stringify(option))
+      ? selectedValues.filter((value) => JSON.stringify(value) !== JSON.stringify(option))
       : [...selectedValues, option];
     setSelectedValues(newSelectedValues);
     onValueChange(newSelectedValues);
@@ -129,7 +131,10 @@ export const MultiSelect = forwardRef((props, ref) => {
             <div className="flex justify-between items-center w-full">
               <div className="flex flex-wrap items-center">
                 {selectedValues.slice(0, maxCount).map((value, indx) => {
-                  const option = options.find((o) => o.value === value);
+                  // console.log("value: ", value)
+                  // console.log("options: ", options)
+                  const option = options.find((o) => JSON.stringify(o.value) === JSON.stringify(value))
+                  console.log("found: ", option)
                   const IconComponent = option?.icon;
                   return (
                     <Badge
@@ -206,11 +211,11 @@ export const MultiSelect = forwardRef((props, ref) => {
       >
         <Command>
           <CommandInput
-            placeholder="Search..."
+            placeholder="Keresés..."
             onKeyDown={handleInputKeyDown}
           />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>Nincs találat.</CommandEmpty>
             <CommandGroup>
               <CommandItem
                 key="all"
@@ -230,7 +235,7 @@ export const MultiSelect = forwardRef((props, ref) => {
                 <span>(Select All)</span>
               </CommandItem>
               {options.map((option, indx) => {
-                const isSelected = selectedValues.includes(option.value);
+                const isSelected = selectedValues.map(so => JSON.stringify(so)).includes(JSON.stringify(option.value));
                 const IconComponent = option.icon;
                 return (
                   <CommandItem

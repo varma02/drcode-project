@@ -3,6 +3,7 @@ import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, C
 import { useNavigate } from 'react-router-dom'
 import { getAllEmployees, getAllGroups, getAllInvites, getAllLessons, getAllLocations, getAllStudents, getAllSubjects } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
+import { DialogDescription, DialogTitle } from './ui/dialog'
 
 export default function CommandMenu() {
   const auth = useAuth()
@@ -90,6 +91,8 @@ export default function CommandMenu() {
   return (
     <>
       <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
+        <DialogTitle></DialogTitle>
+        <DialogDescription></DialogDescription>
         <CommandInput placeholder="Írj egy parancsot vagy keress..." />
         <CommandList>
           <CommandEmpty>Nincs Találat</CommandEmpty>

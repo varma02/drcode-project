@@ -96,11 +96,6 @@ export default function Locations() {
       header: ({ column }) => column.columnDef.displayName,
     },
     {
-      accessorKey: "notes",
-      displayName: "Megjegyzés",
-      header: ({ column }) => column.columnDef.displayName,
-    },
-    {
       displayName: "Létrehozva",
       accessorKey: "created",
       header: ({ column }) => column.columnDef.displayName,
@@ -114,7 +109,7 @@ export default function Locations() {
 
       <DataTable data={locations} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("location:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
-      headerAfter={<div className='flex gap-4 pl-4'>
+      headerAfter={<div className='flex gap-4'>
         <AreYouSureAlert onConfirm={handleDelete} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>

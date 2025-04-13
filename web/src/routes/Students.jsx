@@ -93,11 +93,6 @@ export default function Students() {
       },
     },
     {
-      accessorKey: "notes",
-      displayName: "Megjegyzés",
-      header: ({ column }) => column.columnDef.displayName,
-    },
-    {
       displayName: "Létrehozva",
       accessorKey: "created",
       header: ({ column }) => column.columnDef.displayName,
@@ -110,7 +105,7 @@ export default function Students() {
 
       <DataTable data={students} columns={columns} rowSelection={rowSelection} setRowSelection={setRowSelection}
       rowOnClick={(row) => navigate(`/students/${row.original.id.replace("student:", "")}`)}
-      headerAfter={<div className='flex gap-4 pl-4'>
+      headerAfter={<div className='flex gap-4'>
         <AreYouSureAlert onConfirm={handleDelete} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>

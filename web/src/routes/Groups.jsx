@@ -119,7 +119,7 @@ export default function Groups() {
 
       <DataTable data={groups} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("group:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
-      headerAfter={<div className='flex gap-4 pl-4'>
+      headerAfter={<div className='flex gap-4'>
         <AreYouSureAlert onConfirm={handleDelete} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>

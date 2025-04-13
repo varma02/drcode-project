@@ -162,11 +162,6 @@ export default function LessonDetails() {
       </div>
 
       <div className="flex flex-col gap-2 py-4">
-        <h3 className='font-bold'>Megjegyzés</h3>
-        <Textarea placeholder="Lorem ipsum dolor..." className="h-20 max-h-48" defaultValue={lesson.notes} name="notes" />
-      </div>
-
-      <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Csoport</h3>
         { selectedGroup &&
           <Link to={`/groups/${selectedGroup.id.replace("group:", "")}`} key={selectedGroup.id}>

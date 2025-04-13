@@ -1,12 +1,10 @@
-import { TimePicker } from "@/components/TimePicker"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { getAllEmployees, getAllGroups, getAllLocations, getEmployee, getLesson, getLocation, updateLesson, updateLocation } from "@/lib/api/api"
+import { getLocation, updateLocation } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
-import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
+import { Edit, LoaderCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { toast } from "sonner"
 
 export default function LocationDetails() {
@@ -49,7 +47,6 @@ export default function LocationDetails() {
       address: data.get("locationAddress"),
       contact_email: data.get("locationEmail"),
       contact_phone: data.get("locationPhone"),
-      notes: data.get("notes"),
     };
     console.log("AAAA: ", locationData)
     updateLocation(auth.token, locationData)
@@ -93,11 +90,6 @@ export default function LocationDetails() {
           <Input defaultValue={location.contact_email} placeholder="nincs megadva" type="email" name="locationEmail" />
           <Input defaultValue={location.contact_phone} placeholder="nincs megadva" type="tel" name="locationPhone" />
         </div>
-      </div>
-
-      <div className="flex flex-col gap-2 py-4">
-        <h3 className='font-bold'>Megjegyzés</h3>
-        <Textarea placeholder="Lorem ipsum dolor..." className="h-20 max-h-48" defaultValue={location.notes} name="notes" />
       </div>
     </form>
   )

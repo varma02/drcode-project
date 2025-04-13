@@ -1,18 +1,14 @@
 import DataTable from "@/components/DataTable"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Textarea } from "@/components/ui/textarea"
-import { getEmployee, getGroup, getGroupWithDetails, getStudent, getSubject } from "@/lib/api/api"
+import { getEmployee, getGroupWithDetails, getStudent, getSubject } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
-import { hu, id } from "date-fns/locale"
-import { ArrowDown, ArrowUp, ArrowUpDown, LoaderCircle, SquareArrowOutUpRight } from "lucide-react"
+import { hu } from "date-fns/locale"
+import { LoaderCircle, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { toast } from "sonner"
 
 export default function GroupDetails() {
   const auth = useAuth()
@@ -120,11 +116,6 @@ export default function GroupDetails() {
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>{group.name}</h1>
-      <div className="flex flex-col gap-2 py-4">
-        <h3 className='font-bold'>Megjegyzés</h3>
-        <Textarea id="notes" placeholder="Lorem ipsum dolor..." className="h-28 max-h-48" defaultValue={group.notes} />
-      </div>
-
       <div className="flex flex-col lg:flex-row lg:gap-10">
         <div className="flex flex-col gap-2 py-4">
           <h3 className='font-bold'>Oktatók</h3>

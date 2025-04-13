@@ -14,7 +14,7 @@ export default function AddNewLocation() {
     event.preventDefault()
     const formData = new FormData(event.target)
     console.log(formData)
-    createLocation(auth.token, formData.get("name"), formData.get("address"), formData.get("contact_email"), formData.get("contact_phone"), formData.get("note")).then(
+    createLocation(auth.token, formData.get("name"), formData.get("address"), formData.get("contact_email"), formData.get("contact_phone")).then(
       () => { 
         toast.success("Helyszín sikeresen létrehozva!")
       },
@@ -43,9 +43,7 @@ export default function AddNewLocation() {
         <Input type="text" placeholder="Email" name="contact_email" />
         <Input type="text" placeholder="Telefon" name="contact_phone" />
       </div>
-      <Textarea placeholder="Megjegyzés..." name="note" />
 
-      
       <div className='flex gap-6 ml-auto'>
         <Link to="/locations">
           <Button variant="outline" className="w-28">Vissza</Button>

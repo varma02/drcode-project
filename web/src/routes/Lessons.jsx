@@ -89,11 +89,6 @@ export default function Lessons() {
       cell: ({ row }) => format(new Date(row.original.end), "p", {locale: hu}),
     },
     {
-      accessorKey: "notes",
-      displayName: "Leírás",
-      header: ({ column }) => column.columnDef.displayName,
-    },
-    {
       displayName: "Létrehozva",
       accessorKey: "created",
       header: ({ column }) => column.columnDef.displayName,
@@ -108,7 +103,7 @@ export default function Lessons() {
 
       <DataTable data={lessons} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("lesson:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
-      headerAfter={<div className='flex gap-4 pl-4'>
+      headerAfter={<div className='flex gap-4'>
         <AreYouSureAlert onConfirm={handleDelete} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>

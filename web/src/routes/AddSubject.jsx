@@ -14,7 +14,7 @@ export default function AddNewSubject() {
     event.preventDefault()
     const formData = new FormData(event.target)
     console.log(formData)
-    createSubject(auth.token, formData.get("name"), formData.get("note")).then(
+    createSubject(auth.token, formData.get("name"), formData.get("description")).then(
       () => { 
         toast.success("Kurzus sikeresen létrehozva!")
       },
@@ -38,7 +38,7 @@ export default function AddNewSubject() {
       <div className='flex gap-4'>
         <Input type="text" placeholder="Név" name="name" />
       </div>
-      <Textarea placeholder="Megjegyzés..." name="note" />
+      <Textarea placeholder="Leírás..." name="description" />
 
       <div className='flex gap-6 ml-auto'>
         <Link to="/subjects">

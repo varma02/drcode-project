@@ -70,7 +70,7 @@ export default function Locations() {
       },
     },
     {
-      accessorKey: "notes",
+      accessorKey: "description",
       displayName: "Leírás",
       header: ({ column }) => column.columnDef.displayName,
     },
@@ -87,7 +87,7 @@ export default function Locations() {
 
       <DataTable data={subjects} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("subject:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
-      headerAfter={<div className='flex gap-4 pl-4'>
+      headerAfter={<div className='flex gap-4'>
         <AreYouSureAlert onConfirm={handleDelete} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>

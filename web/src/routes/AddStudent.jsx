@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { createStudent } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import React from 'react'
@@ -23,8 +22,7 @@ export default function AddStudent() {
       +formData.get("grade"),
       formData.get("email") || undefined,
       formData.get("phone") || undefined,
-      !Object.values(parent).every(e => e == undefined) ? parent : undefined,
-      formData.get("note")
+      !Object.values(parent).every(e => e == undefined) ? parent : undefined
     ).then(
       () => {
         toast.success("Tanuló sikeresen létrehozva!")
@@ -60,7 +58,6 @@ export default function AddStudent() {
         <Input type="text" placeholder="Szülő email" name="parentEmail" />
         <Input type="text" placeholder="Szülő telefonszáma" name="parentPhone" />
       </div>
-      <Textarea placeholder="Megjegyzés..." name="note" />
 
       <div className='flex gap-6 ml-auto'>
         <Link to="/students">

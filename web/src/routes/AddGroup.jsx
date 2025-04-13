@@ -1,16 +1,13 @@
 import { Combobox } from '@/components/ComboBox'
 import { DatePicker } from '@/components/DatePicker'
-import { GroupComboBox } from '@/components/GroupComboBox'
 import { MultiSelect } from '@/components/MultiSelect'
 import { TimePicker } from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
 import { createGroup, getAllEmployees, getAllLocations } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { Label } from '@radix-ui/react-dropdown-menu'
-import { ArrowLeft } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -48,7 +45,7 @@ export default function AddCalendarGroup() {
     const formData = new FormData(event.target)
     console.log(formData)
     const lessons = generateLessons(formData.get("startDate"), formData.get("lessonNum"), formData.get("startTime"), formData.get("endTime"))
-    createGroup(auth.token, formData.get("name"), formData.get("location"), formData.get("employees").split(","), formData.get("note"), lessons).then(
+    createGroup(auth.token, formData.get("name"), formData.get("location"), formData.get("employees").split(","), lessons).then(
       () => { 
         toast.success("Csoport sikeresen létrehozva!")
       },
@@ -74,7 +71,6 @@ export default function AddCalendarGroup() {
         <Combobox data={locations} displayName={"name"} placeholder='Válassz helyszínt...' value={location} setValue={setLocation} className={"w-full"} name="location" />
       </div>
       <MultiSelect options={[...employees.map(e => ({label:e.name, value:e}) )]} name={"employees"} placeholder='Válassz oktatót...' />
-      <Textarea placeholder="Megjegyzés..." name="note" />
 
       <div className='flex gap-4'>
         <h4>Órák generálása</h4>

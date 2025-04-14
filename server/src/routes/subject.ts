@@ -9,9 +9,7 @@ const subject = new Thing({
     update: PermissionDefaults.adminOnly,
     remove: PermissionDefaults.adminOnly,
   },
-  fields: {
-    students: {SELECT: "(SELECT VALUE id FROM student WHERE array::find(->enroled.*.subject, $parent.id)) as students"}
-  }
+  fields: {}
 })
 
 subject.addDefaults({});

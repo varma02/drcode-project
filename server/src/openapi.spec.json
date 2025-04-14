@@ -3397,6 +3397,27 @@
             ],
             "description": "Roles assigned to the employee"
           },
+          "worksheet": {
+            "type": "array",
+            "description": "The unpaid part of this employee's worksheet",
+            "items": {
+              "$ref": "#/components/schemas/WorksheetRelation"
+            }
+          },
+          "groups": {
+            "type": "array",
+            "description": "The groups this employee is teaching",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Group/properties/id"
+                },
+                {
+                  "$ref": "#/components/schemas/Group"
+                }
+              ]
+            }
+          },
           "created": {
             "$ref": "#/components/schemas/Datetime"
           }
@@ -3429,6 +3450,20 @@
           },
           "contact_phone": {
             "$ref": "#/components/schemas/PhoneNumber"
+          },
+          "groups": {
+            "type": "array",
+            "description": "The groups that are held at this location",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Group/properties/id"
+                },
+                {
+                  "$ref": "#/components/schemas/Group"
+                }
+              ]
+            }
           }
         },
         "required": [
@@ -3502,6 +3537,11 @@
             "type": "string",
             "description": "The name of the subject",
             "example": "Scratch"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the subject",
+            "example": "A fun programming language for kids"
           }
         }
       },
@@ -3550,6 +3590,41 @@
               ]
             },
             "description": "The teachers assigned to the group"
+          },
+          "lessons": {
+            "type": "array",
+            "description": "The lessons assigned to this group",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Lesson/properties/id"
+                },
+                {
+                  "$ref": "#/components/schemas/Lesson"
+                }
+              ]
+            }
+          },
+          "enroled": {
+            "type": "array",
+            "description": "The student enrolments to this group",
+            "items": {
+              "$ref": "#/components/schemas/EnroledRelation"
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "description": "The subjects assigned to this group",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Subject/properties/id"
+                },
+                {
+                  "$ref": "#/components/schemas/Subject"
+                }
+              ]
+            }
           }
         }
       },
@@ -3605,6 +3680,13 @@
           },
           "phone": {
             "$ref": "#/components/schemas/PhoneNumber"
+          },
+          "enroled": {
+            "type": "array",
+            "description": "The group enrolments of this student",
+            "items": {
+              "$ref": "#/components/schemas/EnroledRelation"
+            }
           }
         }
       },
@@ -3748,6 +3830,27 @@
           },
           "end": {
             "$ref": "#/components/schemas/Datetime"
+          },
+          "enroled": {
+            "type": "array",
+            "description": "The student enrolments to this lesson",
+            "items": {
+              "$ref": "#/components/schemas/AttendedRelation"
+            }
+          },
+          "replaced": {
+            "type": "array",
+            "description": "The students who replaced another lesson with this one",
+            "items": {
+              "$ref": "#/components/schemas/ReplacedRelation"
+            }
+          },
+          "attended": {
+            "type": "array",
+            "description": "The students who attended this lesson",
+            "items": {
+              "$ref": "#/components/schemas/AttendedRelation"
+            }
           }
         }
       },

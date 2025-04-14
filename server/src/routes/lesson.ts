@@ -10,9 +10,9 @@ const lesson = new Thing({
     remove: PermissionDefaults.adminOnly,
   },
   fields: {
-    attendance: {SELECT: "<-attended<-student as attendance"},
+    attended: {SELECT: "<-attended<-student as attended"},
     replaced: {SELECT: "<-replaced<-student as replaced"},
-    enrolments: {SELECT: "group<-enroled.* as enrolments"}
+    enroled: {SELECT: "group<-enroled.* as enroled"}
   }
 })
 

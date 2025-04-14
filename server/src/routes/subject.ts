@@ -10,10 +10,7 @@ const subject = new Thing({
     remove: PermissionDefaults.adminOnly,
   },
   fields: {
-    id: {required: true},
-    created: {required: true},
-    name: {required: true, writable: true},
-    description: {required: true, writable: true},
+    students: {SELECT: "(SELECT VALUE id FROM student WHERE array::find(->enroled.*.subject, $parent.id)) as students"}
   }
 })
 

@@ -11,7 +11,6 @@ import inviteRouter from './routes/invite';
 import subjectRouter from './routes/subject';
 import studentRouter from './routes/student';
 import fileRouter from './routes/file';
-import { isDev } from './lib/utils';
 
 export const app = express();
 
@@ -36,12 +35,10 @@ export async function setup(): Promise<string | null> {
   app.use(cors());
   app.disable('x-powered-by');
 
-  if (isDev()) {
-    app.use((req, res, next) => {
-      console.log(req.ip, req.method, req.path);
-      next();
-    });
-  }
+  app.use((req, res, next) => {
+    console.log(req.ip, req.method, req.path);
+    next();
+  });
 
   app.get('/', async (req, res) => {
     res.status(200).json({

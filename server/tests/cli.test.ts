@@ -9,26 +9,19 @@ import { parse as jsonrefParse } from 'jsonref';
 import Ajv from 'ajv';
 import AjvAddFormats from 'ajv-formats';
 
-const spec = await jsonrefParse((await import("../openapi.spec.json")).default, {scope: 'file:///'});
+const ajv = new Ajv({ strictSchema: false, allErrors: true });
+AjvAddFormats(ajv);
+export const spec = await jsonrefParse((await import("../src/openapi.spec.json")).default, {scope: 'file:///'});
 
-interface TestCase {
-  category: string,
-  tests: {
-      auth: "teacher" | "administrator",
-      description: string,
-      request: {
-        method: string,
-        body: object,
-        query: object,
-      },
-      response: {
-        status: number,
-        schema: any,
-      } | string,
-  }[]
+export interface TestCase {
+  description: string,
+  request?: {
+      auth?: "teacher" | "administrator",
+      body?: object,
+      query?: object,
+    },
+    response?: object,
 }
-// @ts-expect-error
-const cases: {[key:string]: TestCase} = (await import("./testcases.json")).default;
 
 export async function tests() {
   const auth = {
@@ -63,14 +56,15 @@ export async function tests() {
       const resp = await request(app)
         .post('/auth/login')
         .send({
-          email: "admin@example.com",
-          password: "1234"
+          email: x.email,
+          password: x.password,
+          remember: false,
         })
-      if (resp.status !== 200) {
+      if (resp.status !== 200 || !resp.body.data.token) {
         console.error("Failed to login with email:", x.email, "\nResponse:\n", resp.body);
         throw new Error("Setup failed");
       }
-      x.token = resp.body.token;
+      x.token = resp.body.data.token;
     }
     done();
   });
@@ -79,89 +73,36 @@ export async function tests() {
     db.close();
   });
 
-  for (const [p, c] of Object.entries(cases)) {
-    describe(p, () => {
-      for (const t of c.tests) {
-        test(t.description, async () => {
-          const agent = request(app);
-          let resp;
-          switch (t.request.method) {
-            case "GET": resp = agent.get(p); break;
-            case "POST": resp = agent.post(p); break;
-            default: throw new Error("Method not supported");
+  for (const [path, pv] of Object.entries(spec.paths as object)) {
+    describe(path, () => {
+      for (const [operation, ov] of Object.entries(pv)) {
+        describe(operation.toUpperCase(), () => {
+          for (let [response, rv] of Object.entries((ov as any).responses as object)) {
+            if (rv.allOf) rv = (rv?.allOf as any[])?.reduce((prev, v) => ({...prev, ...v}), {});
+            describe(response, () => {
+              for (const xtest of (rv?.["x-tests"] as TestCase[]) || []) {
+                test(xtest.description, async () => {
+                  let agent = operation == "get" ? request(app).get(path) : operation == "post" ? request(app).post(path) : undefined;
+                  if (!agent) throw new Error("Invalid operation");
+                  if (xtest.request?.auth) agent = agent.set("Authorization", `Bearer ${auth[xtest.request.auth].token}`)
+                  const resp = await agent
+                    .query(xtest.request?.query || {})
+                    .send(xtest.request?.body || {})
+                  const validate = ajv.compile(xtest.response || rv.content["application/json"].schema);
+                  expect(resp.status).toBe(parseInt(response));
+                  const isValid = validate(resp.body);
+                  if (!isValid) console.error("Validation errors:", validate.errors);
+                  expect(isValid).toBe(true);
+                });
+              }
+            });
           }
-          if (t.auth) resp = resp.set("Authorization", `Bearer ${auth[t.auth].token}`)
-          resp = await resp
-            .query(t.request.query || {})
-            .send(t.request.body || {})
-          const ajv = new Ajv({strict: false, allErrors: true});
-          AjvAddFormats(ajv);
-          const validate = ajv.compile(typeof t.response === "string" 
-            ? spec.paths[p][t.request.method.toLowerCase()].responses[t.response].content["application/json"].schema
-            : t.response.schema
-          );
-          expect(resp.status).toBe(typeof t.response === "object"
-            ? t.response.status
-            : parseInt(t.response)
-          );
-          const isValid = validate(resp.body);
-          if (!isValid) console.error("Validation errors:", validate.errors);
-          expect(isValid).toBe(true);
         });
       }
-    })
-  }
-}
-
-export async function generate(args: string[]) {
-  const newCases: {[key:string]: object} = {};
-
-  for (const [path, v] of Object.entries(spec.paths)) {
-    if (cases[path]) newCases[path] = cases[path];
-    else {
-      // console.log((v as any).map(x => x.responses.map(y => y.content["application/json"].schema)).flat(1));
-      newCases[path] = {
-        category: (v as any)?.tags?.[0] || "uncategorized",
-        tests: [
-          {
-            auth: "administrator",
-            description: "example test",
-            request: {
-              method: "GET",
-              body: {},
-              query: {},
-            },
-            response: {
-              status: 200,
-              body: {},
-            },
-          }
-        ]
-      };
-    }
-  }
-
-  fs.writeFileSync(
-    path.join(__dirname, "testcases.json"),
-    JSON.stringify(newCases, null, 2),
-    { encoding: "utf-8" }
-  );
-  console.log("Test cases generated successfully.");
-}
-
-async function main() {
-  const args = process.argv.slice(2);
-
-  switch (args[0]) {
-    case 'generate':
-      await generate(args.slice(1));
-      break;
-    default:
-      await tests();
-      break;
+    });
   }
 }
 
 if (require.main === module) {
-  main();
+  await tests();
 }

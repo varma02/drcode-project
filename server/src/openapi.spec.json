@@ -55,10 +55,25 @@
                 }
               }
             },
-            "description": "The request succeeded, user data can be found in the response."
+            "description": "The request succeeded, user data can be found in the response.",
+            "x-tests": [
+              {
+                "description": "Get the logged in user",
+                "request": {
+                  "auth": "administrator"
+                }
+              }
+            ]
           },
           "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "allOf": [
+              {"$ref": "#/components/responses/Unauthorized"},
+              {"x-tests": [
+                {
+                  "description": "Try to access the endpoint without a token"
+                }
+              ]}
+            ]
           }
         },
         "parameters": [],
@@ -80,8 +95,7 @@
                   "title": "LoginWithEmailAndPasswordOk",
                   "required": [
                     "data",
-                    "code",
-                    "message"
+                    "code"
                   ],
                   "properties": {
                     "code": {
@@ -103,10 +117,6 @@
                           "$ref": "#/components/schemas/Employee"
                         }
                       }
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "An unexpexted error occured"
                     }
                   }
                 }
@@ -133,8 +143,7 @@
                 ],
                 "properties": {
                   "email": {
-                    "type": "string",
-                    "example": "john.doe@example.com"
+                    "$ref": "#/components/schemas/Email"
                   },
                   "password": {
                     "type": "string",
@@ -172,8 +181,7 @@
                   "title": "UpdateAccountOk",
                   "required": [
                     "data",
-                    "code",
-                    "message"
+                    "code"
                   ],
                   "properties": {
                     "code": {
@@ -190,10 +198,6 @@
                           "$ref": "#/components/schemas/Employee"
                         }
                       }
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Employee updated"
                     }
                   }
                 }
@@ -214,21 +218,15 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "id",
                   "old_password"
                 ],
                 "properties": {
-                  "id": {
-                    "type": "string",
-                    "example": "employee:1234"
-                  },
                   "name": {
                     "type": "string",
                     "example": "John Doe"
                   },
                   "email": {
-                    "type": "string",
-                    "example": "john.doe@example.com"
+                    "$ref": "#/components/schemas/Email"
                   },
                   "new_password": {
                     "type": "string",
@@ -303,16 +301,15 @@
                     "example": "John Doe"
                   },
                   "email": {
-                    "type": "string",
-                    "example": "john.doe@example.com"
+                    "$ref": "#/components/schemas/Email"
                   },
                   "password": {
                     "type": "string",
+                    "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*\\W).{8,}$",
                     "example": "Password1234#"
                   },
                   "invite_id": {
-                    "type": "string",
-                    "example": "invite:1234"
+                    "$ref": "#/components/schemas/Invite/properties/id"
                   }
                 }
               }
@@ -342,17 +339,12 @@
                   "type": "object",
                   "title": "LogoutTheUserFromAllDevicesOk",
                   "required": [
-                    "code",
-                    "message"
+                    "code"
                   ],
                   "properties": {
                     "code": {
                       "type": "string",
                       "example": "success"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Logged out of all sessions"
                     }
                   }
                 }
@@ -453,8 +445,7 @@
                   "title": "GetAllEmployeesOk",
                   "required": [
                     "data",
-                    "code",
-                    "message"
+                    "code"
                   ],
                   "properties": {
                     "code": {
@@ -474,10 +465,6 @@
                           }
                         }
                       }
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "All employees retrieved"
                     }
                   }
                 }
@@ -514,8 +501,7 @@
                   "title": "GetEmployeesByIdOk",
                   "required": [
                     "data",
-                    "code",
-                    "message"
+                    "code"
                   ],
                   "properties": {
                     "code": {
@@ -523,14 +509,18 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Employee"
+                      "type": "object",
+                      "required": [
+                        "employees"
+                      ],
+                      "properties": {
+                        "employees": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Employee"
+                          }
+                        }
                       }
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Employees retrieved"
                     }
                   }
                 }
@@ -544,8 +534,18 @@
         },
         "parameters": [
           {
-            "$ref": "#/components/parameters/ids"
-          }
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "regex",
+              "description": "Comma-separated list of employee IDs to retrieve",
+              "example": "employee:12345,employee:67890",
+              "pattern": "^(employee:\\w+,)*employee:\\w+$"
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
         ],
         "description": "Get one or more employees with the ability to fetch record links.",
         "operationId": "getEmployeesById"
@@ -571,8 +571,7 @@
                   "title": "RemoveEmployeesOk",
                   "required": [
                     "data",
-                    "code",
-                    "message"
+                    "code"
                   ],
                   "properties": {
                     "code": {
@@ -592,10 +591,6 @@
                           }
                         }
                       }
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Employees removed"
                     }
                   }
                 }
@@ -624,8 +619,7 @@
                   "ids": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "example": "employee:1234"
+                      "$ref": "#/components/schemas/Employee/properties/id"
                     },
                     "description": "The ids of the employees you want to delete"
                   }
@@ -658,8 +652,7 @@
                   "title": "UpdateAnEmployeeOk",
                   "required": [
                     "data",
-                    "code",
-                    "message"
+                    "code"
                   ],
                   "properties": {
                     "code": {
@@ -676,10 +669,6 @@
                           "$ref": "#/components/schemas/Employee"
                         }
                       }
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Employee updated"
                     }
                   }
                 }
@@ -707,16 +696,14 @@
                 ],
                 "properties": {
                   "id": {
-                    "type": "string",
-                    "example": "employee:1234"
+                    "$ref": "#/components/schemas/Employee/properties/id"
                   },
                   "name": {
                     "type": "string",
                     "example": "John Doe"
                   },
                   "email": {
-                    "type": "string",
-                    "example": "john.doe@example.com"
+                    "$ref": "#/components/schemas/Email"
                   },
                   "roles": {
                     "type": "array",
@@ -761,9 +748,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Location"
+                      "type": "object",
+                      "required": [
+                        "locations"
+                      ],
+                      "properties": {
+                        "locations": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Location"
+                          }
+                        }
                       }
                     }
                   }
@@ -807,9 +802,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Location"
+                      "type": "object",
+                      "required": [
+                        "locations"
+                      ],
+                      "properties": {
+                        "locations": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Location"
+                          }
+                        }
                       }
                     }
                   }
@@ -824,8 +827,17 @@
         },
         "parameters": [
           {
-            "$ref": "#/components/parameters/ids"
-          }
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated list of location IDs to retrieve",
+              "example": "location:12345,location:67890",
+              "pattern": "^(location:\\w+,)*location:\\w+$"
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
         ],
         "operationId": "getLocationsById"
       }
@@ -904,7 +916,7 @@
                   "ids": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Location/properties/id"
                     },
                     "description": "The ids of the locations you want to delete"
                   }
@@ -981,7 +993,7 @@
                 ],
                 "properties": {
                   "id": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/Location/properties/id"
                   },
                   "name": {
                     "type": "string",
@@ -1122,9 +1134,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Subject"
+                      "type": "object",
+                      "required": [
+                        "subjects"
+                      ],
+                      "properties": {
+                        "subjects": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Subject"
+                          }
+                        }
                       }
                     }
                   }
@@ -1171,9 +1191,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Subject"
+                      "type": "object",
+                      "required": [
+                        "subjects"
+                      ],
+                      "properties": {
+                        "subjects": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Subject"
+                          }
+                        }
                       }
                     }
                   }
@@ -1187,8 +1215,17 @@
         },
         "parameters": [
           {
-            "$ref": "#/components/parameters/ids"
-          }
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated list of subject IDs to retrieve",
+              "example": "subject:12345,subject:67890",
+              "pattern": "^(subject:\\w+,)*subject:\\w+$"
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
         ],
         "operationId": "getSubjectsById"
       }
@@ -1267,7 +1304,7 @@
                   "ids": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Subject/properties/id"
                     },
                     "description": "The ids of the subjects you want to delete"
                   }
@@ -1344,7 +1381,7 @@
                 ],
                 "properties": {
                   "id": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/Subject/properties/id"
                   },
                   "name": {
                     "type": "string",
@@ -1465,9 +1502,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Student"
+                      "type": "object",
+                      "required": [
+                        "students"
+                      ],
+                      "properties": {
+                        "students": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Student"
+                          }
+                        }
                       }
                     }
                   }
@@ -1513,9 +1558,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Student"
+                      "type": "object",
+                      "required": [
+                        "students"
+                      ],
+                      "properties": {
+                        "students": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Student"
+                          }
+                        }
                       }
                     }
                   }
@@ -1532,8 +1585,17 @@
         },
         "parameters": [
           {
-            "$ref": "#/components/parameters/ids"
-          }
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated list of student IDs to retrieve",
+              "example": "student:12345,student:67890",
+              "pattern": "^(student:\\w+,)*student:\\w+$"
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
         ],
         "operationId": "getStudentsById"
       }
@@ -1612,7 +1674,7 @@
                   "ids": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Student/properties/id"
                     },
                     "description": "The ids of the students you want to delete"
                   }
@@ -1689,7 +1751,7 @@
                 ],
                 "properties": {
                   "id": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/Student/properties/id"
                   },
                   "name": {
                     "type": "string",
@@ -1868,9 +1930,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Lesson"
+                      "type": "object",
+                      "required": [
+                        "lessons"
+                      ],
+                      "properties": {
+                        "lessons": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Lesson"
+                          }
+                        }
                       }
                     }
                   }
@@ -1916,9 +1986,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Lesson"
+                      "type": "object",
+                      "required": [
+                        "lessons"
+                      ],
+                      "properties": {
+                        "lessons": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Lesson"
+                          }
+                        }
                       }
                     }
                   }
@@ -1932,8 +2010,17 @@
         },
         "parameters": [
           {
-            "$ref": "#/components/parameters/ids"
-          }
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated list of lesson IDs to retrieve",
+              "example": "lesson:12345,lesson:67890",
+              "pattern": "^(lesson:\\w+,)*lesson:\\w+$"
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
         ],
         "operationId": "getLessonsById"
       }
@@ -1968,9 +2055,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Lesson"
+                      "type": "object",
+                      "required": [
+                        "lessons"
+                      ],
+                      "properties": {
+                        "lessons": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Lesson"
+                          }
+                        }
                       }
                     }
                   }
@@ -2083,7 +2178,7 @@
                   "ids": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Lesson/properties/id"
                     },
                     "description": "The ids of the lessons you want to delete"
                   }
@@ -2160,7 +2255,7 @@
                 ],
                 "properties": {
                   "id": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/Employee/properties/id"
                   },
                   "name": {
                     "type": "string",
@@ -2175,7 +2270,7 @@
                   "teachers": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Employee/properties/id"
                     }
                   },
                   "start": {
@@ -2262,15 +2357,15 @@
                     "example": "Scratch lesson 1"
                   },
                   "group": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/Group/properties/id"
                   },
                   "location": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/Location/properties/id"
                   },
                   "teachers": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Employee/properties/id"
                     }
                   },
                   "start": {
@@ -2316,9 +2411,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Invite"
+                      "type": "object",
+                      "required": [
+                        "invites"
+                      ],
+                      "properties": {
+                        "invites": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Invite"
+                          }
+                        }
                       }
                     }
                   }
@@ -2408,7 +2511,7 @@
                   "ids": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Invite/properties/id"
                     },
                     "description": "The ids of the invites you want to delete"
                   }
@@ -2532,9 +2635,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Group"
+                      "type": "object",
+                      "required": [
+                        "groups"
+                      ],
+                      "properties": {
+                        "groups": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Group"
+                          }
+                        }
                       }
                     }
                   }
@@ -2580,9 +2691,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Group"
+                      "type": "object",
+                      "required": [
+                        "groups"
+                      ],
+                      "properties": {
+                        "groups": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Group"
+                          }
+                        }
                       }
                     }
                   }
@@ -2596,8 +2715,17 @@
         },
         "parameters": [
           {
-            "$ref": "#/components/parameters/ids"
-          }
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated list of group IDs",
+              "example": "group:12345,group:67890",
+              "pattern": "^(group:\\w+,)*group:\\w+$"
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
         ],
         "operationId": "getGroupsById"
       }
@@ -2676,7 +2804,7 @@
                   "ids": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Group/properties/id"
                     },
                     "description": "The ids of the groups you want to delete"
                   }
@@ -2753,7 +2881,7 @@
                 ],
                 "properties": {
                   "id": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/Group/properties/id"
                   },
                   "name": {
                     "type": "string",
@@ -2770,7 +2898,7 @@
                   "teachers": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Employee/properties/id"
                     }
                   }
                 }
@@ -2852,12 +2980,12 @@
                     "example": "Kodály 16:00 Scratch"
                   },
                   "location": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/Location/properties/id"
                   },
                   "teachers": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Employee/properties/id"
                     }
                   },
                   "lessons": {
@@ -2916,9 +3044,17 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/File"
+                      "type": "object",
+                      "required": [
+                        "files"
+                      ],
+                      "properties": {
+                        "files": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/File"
+                          }
+                        }
                       }
                     }
                   }
@@ -2935,8 +3071,17 @@
         },
         "parameters": [
           {
-            "$ref": "#/components/parameters/ids"
-          }
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated list of file IDs",
+              "example": "file:12345,file:67890",
+              "pattern": "^(file:\\w+,)*file:\\w+$"
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
         ],
         "operationId": "getFilesById"
       }
@@ -3015,7 +3160,7 @@
                   "ids": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/File/properties/id"
                     },
                     "description": "The ids of the files you want to delete"
                   }
@@ -3116,7 +3261,7 @@
                   "shared_with": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/File/properties/id"
                     },
                     "description": "The ids of the users the file is shared with"
                   }
@@ -3193,7 +3338,7 @@
                 ],
                 "properties": {
                   "id": {
-                    "$ref": "#/components/schemas/ID"
+                    "$ref": "#/components/schemas/File/properties/id"
                   },
                   "name": {
                     "type": "string",
@@ -3202,7 +3347,7 @@
                   "shared_with": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/ID"
+                      "$ref": "#/components/schemas/Employee/properties/id"
                     },
                     "description": "The ids of the users the file is shared with"
                   }
@@ -3228,7 +3373,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "employee:abc123",
+            "pattern": "^employee:.+$"
           },
           "name": {
             "type": "string",
@@ -3237,10 +3384,7 @@
             "description": "Full name of the employee"
           },
           "email": {
-            "type": "string",
-            "format": "email",
-            "example": "john.doe@example.com",
-            "description": "Email address of the employee"
+            "$ref": "#/components/schemas/Email"
           },
           "roles": {
             "type": "array",
@@ -3263,7 +3407,9 @@
         "description": "A location object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "location:abc123",
+            "pattern": "^location:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3305,7 +3451,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "invite:abc123",
+            "pattern": "^invite:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3313,7 +3461,7 @@
           "author": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/ID"
+                "$ref": "#/components/schemas/Employee/properties/id"
               },
               {
                 "$ref": "#/components/schemas/Employee"
@@ -3343,7 +3491,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "subject:abc123",
+            "pattern": "^subject:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3367,10 +3517,17 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "group:abc123",
+            "pattern": "^group:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the group",
+            "example": "Kodály 16:00 Scratch"
           },
           "location": {
             "$ref": "#/components/schemas/Location"
@@ -3385,7 +3542,7 @@
             "items": {
               "anyOf": [
                 {
-                  "$ref": "#/components/schemas/ID"
+                  "$ref": "#/components/schemas/Employee/properties/id"
                 },
                 {
                   "$ref": "#/components/schemas/Employee"
@@ -3409,7 +3566,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "student:abc123",
+            "pattern": "^student:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3463,7 +3622,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "file:abc123",
+            "pattern": "^file:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3471,7 +3632,7 @@
           "author": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/ID"
+                "$ref": "#/components/schemas/Employee/properties/id"
               },
               {
                 "$ref": "#/components/schemas/Employee"
@@ -3513,7 +3674,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "enroled:abc123",
+            "pattern": "^enroled:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3549,7 +3712,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "lesson:abc123",
+            "pattern": "^lesson:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3570,7 +3735,7 @@
             "items": {
               "anyOf": [
                 {
-                  "$ref": "#/components/schemas/ID"
+                  "$ref": "#/components/schemas/Employee/properties/id"
                 },
                 {
                   "$ref": "#/components/schemas/Employee"
@@ -3598,7 +3763,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "replaced:abc123",
+            "pattern": "^replaced:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3626,7 +3793,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "attended:abc123",
+            "pattern": "^attended:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3658,7 +3827,9 @@
         ],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/ID"
+            "type": "string",
+            "example": "worksheet:abc123",
+            "pattern": "^worksheet:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"
@@ -3689,14 +3860,15 @@
       },
       "PhoneNumber": {
         "type": "string",
-        "format": "telephone",
+        "format": "regex",
+        "pattern": "^\\+\\d{5,}$",
         "example": "+36301131313",
         "description": "A telephone number starting with country code"
       },
-      "ID": {
+      "Password": {
         "type": "string",
-        "description": "A surrealdb id in the format `table:id`",
-        "example": "sometable:1234"
+        "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*\\W).{8,}$",
+        "example": "Password1234#"
       },
       "Role": {
         "type": "string",
@@ -3807,17 +3979,27 @@
       }
     },
     "parameters": {
-      "ids": {
-        "name": "ids",
-        "description": "Ids in surrealdb format (table:id) separated by commas",
+      "include": {
+        "name": "include",
         "in": "query",
-        "style": "form",
         "schema": {
-          "$ref": "#/components/schemas/ID"
-        },
-        "explode": true,
-        "required": true,
-        "allowReserved": false
+          "type": "string",
+          "format": "regex",
+          "pattern": "^(\\w+,)*\\w+$",
+          "description": "Comma-separated list of extra fields to include",
+          "example": "field1,field2"
+        }
+      },
+      "fetch": {
+        "name": "fetch",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "regex",
+          "pattern": "^(\\w+,)*\\w+$",
+          "description": "Comma-separated list of fields to further expand on",
+          "example": "field1,field2"
+        }
       }
     },
     "securitySchemes": {
@@ -3828,23 +4010,5 @@
         "bearerFormat": "Json Web Token (JWT)"
       }
     }
-  },
-  "tags": [
-    {
-      "name": "auth",
-      "description": "Endpoints related to user authentication and account management"
-    },
-    {
-      "name": "employee",
-      "description": "Endpoints for managing employees"
-    },
-    {
-      "name": "location",
-      "description": "Endpoints for managing locations."
-    },
-    {
-      "name": "subject",
-      "description": "Endpoints for managing subjects."
-    }
-  ]
+  }
 }

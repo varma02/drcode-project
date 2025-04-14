@@ -10,10 +10,7 @@ const invite = new Thing({
     remove: PermissionDefaults.adminOnly,
   },
   fields: {
-    id: {required: true},
-    created: {required: true},
-    author: {required: true, default: "type::thing($user.id)"},
-    roles: {required: true, writable: true},
+    author: {default: "type::thing($user.id)"},
   }
 })
 

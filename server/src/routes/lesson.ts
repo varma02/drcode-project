@@ -1,115 +1,28 @@
-import express from 'express';
-import db from '../database/connection';
-import { ensureAdmin, isAdmin } from '../middleware/ensureadmin';
-import ensureAuth from '../middleware/ensureauth';
-import errorHandler from '../lib/errorHandler';
-import { FieldsInvalidError, FieldsRequiredError, NotFoundError } from '../lib/errors';
-import type { DBLesson } from '../database/models';
-import { addAllGetter, addRemover } from '../lib/defaultCRUD';
+import { PermissionDefaults, Thing } from '../lib/thing';
 
-const lessonRouter = express.Router();
-
-lessonRouter.use(ensureAuth);
-
-addRemover(lessonRouter, "lesson");
-
-addAllGetter(lessonRouter, "lesson");
-
-lessonRouter.get('/between_dates', errorHandler(async (req, res) => {
-  const { start, end } = req.query;
-  if (!start && !end) 
-    throw new FieldsRequiredError();
-
-  const lessons = (await db.query<DBLesson[][]>(`
-    SELECT * FROM lesson WHERE
-    ${start ? "start >= type::datetime($start)" : "true"}
-    AND
-    ${end ? "end <= type::datetime($end);" : "true"};
-  `, { start, end }))[0];
-
-  if (!lessons || !lessons.length)
-    throw new NotFoundError();
-
-  res.status(200).json({
-    code: "success",
-    message: "Lessons retrieved",
-    data: { lessons },
-  });
-}));
-
-lessonRouter.get('/get', errorHandler(async (req, res) => {
-  const ids = (req.query.ids as string).trim().split(",");
-  if (ids.length === 0)
-    throw new FieldsRequiredError();
-  if (ids.every(id => !id.startsWith("lesson:")))
-    throw new FieldsInvalidError();
-
-  const selection = [];
-  selection.push("*");
-  if (req.query.include) {
-    const include = new Set((req.query.include as string).trim().split(","));
-    if (include.has("students_attended")) selection.push("<-attended<-student as students_attended");
-    if (include.has("students_replaced")) selection.push("<-replaced<-student as students_replaced");
+const lesson = new Thing({
+  table: "lesson",
+  permissions: {
+    create: PermissionDefaults.adminOnly,
+    getAll: PermissionDefaults.adminOnly,
+    getById: PermissionDefaults.everyone,
+    update: PermissionDefaults.adminOnly,
+    remove: PermissionDefaults.adminOnly,
+  },
+  fields: {
+    attendance: {SELECT: "<-attended<-student as attendance"},
+    replaced: {SELECT: "<-replaced<-student as replaced"},
+    enrolments: {SELECT: "group<-enroled.* as enrolments"}
   }
-  const lessons = (await db.query<DBLesson[][]>(`
-    SELECT ${selection.join(",")} FROM array::map($ids, |$id| type::thing($id));
-  `, {ids}))[0];
+})
 
-  if (!lessons || !lessons.length)
-    throw new NotFoundError();
+lesson.addDefaults({});
 
-  res.status(200).json({
-    code: "success",
-    message: "Lesson(s) retrieved",
-    data: { lessons },
-  });
+lesson.router.get('/between_dates', lesson.get({
+  WHERE: (req) => `
+    ${req.params.start ? "start >= type::datetime($start)" : "true"}
+    AND
+    ${req.params.end ? "end <= type::datetime($end);" : "true"};`
 }));
 
-lessonRouter.post('/create', ensureAdmin, errorHandler(async (req, res) => {
-  const { name, group, location, teachers, start, end } = req.body;
-  if (!start || !end) 
-    throw new FieldsRequiredError();
-
-  const lesson = (await db.query(`
-    CREATE ONLY lesson CONTENT {
-      ${name ? "name: $name," : ""}
-      ${location ? "location: type::thing($location)," : ""}
-      ${teachers ? "teachers: array::map($teachers, |$v| type::thing($v))," : ""}
-      ${group ? "group: type::thing($group)," : ""}
-      start: type::datetime($start),
-      end: type::datetime($end)
-    };
-  `, {name, group, location, teachers, start, end}))[0];
-  res.status(200).json({
-    code: "success",
-    message: "Lesson created",
-    data: { lesson },
-  });
-}));
-
-lessonRouter.post('/update', ensureAdmin, errorHandler(async (req, res) => {
-  const { id, name, group, location, teachers, start, end } = req.body;
-  if (!id)
-    throw new FieldsRequiredError();
-  if (!id.startsWith("lesson:")) 
-    throw new FieldsInvalidError();
-
-  const lesson = (await db.query(`
-    UPDATE ONLY type::thing($id) MERGE {
-      ${name ? "name: $name," : ""}
-      ${location ? "location: type::thing($location)," : ""}
-      ${teachers ? "teachers: array::map($teachers, |$v| type::thing($v))," : ""}
-      ${group ? "group: type::thing($group)," : ""}
-      ${start ? "start: type::datetime($start)," : ""}
-      ${end ? "end: type::datetime($end)," : ""}
-    };
-  `, { id, name, group, location, teachers, start, end }))[0];
-
-  res.status(200).json({
-    code: "success",
-    message: "Lesson updated",
-    data: { lesson },
-  });
-}));
-
-export default lessonRouter;
+export default lesson.router;

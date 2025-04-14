@@ -10,11 +10,6 @@ const employees = new Thing({
     remove: PermissionDefaults.adminOnly,
   },
   fields: {
-    id: {required: true},
-    created: {required: true},
-    name: {required: true, writable: true},
-    email: {required: true, writable: true},
-    roles: {required: true, writable: true},
     worksheet: {SELECT: "->worked_at[WHERE !paid].* AS worksheet"},
     groups: {SELECT: "(SELECT VALUE id FROM group WHERE type::thing($parent.id) IN teachers) AS groups"},
   }

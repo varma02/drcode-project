@@ -3,6 +3,7 @@ export enum ErrorCode {
   BadRequest = "bad_request",
   NotFound = "not_found",
   Unauthorized = "unauthorized",
+  Forbidden = "forbidden",
   InvalidCredentials = "invalid_credentials",
   InvalidRequestBody = "invalid_request_body",
   FieldsRequired = "fields_required",
@@ -38,7 +39,12 @@ export class NotFoundError extends BaseError {
 }
 export class UnauthorizedError extends BaseError {
   constructor(message?: string) {
-    super(ErrorCode.Unauthorized, message || "You are not authorized to perform this action."); 
+    super(ErrorCode.Unauthorized, message || "You are not authorized to perform this action.");
+  }
+}
+export class Forbidden extends BaseError {
+  constructor(message?: string) {
+    super(ErrorCode.Unauthorized, message || "You are not authorized to perform this action.");
   }
 }
 export class InvalidCredentialsError extends BaseError {

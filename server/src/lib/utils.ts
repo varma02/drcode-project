@@ -1,8 +1,79 @@
-export function verifyPassword(password: string): boolean {
-  // The password must contain at least one lowercase letter, uppercase letter, number, special character, and be at least 8 characters long
-  return !!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/);
+import Ajv from 'ajv';
+import AjvAddFormats from 'ajv-formats';
+import express from 'express';
+import { parse as jsonrefParse } from 'jsonref';
+import { BadRequestError, ServerError } from './errors';
+
+export const spec = await jsonrefParse((await import("../openapi.spec.json")).default, {scope: 'file:///'});
+export const ajv = new Ajv({ keywords: ['example'], removeAdditional: "all", allErrors: true });
+AjvAddFormats(ajv);
+
+export function validateRequest(req: express.Request, bodySchema: object | string, querySchema?: object) {
+  if (typeof bodySchema === "string") {
+    const ref = bodySchema.split(" ");
+    const urlSchema = spec.paths?.[ref[1]]?.[ref[0].toLowerCase()];
+    if (!urlSchema) {
+      console.warn("Route not implemented: ", bodySchema);
+      throw new ServerError("Route not implemented");
+    }
+    bodySchema = spec.paths?.[ref[1]]?.[ref[0].toLowerCase()]?.requestBody?.content?.["application/json"].schema;
+    querySchema = spec.paths?.[ref[1]]?.[ref[0].toLowerCase()]?.parameters?.filter((v:any) => v.in == "query");
+  }
+  if (bodySchema) {
+    const validate = ajv.compile(bodySchema as object);
+    const valid = validate(req.body);
+    if (!valid) {
+      console.log(validate.errors);
+      throw new BadRequestError(
+        "Invalid request body, "
+        + (validate.errors?.[0].keyword == "required" ? "" : "field " + validate.errors?.[0].instancePath + " ")
+        + validate.errors?.[0].message
+      );
+    }
+  } else if (Object.keys(req.body).length) {
+    req.body = {};
+    throw new BadRequestError("No body is allowed for this request.")
+  }
+  if (querySchema) {
+    const querySchemaObj: any = {type: "object", properties: {}};
+    (querySchema as any).forEach((v:any) => {querySchemaObj.properties[v.name] = v.schema});
+    const validate = ajv.compile(querySchemaObj);
+    const query = JSON.parse(JSON.stringify(req.query));
+    const valid = validate(query);
+    if (!valid) {
+      console.log(req.query, validate.errors);
+      throw new BadRequestError("An invalid query parameter was provided");
+    }
+  } else if (Object.keys(req.body).length) {
+    req.query = {};
+    throw new BadRequestError("No query parameters are allowed with this request.")
+  }
 }
 
-export function isDev(): boolean {
-  return process.env.DEVELOPMENT_MODE == "true";
+export function sanitizeResponse(data: object, schema: object | string) {
+  if (typeof schema === "string") {
+    const ref = schema.split(" ");
+    const originalSchema = schema;
+    schema = spec.paths?.[ref[1]]?.[ref[0].toLowerCase()]?.responses?.[ref[2]]?.content?.["application/json"]?.schema;
+    if (!schema) {
+      console.warn("Route not implemented: ", originalSchema)
+      throw new ServerError("Route not implemented")
+    };
+  }
+  data = JSON.parse(JSON.stringify(data));
+  ajv.compile(schema as object)(data);
+  return data;
+}
+
+export function respond200(res: express.Response, route?: string, data?: object) {
+  res.status(200).json(data ? sanitizeResponse({ code: "success", data }, route + " 200") : {code: "success"});
+}
+
+export function getReqURI(req: express.Request) {
+  return req.originalUrl.slice(
+    0,
+    req.originalUrl.indexOf("?") == -1
+      ? req.originalUrl.length
+      : req.originalUrl.indexOf("?")
+  );
 }

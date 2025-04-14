@@ -1,17 +1,9 @@
-import fs from 'fs';
-import path from 'path';
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import { setup, app } from '../src/index';
 import db from '../src/database/connection';
 import { apply_seed, reset } from "../src/database/cli";
 import request from 'supertest';
-import { parse as jsonrefParse } from 'jsonref';
-import Ajv from 'ajv';
-import AjvAddFormats from 'ajv-formats';
-
-const ajv = new Ajv({ strictSchema: false, allErrors: true });
-AjvAddFormats(ajv);
-export const spec = await jsonrefParse((await import("../src/openapi.spec.json")).default, {scope: 'file:///'});
+import { spec, ajv } from '../src/lib/utils';
 
 export interface TestCase {
   description: string,

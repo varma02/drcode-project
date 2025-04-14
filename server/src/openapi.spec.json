@@ -517,7 +517,7 @@
                         "employees": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/Employee"
+                            "$ref": "#/components/schemas/EmployeeExtended"
                           }
                         }
                       }
@@ -810,7 +810,7 @@
                         "locations": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/Location"
+                            "$ref": "#/components/schemas/LocationExtended"
                           }
                         }
                       }
@@ -1566,7 +1566,7 @@
                         "students": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/Student"
+                            "$ref": "#/components/schemas/StudentExtended"
                           }
                         }
                       }
@@ -1994,7 +1994,7 @@
                         "lessons": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/Lesson"
+                            "$ref": "#/components/schemas/LessonExtended"
                           }
                         }
                       }
@@ -2699,7 +2699,7 @@
                         "groups": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/Group"
+                            "$ref": "#/components/schemas/GroupExtended"
                           }
                         }
                       }
@@ -3397,31 +3397,43 @@
             ],
             "description": "Roles assigned to the employee"
           },
-          "worksheet": {
-            "type": "array",
-            "description": "The unpaid part of this employee's worksheet",
-            "items": {
-              "$ref": "#/components/schemas/WorksheetRelation"
-            }
-          },
-          "groups": {
-            "type": "array",
-            "description": "The groups this employee is teaching",
-            "items": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/Group/properties/id"
-                },
-                {
-                  "$ref": "#/components/schemas/Group"
-                }
-              ]
-            }
-          },
           "created": {
             "$ref": "#/components/schemas/Datetime"
           }
         }
+      },
+      "EmployeeExtended": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Employee"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "worksheet": {
+                "type": "array",
+                "description": "The unpaid part of this employee's worksheet",
+                "items": {
+                  "$ref": "#/components/schemas/WorksheetRelation"
+                }
+              },
+              "groups": {
+                "type": "array",
+                "description": "The groups this employee is teaching",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Group/properties/id"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Group"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
       },
       "Location": {
         "type": "object",
@@ -3450,20 +3462,6 @@
           },
           "contact_phone": {
             "$ref": "#/components/schemas/PhoneNumber"
-          },
-          "groups": {
-            "type": "array",
-            "description": "The groups that are held at this location",
-            "items": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/Group/properties/id"
-                },
-                {
-                  "$ref": "#/components/schemas/Group"
-                }
-              ]
-            }
           }
         },
         "required": [
@@ -3473,6 +3471,32 @@
           "address",
           "contact_email",
           "contact_phone"
+        ]
+      },
+      "LocationExtended": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Location"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "groups": {
+                "type": "array",
+                "description": "The groups that are held at this location",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Group/properties/id"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Group"
+                    }
+                  ]
+                }
+              }
+            }
+          }
         ]
       },
       "Invite": {
@@ -3590,43 +3614,55 @@
               ]
             },
             "description": "The teachers assigned to the group"
-          },
-          "lessons": {
-            "type": "array",
-            "description": "The lessons assigned to this group",
-            "items": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/Lesson/properties/id"
-                },
-                {
-                  "$ref": "#/components/schemas/Lesson"
-                }
-              ]
-            }
-          },
-          "enroled": {
-            "type": "array",
-            "description": "The student enrolments to this group",
-            "items": {
-              "$ref": "#/components/schemas/EnroledRelation"
-            }
-          },
-          "subjects": {
-            "type": "array",
-            "description": "The subjects assigned to this group",
-            "items": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/Subject/properties/id"
-                },
-                {
-                  "$ref": "#/components/schemas/Subject"
-                }
-              ]
-            }
           }
         }
+      },
+      "GroupExtended": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Group"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "lessons": {
+                "type": "array",
+                "description": "The lessons assigned to this group",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Lesson/properties/id"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Lesson"
+                    }
+                  ]
+                }
+              },
+              "enroled": {
+                "type": "array",
+                "description": "The student enrolments to this group",
+                "items": {
+                  "$ref": "#/components/schemas/EnroledRelation"
+                }
+              },
+              "subjects": {
+                "type": "array",
+                "description": "The subjects assigned to this group",
+                "items": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Subject/properties/id"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Subject"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
       },
       "Student": {
         "type": "object",
@@ -3634,10 +3670,7 @@
         "required": [
           "id",
           "created",
-          "name",
-          "parent",
-          "email",
-          "phone"
+          "name"
         ],
         "properties": {
           "id": {
@@ -3681,14 +3714,31 @@
           "phone": {
             "$ref": "#/components/schemas/PhoneNumber"
           },
-          "enroled": {
-            "type": "array",
-            "description": "The group enrolments of this student",
-            "items": {
-              "$ref": "#/components/schemas/EnroledRelation"
-            }
+          "grade": {
+            "type": "number",
+            "description": "The grade of the student",
+            "example": 5
           }
         }
+      },
+      "StudentExtended": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Student"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "enroled": {
+                "type": "array",
+                "description": "The group enrolments of this student",
+                "items": {
+                  "$ref": "#/components/schemas/EnroledRelation"
+                }
+              }
+            }
+          }
+        ]
       },
       "File": {
         "type": "object",
@@ -3764,13 +3814,34 @@
             "$ref": "#/components/schemas/Datetime"
           },
           "in": {
-            "$ref": "#/components/schemas/Student"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Student/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Student"
+              }
+            ]
           },
           "out": {
-            "$ref": "#/components/schemas/Group"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Group/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Group"
+              }
+            ]
           },
           "subject": {
-            "$ref": "#/components/schemas/Subject"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Subject/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Subject"
+              }
+            ]
           },
           "price": {
             "type": "number",
@@ -3785,10 +3856,6 @@
         "required": [
           "id",
           "created",
-          "name",
-          "group",
-          "location",
-          "teachers",
           "start",
           "end"
         ],
@@ -3807,7 +3874,14 @@
             "example": "Scratch lesson 1"
           },
           "group": {
-            "$ref": "#/components/schemas/Group"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Group/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Group"
+              }
+            ]
           },
           "location": {
             "$ref": "#/components/schemas/Location"
@@ -3830,29 +3904,41 @@
           },
           "end": {
             "$ref": "#/components/schemas/Datetime"
-          },
-          "enroled": {
-            "type": "array",
-            "description": "The student enrolments to this lesson",
-            "items": {
-              "$ref": "#/components/schemas/AttendedRelation"
-            }
-          },
-          "replaced": {
-            "type": "array",
-            "description": "The students who replaced another lesson with this one",
-            "items": {
-              "$ref": "#/components/schemas/ReplacedRelation"
-            }
-          },
-          "attended": {
-            "type": "array",
-            "description": "The students who attended this lesson",
-            "items": {
-              "$ref": "#/components/schemas/AttendedRelation"
-            }
           }
         }
+      },
+      "LessonExtended": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Lesson"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "enroled": {
+                "type": "array",
+                "description": "The student enrolments to this lesson",
+                "items": {
+                  "$ref": "#/components/schemas/AttendedRelation"
+                }
+              },
+              "replaced": {
+                "type": "array",
+                "description": "The students who replaced another lesson with this one",
+                "items": {
+                  "$ref": "#/components/schemas/ReplacedRelation"
+                }
+              },
+              "attended": {
+                "type": "array",
+                "description": "The students who attended this lesson",
+                "items": {
+                  "$ref": "#/components/schemas/AttendedRelation"
+                }
+              }
+            }
+          }
+        ]
       },
       "ReplacedRelation": {
         "type": "object",
@@ -3874,13 +3960,34 @@
             "$ref": "#/components/schemas/Datetime"
           },
           "in": {
-            "$ref": "#/components/schemas/Student"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Student/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Student"
+              }
+            ]
           },
           "out": {
-            "$ref": "#/components/schemas/Lesson"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Lesson/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Lesson"
+              }
+            ]
           },
           "replacement": {
-            "$ref": "#/components/schemas/Lesson"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Lesson/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Lesson"
+              }
+            ]
           }
         }
       },
@@ -3904,10 +4011,24 @@
             "$ref": "#/components/schemas/Datetime"
           },
           "in": {
-            "$ref": "#/components/schemas/Student"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Student/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Student"
+              }
+            ]
           },
           "out": {
-            "$ref": "#/components/schemas/Lesson"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Lesson/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Lesson"
+              }
+            ]
           },
           "paid": {
             "type": "boolean",
@@ -3938,10 +4059,24 @@
             "$ref": "#/components/schemas/Datetime"
           },
           "in": {
-            "$ref": "#/components/schemas/Student"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Employee/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Employee"
+              }
+            ]
           },
           "out": {
-            "$ref": "#/components/schemas/Lesson"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Lesson/properties/id"
+              },
+              {
+                "$ref": "#/components/schemas/Lesson"
+              }
+            ]
           },
           "paid": {
             "type": "boolean",
@@ -3963,8 +4098,6 @@
       },
       "PhoneNumber": {
         "type": "string",
-        "format": "regex",
-        "pattern": "^\\+\\d{5,}$",
         "example": "+36301131313",
         "description": "A telephone number starting with country code"
       },

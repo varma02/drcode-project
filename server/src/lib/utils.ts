@@ -1,10 +1,12 @@
-import Ajv from 'ajv';
+import Ajv from 'ajv/dist/2020';
 import AjvAddFormats from 'ajv-formats';
 import express from 'express';
-import { parse as jsonrefParse } from 'jsonref';
+import JsonRefs from 'json-refs';
 import { BadRequestError, ServerError } from './errors';
+// @ts-expect-error
+import mergeAllOf from 'json-schema-merge-allof';
 
-export const spec = await jsonrefParse((await import("../openapi.spec.json")).default, {scope: 'file:///'});
+export const spec: any = mergeAllOf((await JsonRefs.resolveRefs((await import("../openapi.spec.json")).default)).resolved);
 export const ajv = new Ajv({ keywords: ['example'], removeAdditional: "all", allErrors: true });
 AjvAddFormats(ajv);
 
@@ -23,7 +25,7 @@ export function validateRequest(req: express.Request, bodySchema: object | strin
     const validate = ajv.compile(bodySchema as object);
     const valid = validate(req.body);
     if (!valid) {
-      console.log(validate.errors);
+      console.warn(validate.errors);
       throw new BadRequestError(
         "Invalid request body, "
         + (validate.errors?.[0].keyword == "required" ? "" : "field " + validate.errors?.[0].instancePath + " ")
@@ -41,7 +43,7 @@ export function validateRequest(req: express.Request, bodySchema: object | strin
     const query = JSON.parse(JSON.stringify(req.query));
     const valid = validate(query);
     if (!valid) {
-      console.log(req.query, validate.errors);
+      console.warn(req.query, validate.errors);
       throw new BadRequestError("An invalid query parameter was provided");
     }
   } else if (Object.keys(req.body).length) {
@@ -61,7 +63,10 @@ export function sanitizeResponse(data: object, schema: object | string) {
     };
   }
   data = JSON.parse(JSON.stringify(data));
-  ajv.compile(schema as object)(data);
+  const validate = ajv.compile(mergeAllOf(schema as object));
+  if (!validate(data)) {
+    console.warn("Invalid response:\n", validate.errors);
+  }
   return data;
 }
 

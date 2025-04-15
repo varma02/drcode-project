@@ -11,7 +11,7 @@ import { useAuth } from '@/lib/api/AuthProvider'
 import { getAllLessonsBetweenDates, getAllSubjects, getGroupWithDetails, getLocation, getStudentWithDetails } from '@/lib/api/api'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
-import { Checkbox } from '@/components/ui/checkbox'
+import WorkInProgress from '@/components/WorkInProgress'
 
 export default function Home() {
   const auth = useAuth()
@@ -39,8 +39,6 @@ export default function Home() {
     getStudentWithDetails(auth.token, [...nextLessonGroup.enroled.map(e => e.in)]).then(resp => setNextLessonStudents(resp.data.students))
     getLocation(auth.token, nextLessonGroup.location).then(resp => setNextLessonLocation(resp.data.locations[0]))
   }, [nextLessonGroup])
-
-  console.log(nextLessonLocation)
   
   const columns = [
     {
@@ -104,7 +102,7 @@ export default function Home() {
           { nextLesson ?
           <>
           <div className='p-4 pr-0 md:self-auto self-center md:w-32 w-20'>
-            <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center' />
+            <img src="https://seeklogo.com/images/S/scratch-cat-logo-7F652C6253-seeklogo.com.png" className='object-cover object-center rounded-md' />
           </div>
           <div className='flex flex-col'>
             <CardHeader className="pb-4 md:pt-6 pt-0">
@@ -151,25 +149,11 @@ export default function Home() {
           }
         </Card>
         <Textarea placeholder="Jegyzetek" className="h-28 max-h-48" />
-        <DataTable columns={columns} data={nextLessonStudents} />
+        <DataTable columns={columns} data={nextLessonStudents} hideColumns={["created", "parent_name"]} />
       </div>
 
-      <div className='bg-primary-foreground rounded-xl p-4 h-full row-span-2'>
-        <h2 className='md:text-left text-center mb-4'>Üzenetek</h2>
-        <ScrollArea className="h-[calc(100%-3rem)]">
-            <AssignmentMessage />
-            <NotificationMessage />
-        </ScrollArea>
-      </div>
-
-      <div className='bg-primary-foreground rounded-xl p-4'>
-        <h2 className='md:text-left text-center mb-2'>Segédletek</h2>
-        <ScrollArea className='h-16 overflow-x-auto gap-2 py-2'>
-          <div className='flex w-max gap-2'>
-            {allSubjects.map(e => <Button variant="outline" key={e.id} className="font-bold text-xl"><Folder strokeWidth={4} /> {e.name}</Button>)}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+      <div className='row-span-3 overflow-y-hidden bg-primary-foreground rounded-xl'>
+        <WorkInProgress />
       </div>
     </div>
   )

@@ -3,7 +3,7 @@ import { LessonCardItem } from '@/components/LessonCardItem'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
-import { getAllLessonsBetweenDates, getEmployee, getGroup, getLocation } from '@/lib/api/api'
+import { get, getAllLessonsBetweenDates } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { Plus } from 'lucide-react'
@@ -36,6 +36,8 @@ export default function CalendarPage() {
     getAllLessonsBetweenDates(auth.token, getWeek(selectedDate).start, getWeek(selectedDate).end).then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
   }, [selectedDate])
 
+  console.log(lessons)
+
   useEffect(() => {
     setGroups({})
     const gids = new Set()
@@ -45,7 +47,7 @@ export default function CalendarPage() {
       gids.add(e.group)
     })
     if (gids.size == 0) return
-    getGroup(auth.token, Array.from(gids).join(",")).then(resp => resp.data.groups.map(e => {
+    get(auth.token, 'group', Array.from(gids).join(",")).then(resp => resp.data.groups.map(e => {
       setGroups(p => ({
         ...p,
         [e.id]: {
@@ -59,14 +61,14 @@ export default function CalendarPage() {
       eids.add(...e.teachers)
       lids.add(e.location)
 
-      getEmployee(auth.token, Array.from(eids).join(",")).then(resp => resp.data.employees.map(e => {
+      get(auth.token, 'employee', Array.from(eids).join(",")).then(resp => resp.data.employees.map(e => {
         setTeachers(p => ({
           ...p,
           [e.id]: e.name
         }))
       }))
 
-      getLocation(auth.token, Array.from(lids).join(",")).then(resp => resp.data.locations.map(e => {
+      get(auth.token, 'location', Array.from(lids).join(",")).then(resp => resp.data.locations.map(e => {
         setLocations(p => ({
           ...p,
           [e.id]: e.address

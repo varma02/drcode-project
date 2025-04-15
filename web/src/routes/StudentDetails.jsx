@@ -1,19 +1,16 @@
 import AreYouSureAlert from "@/components/AreYouSureAlert"
 import DataTable from "@/components/DataTable"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
-import { getEmployeeWithDetails, getGroup, getGroupWithDetails, getStudent, getStudentWithDetails, getSubject, updateStudent } from "@/lib/api/api"
+import { get } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
-import { hu, id } from "date-fns/locale"
-import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
+import { hu } from "date-fns/locale"
+import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { toast } from "sonner"
 
 export default function StudentDetails() {
@@ -25,7 +22,7 @@ export default function StudentDetails() {
   const [subjects, setSubjects] = useState(null)
 
   useEffect(() => {
-    getStudentWithDetails(auth.token, "student:" + params.id)
+    get(auth.token, 'student', ["student:" + params.id], null, "enroled")
     .then(data => setStudent(data.data.students[0]))
   }, [auth.token, params.id]);
 
@@ -35,7 +32,7 @@ export default function StudentDetails() {
     const gids = new Set()
     student.enroled?.forEach(s => gids.add(s.out))
     if (gids.size !== 0)
-      getGroup(auth.token, Array.from(gids))
+      get(auth.token, 'group', Array.from(gids))
       .then(data => setGroups(data.data.groups))
     else
       setGroups([])
@@ -43,7 +40,7 @@ export default function StudentDetails() {
     const stids = new Set()
     student.enroled?.forEach(s => stids.add(s.subject))
     if (stids.size !== 0)
-      getSubject(auth.token, Array.from(stids))
+      get(auth.token, 'subject', Array.from(stids))
       .then(data => setSubjects(data.data.subjects))
     else
       setSubjects([])

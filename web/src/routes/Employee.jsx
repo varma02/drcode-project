@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { createInvite, getAllEmployees, getAllInvites, removeEmployee, removeInvite } from '@/lib/api/api';
+import { getAll } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
@@ -29,8 +29,8 @@ export default function Employee() {
   console.log(rowSelection)
 
   useEffect(() => {
-    getAllInvites(auth.token).then(i => setInvites(i.data.invites))
-    getAllEmployees(auth.token).then(e => setEmployees(e.data.employees))
+    getAll(auth.token, 'invite').then(i => setInvites(i.data.invites))
+    getAll(auth.token, 'employee').then(e => setEmployees(e.data.employees))
   }, [])
   
   const columns = [

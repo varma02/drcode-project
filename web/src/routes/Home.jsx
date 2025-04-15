@@ -1,44 +1,32 @@
-import { AssignmentMessage, NotificationMessage } from '@/components/Messages'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Folder, ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, Play } from 'lucide-react'
+import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, Play } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ToggleButton } from '@/components/ToggleButton'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/lib/api/AuthProvider'
-import { getAllLessonsBetweenDates, getAllSubjects, getGroupWithDetails, getLocation, getStudentWithDetails } from '@/lib/api/api'
+import { get, getAllLessonsBetweenDates } from '@/lib/api/api'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 import WorkInProgress from '@/components/WorkInProgress'
 
 export default function Home() {
   const auth = useAuth()
-  const [allSubjects, setAllSubjects] = useState([])
   const [nextLesson, setNextLesson] = useState(null)
-  const [nextLessonGroup, setNextLessonGroup] = useState(null)
-  const [nextLessonLocation, setNextLessonLocation] = useState(null)
   const [nextLessonStudents, setNextLessonStudents] = useState([])
 
   useEffect(() => {
-    getAllSubjects(auth.token).then(resp => setAllSubjects(resp.data.subjects))
     const today = new Date()
     const nextWeek = new Date()
     nextWeek.setDate(today.getDate() + 7)
-    getAllLessonsBetweenDates(auth.token, today, nextWeek).then(resp => setNextLesson(resp.data.lessons[0]))
+    getAllLessonsBetweenDates(auth.token, today, nextWeek, "group,group.location", "enroled").then(resp => setNextLesson(resp.data.lessons[0]))
   }, [auth.token])
 
   useEffect(() => {
     if (!nextLesson) return
-    getGroupWithDetails(auth.token, nextLesson.group).then(resp => setNextLessonGroup(resp.data.groups[0]))
+    get(auth.token, 'student', [...nextLesson.enroled.map(e => e.in)], null, "enroled").then(resp => setNextLessonStudents(resp.data.students))
   }, [nextLesson])
-
-  useEffect(() => {
-    if (!nextLessonGroup) return
-    getStudentWithDetails(auth.token, [...nextLessonGroup.enroled.map(e => e.in)]).then(resp => setNextLessonStudents(resp.data.students))
-    getLocation(auth.token, nextLessonGroup.location).then(resp => setNextLessonLocation(resp.data.locations[0]))
-  }, [nextLessonGroup])
   
   const columns = [
     {
@@ -107,21 +95,19 @@ export default function Home() {
           <div className='flex flex-col'>
             <CardHeader className="pb-4 md:pt-6 pt-0">
               <div className="flex items-center gap-4">
-                <p className='font-bold text-xl text-wrap'>{nextLessonGroup && nextLessonGroup.name}</p>
+                <p className='font-bold text-xl text-wrap'>{nextLesson.group.location.name}</p>
               </div>
             </CardHeader>
             <CardContent>
               <div className='flex gap-6 flex-wrap'>
-                {nextLessonLocation &&
                 <span className='flex gap-2 items-center opacity-75'>
                   <MapPin width={22} />
                   <p className='font-bold'>
-                    {nextLessonLocation.name}
+                    {nextLesson.group.location.name}
                     <br />
-                    <span className="opacity-50">{nextLessonLocation.address}</span>
+                    <span className="opacity-50">{nextLesson.group.location.address}</span>
                   </p>
                 </span>
-                }
                 <span className='flex gap-2 items-center opacity-75'>
                   <Clock width={22} />
                   <p className='font-bold'>

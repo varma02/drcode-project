@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { getLocation, updateLocation } from "@/lib/api/api"
+import { get } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { Edit, LoaderCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -14,7 +14,7 @@ export default function LocationDetails() {
   const [location, setLocation] = useState(null)
 
   useEffect(() => {
-    getLocation(auth.token, "location:" + params.id).then(data => setLocation(data.data.locations[0]))
+    get(auth.token, 'location', ["location:" + params.id]).then(data => setLocation(data.data.locations[0]))
   }, [auth.token, params.id])
 
   const [saveTimer, setSaveTimer] = useState(0);

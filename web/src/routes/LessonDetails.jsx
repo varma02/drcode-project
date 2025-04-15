@@ -1,8 +1,7 @@
 import { TimePicker } from "@/components/TimePicker"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { getAllEmployees, getAllGroups, getAllLocations, getEmployee, getLesson, updateLesson } from "@/lib/api/api"
+import { get, getAll } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -22,19 +21,19 @@ export default function LessonDetails() {
   const [selectedGroup, setSelectedGroup] = useState(null)
 
   useEffect(() => {
-    getLesson(auth.token, "lesson:" + params.id).then(data => setLesson(data.data.lessons[0]))
-    getAllEmployees(auth.token).then(resp => setAllTeachers(resp.data.employees))
-    getAllLocations(auth.token).then(resp => setAllLocations(resp.data.locations))
+    get(auth.token, 'lesson', ["lesson:" + params.id]).then(data => setLesson(data.data.lessons[0]))
+    getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
+    getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
   }, [auth.token, params.id]);
 
   useEffect(() => {
     if (!lesson) return;
     if (lesson.group) {
-      getAllGroups(auth.token).then(data => setAllGroups(data.data.groups))
+      getAll(auth.token, 'group').then(data => setAllGroups(data.data.groups))
     }
     else setAllGroups([])
 
-    if (lesson.teachers) getEmployee(auth.token, lesson.teachers).then(data => setTeachers(data.data.teachers))
+    if (lesson.teachers) get(auth.token, 'employee', lesson.teachers).then(data => setTeachers(data.data.teachers))
     else setTeachers([])
   }, [lesson]);
 

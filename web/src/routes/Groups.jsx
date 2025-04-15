@@ -2,7 +2,8 @@ import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAllGroups, getEmployee, removeGroup } from '@/lib/api/api'
+import { get, getAll, remove } from '@/lib/api/api'
+
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -18,14 +19,14 @@ export default function Groups() {
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
-    getAllGroups(auth.token).then(data => setGroups(data.data.groups))
+    getAll(auth.token, 'group').then(data => setGroups(data.data.groups))
   }, [])
 
   useEffect(() => {
     const tids = new Set()
     groups.forEach(e => e.teachers.forEach(t => tids.add(t)))
     if (tids.size === 0) return;
-    getEmployee(auth.token, Array.from(tids)).then(data => {
+    get(auth.token, 'employee', Array.from(tids)).then(data => {
       const temp = {}
       data.data.employees.forEach(e => temp[e.id] = e.name)
       setTeachers(temp)
@@ -33,7 +34,7 @@ export default function Groups() {
   }, [groups])
 
   function handleDelete() {
-    removeGroup(auth.token, ...Object.keys(rowSelection).map(e => groups[+e].id)).then(resp => {
+    remove(auth.token, 'group', ...Object.keys(rowSelection).map(e => groups[+e].id)).then(resp => {
       console.log(resp);
       setGroups(p => p.filter(e => !resp.data.groups.find(f => f.id == e.id)))
     })

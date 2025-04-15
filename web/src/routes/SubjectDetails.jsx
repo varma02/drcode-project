@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { getSubject, updateSubject } from "@/lib/api/api"
+import { get } from "@/lib/api/api"
+
 import { useAuth } from "@/lib/api/AuthProvider"
 import { Edit, LoaderCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -15,7 +16,7 @@ export default function SubjectDetails() {
   const [subject, setSubject] = useState(null)
 
   useEffect(() => {
-    getSubject(auth.token, "subject:" + params.id).then(data => setSubject(data.data.subjects[0]))
+    get(auth.token, 'subject', ["subject:" + params.id]).then(data => setSubject(data.data.subjects[0]))
   }, [auth.token, params.id])
 
   const [saveTimer, setSaveTimer] = useState(0);

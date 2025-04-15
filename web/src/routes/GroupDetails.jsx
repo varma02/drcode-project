@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { getAllEmployees, getAllSubjects, getEmployee, getGroupWithDetails, getStudent, getSubject, updateGroup } from "@/lib/api/api"
+import { get, getAll } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
@@ -30,9 +30,9 @@ export default function GroupDetails() {
   const [editSubject, setEditSubject] = useState(false)
 
   useEffect(() => {
-    getGroupWithDetails(auth.token, "group:" + params.id).then(data => setGroup(data.data.groups[0]))
-    getAllSubjects(auth.token).then(resp => setAllSubjects(resp.data.subjects))
-    getAllEmployees(auth.token).then(resp => setAllTeachers(resp.data.employees))
+    get(auth.token, 'group', ["group:" + params.id], null, "lessons,subjects,enroled").then(data => setGroup(data.data.groups[0]))
+    getAll(auth.token, 'subject').then(resp => setAllSubjects(resp.data.subjects))
+    getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
   }, [auth.token, params.id]);
 
   console.log(group)
@@ -43,7 +43,7 @@ export default function GroupDetails() {
     const sids = new Set()
     group.subjects?.forEach(s => sids.add(s))
     if (sids.size !== 0)
-      getSubject(auth.token, Array.from(sids))
+      get(auth.token, 'subject', Array.from(sids))
       .then(data => setSubjects(data.data.subjects))
     else
       setSubjects([])
@@ -51,7 +51,7 @@ export default function GroupDetails() {
     const stids = new Set()
     group.enroled?.forEach(s => stids.add(s.in))
     if (stids.size !== 0)
-      getStudent(auth.token, Array.from(stids))
+      get(auth.token, 'student', Array.from(stids))
       .then(data => setStudents(data.data.students))
     else
       setStudents([])
@@ -59,7 +59,7 @@ export default function GroupDetails() {
     const tids = new Set()
     group.teachers?.forEach(s => tids.add(s))
     if (tids.size !== 0)
-      getEmployee(auth.token, Array.from(tids))
+      get(auth.token, 'employee', Array.from(tids))
       .then(data => setTeachers(data.data.employees))
     else
       setTeachers([])

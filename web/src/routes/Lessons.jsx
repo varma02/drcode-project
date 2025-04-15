@@ -2,11 +2,11 @@ import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAllGroups, getAllLessons, getAllLocations, getAllSubjects, getEmployee, getGroup, removeLesson, removeSubject } from '@/lib/api/api'
+import { get, getAll, remove } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
-import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -18,7 +18,7 @@ export default function Lessons() {
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
-    getAllLessons(auth.token).then(data => setLessons(data.data.lessons))
+    getAll(auth.token, 'lesson').then(data => setLessons(data.data.lessons))
   }, [])
 
   useEffect(() => {
@@ -26,14 +26,14 @@ export default function Lessons() {
       const gids = new Set()
       lessons.forEach(s => s.group && gids.add(s.group))
       if (gids.size !== 0)
-        getGroup(auth.token, Array.from(gids))
+        get(auth.token, 'group', Array.from(gids))
         .then(data => setGroups(data.data.groups))
       else
         setGroups([])
     }, [lessons]);
 
   function handleDelete() {
-    removeLesson(auth.token, ...Object.keys(rowSelection).map(e => lessons[+e].id)).then(resp => {
+    remove(auth.token, 'lesson', ...Object.keys(rowSelection).map(e => lessons[+e].id)).then(resp => {
       setLessons(p => p.filter(e => !resp.data.lessons.find(f => f.id == e.id)))
     })
   }

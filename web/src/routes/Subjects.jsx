@@ -2,7 +2,7 @@ import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAllGroups, getAllLocations, getAllSubjects, getEmployee, removeSubject } from '@/lib/api/api'
+import { getAll, remove } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -17,11 +17,11 @@ export default function Locations() {
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
-    getAllSubjects(auth.token).then(data => setSubjects(data.data.subjects))
+    getAll(auth.token, 'subject').then(data => setSubjects(data.data.subjects))
   }, [])
 
   function handleDelete() {
-    removeSubject(auth.token, ...Object.keys(rowSelection).map(e => subjects[+e].id)).then(resp => {
+    remove(auth.token, 'subject', ...Object.keys(rowSelection).map(e => subjects[+e].id)).then(resp => {
       console.log(resp);
       setSubjects(p => p.filter(e => !resp.data.subjects.find(f => f.id == e.id)))
     })
@@ -81,6 +81,7 @@ export default function Locations() {
       cell: ({ row }) => format(new Date(row.getValue("created")), "P", {locale: hu}),
     },
   ]
+
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Kurzusok</h1>

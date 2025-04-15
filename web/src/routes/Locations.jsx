@@ -2,7 +2,7 @@ import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { getAllLocations, removeLocation } from '@/lib/api/api'
+import { getAll, remove } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -17,11 +17,11 @@ export default function Locations() {
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
-    getAllLocations(auth.token).then(data => setLocations(data.data.locations))
+    getAll(auth.token, 'location').then(data => setLocations(data.data.locations))
   }, [])
 
   function handleDelete() {
-    removeLocation(auth.token, ...Object.keys(rowSelection).map(e => locations[+e].id)).then(resp => {
+    remove(auth.token, 'location', ...Object.keys(rowSelection).map(e => locations[+e].id)).then(resp => {
       console.log(resp);
       setLocations(p => p.filter(e => !resp.data.locations.find(f => f.id == e.id)))
     })

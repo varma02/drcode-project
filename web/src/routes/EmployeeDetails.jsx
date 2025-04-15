@@ -2,7 +2,7 @@ import DataTable from "@/components/DataTable"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { getEmployeeWithDetails, getGroup } from "@/lib/api/api"
+import { get } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
@@ -19,7 +19,7 @@ export default function EmployeeDetails() {
   // const [students, setStudents] = useState(null)
 
   useEffect(() => {
-    getEmployeeWithDetails(auth.token, "employee:" + params.id)
+    get(auth.token, 'employee', ["employee:" + params.id], null, "groups,worksheet")
     .then(data => setEmployee(data.data.employees[0]))
   }, [auth.token, params.id]);
 
@@ -29,7 +29,7 @@ export default function EmployeeDetails() {
     const sids = new Set()
     employee.groups?.forEach(s => sids.add(s))
     if (sids.size !== 0)
-      getGroup(auth.token, Array.from(sids))
+      get(auth.token, 'group', Array.from(sids))
       .then(data => setGroups(data.data.groups))
     else
       setGroups([])
@@ -134,7 +134,7 @@ export default function EmployeeDetails() {
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Jelenléti Ív</h3>
-        <DataTable className="-mt-4" columns={workColumns} data={employee.unpaid_work || []} />
+        <DataTable className="-mt-4" columns={workColumns} data={employee.worksheet || []} />
       </div>
     </div>
   )

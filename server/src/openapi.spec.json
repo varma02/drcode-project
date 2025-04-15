@@ -2071,7 +2071,20 @@
                   }
                 }
               }
-            }
+            },
+            "x-tests": [
+              {
+                "description":  "Get lessons between two dates as admin with fetch",
+                "request": {
+                  "auth": "administrator",
+                  "query": {
+                    "start": "2025-04-10T00:00:00.000Z",
+                    "end": "2025-04-20T23:59:59.000Z",
+                    "fetch": "group"
+                  }
+                }
+              }
+            ]
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"

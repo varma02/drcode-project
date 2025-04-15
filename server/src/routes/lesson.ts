@@ -22,7 +22,7 @@ lesson.router.get('/between_dates', lesson.get({
   WHERE: (req) => `
     ${req.params.start ? "start >= type::datetime($start)" : "true"}
     AND
-    ${req.params.end ? "end <= type::datetime($end);" : "true"};`
+    ${req.params.end ? "end <= type::datetime($end)" : "true"}`
 }));
 
 export default lesson.router;

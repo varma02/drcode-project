@@ -114,7 +114,8 @@ export class Thing {
       const selectedFields = new Set((req.query?.include as string)?.trim().split(","));
       const fetch = new Set((req.query?.fetch as string)?.trim().split(","))
                     .union(new Set(Object.keys(this.fields).filter(v => this.fields[v]?.fetch)));
-      const result = (await db.query<any[][]>(`
+
+      const result = (await db.query<any[][]>(((v:any) => {console.log(v);return v})(`
         IF ${this.permissions.getById.general} {
           RETURN SELECT ${
             ["*", ...(selectedFields ? selectedFields.intersection(new Set(Object.keys(this.fields))) : [])]
@@ -126,7 +127,7 @@ export class Thing {
         } ELSE {
           THROW "x-permission-denied";
         }
-      `, { user: req.user, ids, fetch: [...fetch] }))[0];
+      `), { user: req.user, ids, fetch: [...fetch] }))[0];
       if (!result || !result.length) throw new NotFoundError();
       respond200(res, `GET ${getReqURI(req)}`, { [`${this.table}s`]: result });
     });

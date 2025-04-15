@@ -20,3 +20,8 @@ export function getTopRole(roles: string[] | Set<string>): string {
 export function getMonogram(name: string): string {
   return name.split(" ").slice(0, 2).map(v => v[0]).join("");
 }
+
+export function convertToMultiSelectData(data: Object[], displayKey = "name", valuekey = "id") : Object[] {
+  console.log("MS: ", [...data.map(e => ({label:e[displayKey], value:e[valuekey]}) )]);
+  return [...data.map(e => ({label:e[displayKey], value:e[valuekey]}) )];
+}

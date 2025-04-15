@@ -84,7 +84,6 @@ export default function StudentDetails() {
         email: data.get("parentEmail"),
         phone: data.get("parentPhone"),
       },
-      notes: data.get("notes"),
     };
     updateStudent(auth.token, studentData)
     .then((v) => {

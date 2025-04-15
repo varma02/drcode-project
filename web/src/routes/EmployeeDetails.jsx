@@ -1,18 +1,14 @@
 import DataTable from "@/components/DataTable"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Textarea } from "@/components/ui/textarea"
-import { getEmployeeWithDetails, getGroup, getGroupWithDetails, getStudent, getSubject } from "@/lib/api/api"
+import { getEmployeeWithDetails, getGroup } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
-import { hu, id } from "date-fns/locale"
-import { ArrowDown, ArrowUp, ArrowUpDown, LoaderCircle, SquareArrowOutUpRight } from "lucide-react"
+import { hu } from "date-fns/locale"
+import { LoaderCircle, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { toast } from "sonner"
 
 export default function EmployeeDetails() {
   const auth = useAuth()
@@ -113,10 +109,6 @@ export default function EmployeeDetails() {
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl pt-4'>{employee.name}</h1>
       <h2 className='font-normal text-lg pb-4 text-foreground/70'>{employee.email}</h2>
-      <div className="flex flex-col gap-2 py-4">
-        <h3 className='font-bold'>Megjegyzés</h3>
-        <Textarea id="notes" placeholder="Lorem ipsum dolor..." className="h-20 max-h-48" defaultValue={employee.notes} />
-      </div>
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Csoportok</h3>

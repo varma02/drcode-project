@@ -2099,6 +2099,12 @@
               "format": "date-time",
               "example": "2025-04-10T23:59:59.000Z"
             }
+          },
+          {
+            "$ref": "#/components/parameters/fetch"
+          },
+          {
+            "$ref": "#/components/parameters/include"
           }
         ],
         "operationId": "getLessonsBetweenDates"

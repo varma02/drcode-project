@@ -121,7 +121,7 @@ export class Thing {
             .map(v => this.fields[v]?.SELECT || v)
             .join(",")
           } FROM ${WHERE ? this.table :"array::map($ids, |$id| type::thing($id))"}
-          WHERE ${this.permissions.getById.perRecord || "TRUE"} AND ${WHERE?.(req) || "TRUE"}
+          WHERE ${this.permissions.getById.perRecord || "true"} AND ${WHERE?.(req) || "true"}
           ${fetch.size ? "FETCH type::fields($fetch)" : ""};
         } ELSE {
           THROW "x-permission-denied";

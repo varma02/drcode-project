@@ -4232,9 +4232,9 @@
         "schema": {
           "type": "string",
           "format": "regex",
-          "pattern": "^(\\w+,)*\\w+$",
-          "description": "Comma-separated list of fields to further expand on",
-          "example": "field1,field2"
+          "pattern": "^(\\w+(\\.\\w+){0,1},)*\\w+(\\.\\w+){0,1}$",
+          "description": "Comma-separated list of fields to further expand on, maximum of one level deep",
+          "example": "normal_field,object_or_list.property"
         }
       }
     },

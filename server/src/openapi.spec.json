@@ -2063,7 +2063,7 @@
                         "lessons": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/Lesson"
+                            "$ref": "#/components/schemas/LessonExtended"
                           }
                         }
                       }

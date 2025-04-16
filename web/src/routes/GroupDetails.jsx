@@ -27,44 +27,12 @@ export default function GroupDetails() {
 
   const [editName, setEditName] = useState(false)
   const [editTeachers, setEditTeachers] = useState(false)
-  const [editSubject, setEditSubject] = useState(false)
 
   useEffect(() => {
-    get(auth.token, 'group', ["group:" + params.id], null, "lessons,subjects,enroled").then(data => setGroup(data.data.groups[0]))
+    get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers", "lessons,subjects,enroled").then(data => setGroup(data.data.groups[0]))
     getAll(auth.token, 'subject').then(resp => setAllSubjects(resp.data.subjects))
     getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
-  }, [auth.token, params.id]);
-
-  console.log(group)
-
-  useEffect(() => {
-    if (!group) return;
-
-    const sids = new Set()
-    group.subjects?.forEach(s => sids.add(s))
-    if (sids.size !== 0)
-      get(auth.token, 'subject', Array.from(sids))
-      .then(data => setSubjects(data.data.subjects))
-    else
-      setSubjects([])
-
-    const stids = new Set()
-    group.enroled?.forEach(s => stids.add(s.in))
-    if (stids.size !== 0)
-      get(auth.token, 'student', Array.from(stids))
-      .then(data => setStudents(data.data.students))
-    else
-      setStudents([])
-
-    const tids = new Set()
-    group.teachers?.forEach(s => tids.add(s))
-    if (tids.size !== 0)
-      get(auth.token, 'employee', Array.from(tids))
-      .then(data => setTeachers(data.data.employees))
-    else
-      setTeachers([])
-  }, [group]);
-
+  }, [auth.token, params.id])
   
   const [saveTimer, setSaveTimer] = useState(0)
   function handleChange(e) {
@@ -187,17 +155,15 @@ export default function GroupDetails() {
         <div className="flex flex-col gap-2 py-4 group">
           <h3 className='font-bold'>Oktatók</h3>
           <div className="flex gap-2">
-            { allTeachers.length != 0 && !!teachers &&
-              <MultiSelect 
-                options={convertToMultiSelectData(allTeachers)} 
-                defaultValue={[...teachers?.map(e => e.id)]} 
-                onValueChange={(e) => setTeachers(allTeachers.filter(item => e.includes(item.id)))} 
-                name="groupTeachers" className={`${editName ? "hidden" : "block"}`} />
-            }
-            {teachers?.length > 0 ? (
-              <ScrollArea className={`pb-2 overflow-x-auto ${!editName ? "hidden" : "block"}`}>
+            <MultiSelect 
+              options={convertToMultiSelectData(allTeachers)} 
+              defaultValue={[...group.teachers?.map(e => e.id)]} 
+              onValueChange={(e) => setTeachers(allTeachers.filter(item => e.includes(item.id)))} 
+              name="groupTeachers" className={`${!editTeachers ? "hidden" : "block"}`} />
+            {group.teachers?.length > 0 ? (
+              <ScrollArea className={`pb-2 overflow-x-auto ${editTeachers ? "hidden" : "block"}`}>
                 <div className='flex w-max gap-4 pb-1'>
-                  {teachers.map(teacher => (
+                  {group.teachers.map(teacher => (
                     <Link to={`/employee/${teacher.id.replace("employee:", "")}`} key={teacher.id}>
                       <Button variant='outline' className='flex items-center gap-2'>
                         {teacher.name} <SquareArrowOutUpRight />
@@ -207,10 +173,8 @@ export default function GroupDetails() {
                 </div>
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
-            ) : teachers ? (
-              <p>Ehhez a csoporthoz még nem tartoznak oktatók.</p>
             ) : (
-              <LoaderCircle className='animate-spin' />
+              <p>Ehhez a csoporthoz még nem tartoznak oktatók.</p>
             )}
             <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
             onClick={() => setEditTeachers((o) => !o)} type="button">
@@ -222,24 +186,21 @@ export default function GroupDetails() {
         <div className="flex flex-col gap-2 py-4 group">
           <h3 className='font-bold'>Kurzusok</h3>
           <div className="flex gap-2">
-            {subjects?.length > 0 ? (
+            {group.subjects?.length > 0 ? (
               <ScrollArea className='pb-2 overflow-x-auto'>
                 <div className='flex w-max gap-4 pb-1'>
-                  {subjects.map(subject => (
+                  {group.subjects.map(subject => (
                     <Link to={`/subjects/${subject.id.replace("subject:", "")}`} key={subject.id}>
                       <Button variant='outline' className='flex items-center gap-2'>
                         {subject.name} <SquareArrowOutUpRight />
                       </Button>
                     </Link>
-                  ))}
-                  
+                  ))} 
                 </div>
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
-            ) : subjects ? (
-              <p>Ehhez a csoporthoz még nem tartoznak kurzusok.</p>
             ) : (
-              <LoaderCircle className='animate-spin' />
+              <p>Ehhez a csoporthoz még nem tartoznak kurzusok.</p>
             )}
           </div>
         </div>
@@ -247,12 +208,10 @@ export default function GroupDetails() {
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Tanulók</h3>
-        {students?.length > 0 ? (
+        {group.students?.length > 0 ? (
           <DataTable className="-mt-4" columns={studentColumns} data={group.enroled} />
-        ) : students ? (
-          <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>
         ) : (
-          <LoaderCircle className='animate-spin' />
+          <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>
         )}
       </div>
     </form>

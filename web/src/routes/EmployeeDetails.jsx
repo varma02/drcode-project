@@ -15,33 +15,11 @@ export default function EmployeeDetails() {
   const params = useParams()
 
   const [employee, setEmployee] = useState(null)
-  const [groups, setGroups] = useState(null)
-  // const [students, setStudents] = useState(null)
 
   useEffect(() => {
-    get(auth.token, 'employee', ["employee:" + params.id], null, "groups,worksheet")
+    get(auth.token, 'employee', ["employee:" + params.id], "groups", "groups,worksheet")
     .then(data => setEmployee(data.data.employees[0]))
-  }, [auth.token, params.id]);
-
-  useEffect(() => {
-    if (!employee) return;
-
-    const sids = new Set()
-    employee.groups?.forEach(s => sids.add(s))
-    if (sids.size !== 0)
-      get(auth.token, 'group', Array.from(sids))
-      .then(data => setGroups(data.data.groups))
-    else
-      setGroups([])
-
-    // const stids = new Set()
-    // employee.enroled?.forEach(s => stids.add(s.in))
-    // if (stids.size !== 0)
-    //   getStudent(auth.token, Array.from(stids))
-    //   .then(data => setStudents(data.data.students))
-    // else
-    //   setStudents([])
-  }, [employee]);
+  }, [auth.token, params.id])
 
   if (!employee) return (
     <div className='h-screen w-full bg-background flex items-center justify-center'>
@@ -105,6 +83,7 @@ export default function EmployeeDetails() {
       header: ({ column }) => column.columnDef.displayName,
     },
   ]
+
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl pt-4'>{employee.name}</h1>
@@ -112,10 +91,10 @@ export default function EmployeeDetails() {
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Csoportok</h3>
-        {groups?.length > 0 ? (
+        {employee.groups.length > 0 ? (
           <ScrollArea className='pb-2 overflow-x-auto'>
             <div className='flex w-max gap-4 pb-1'>
-              {groups.map(group => (
+              {employee.groups.map(group => (
                 <Link to={`/groups/${group.id.replace("group:", "")}`} key={group.id}>
                   <Button variant='outline' className='flex items-center gap-2'>
                     {group.name} <SquareArrowOutUpRight />
@@ -125,10 +104,8 @@ export default function EmployeeDetails() {
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
-        ) : groups ? (
-          <p>Ez az alkalmazott nem tanít egy csoportot sem.</p>
         ) : (
-          <LoaderCircle className='animate-spin ' />
+          <p>Ez az alkalmazott nem tanít egy csoportot sem.</p>
         )}
       </div>
 

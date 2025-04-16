@@ -1,7 +1,7 @@
 import { TimePicker } from "@/components/TimePicker"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { get, getAll } from "@/lib/api/api"
+import { get, getAll, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -13,36 +13,14 @@ export default function LessonDetails() {
   const params = useParams()
 
   const [lesson, setLesson] = useState(null)
-  const [allGroups, setAllGroups] = useState([])
-  const [teachers, setTeachers] = useState([])
   const [allTeachers, setAllTeachers] = useState([])
-  const [location, setLocation] = useState([])
   const [allLocations, setAllLocations] = useState([])
-  const [selectedGroup, setSelectedGroup] = useState(null)
 
   useEffect(() => {
-    get(auth.token, 'lesson', ["lesson:" + params.id]).then(data => setLesson(data.data.lessons[0]))
+    get(auth.token, 'lesson', ["lesson:" + params.id], "group,group.teachers,group.location", "enroled").then(data => setLesson(data.data.lessons[0]))
     getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
     getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
-  }, [auth.token, params.id]);
-
-  useEffect(() => {
-    if (!lesson) return;
-    if (lesson.group) {
-      getAll(auth.token, 'group').then(data => setAllGroups(data.data.groups))
-    }
-    else setAllGroups([])
-
-    if (lesson.teachers) get(auth.token, 'employee', lesson.teachers).then(data => setTeachers(data.data.teachers))
-    else setTeachers([])
-  }, [lesson]);
-
-  useEffect(() => {
-    if (allGroups.length == 0) return
-    // if (allGroups == undefined) return
-    setSelectedGroup(allGroups.find(e => e.id == lesson.group))
-    setLocation(allGroups.find(e => e.id == lesson.group).location)
-  }, [allGroups])
+  }, [auth.token, params.id])
 
   const [saveTimer, setSaveTimer] = useState(0);
   function handleChange(e) {
@@ -76,10 +54,9 @@ export default function LessonDetails() {
       // location: data.get("lessonLocation"),
       // teachers: data.get("lessonTeachers").split(","),
       // group: data.get("lessonGroup"),
-      notes: data.get("notes"),
     };
     console.log("AAAA: ", lessonData)
-    updateLesson(auth.token, lessonData)
+    update(auth.token, "lesson", lessonData)
     .then((v) => {
       setLesson((o) => ({...o, ...v.data.lesson}));
       toast.success("Óra mentve");
@@ -87,9 +64,6 @@ export default function LessonDetails() {
     .finally(() => setSaveLoading(false))
     setSaveLoading(false)
   }
-
-  // console.log(lesson)
-  // console.log("GGGGGGGG", selectedGroup)
 
   const [editName, setEditName] = useState(false)
   if (!lesson) return (
@@ -101,9 +75,8 @@ export default function LessonDetails() {
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
       <div className="group flex gap-2 my-4">
-        <Input defaultValue={allGroups.find(e => e.id == lesson.group)?.name} type="text" name="lessonName"
-        placeholder="tanuló neve" className={editName ? "w-max" : "hidden"}/>
-        <h1 className={editName ? "hidden" : "text-4xl"}>{allGroups.find(e => e.id == lesson.group)?.name}</h1>
+        <Input defaultValue={lesson.group.name} type="text" name="lessonName"
+        placeholder="tanuló neve" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} disabled={!editName} />
         <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
         onClick={() => setEditName((o) => !o)} type="button">
           <Edit />
@@ -118,11 +91,11 @@ export default function LessonDetails() {
         <h3 className='font-bold'>Oktatók</h3>
         {/* <GroupComboBox data={allTeachers} title={"Oktatók"} name={"lessonTeachers"} displayName={"name"} defaultValue={teachers} /> */}
         <div className="flex gap-2">
-          { selectedGroup &&
-            selectedGroup.teachers.map(e => 
-              <Link to={`/employee/${e.replace("employee:", "")}`} key={e}>
+          {
+            lesson.group.teachers.map(e => 
+              <Link to={`/employee/${e.id.replace("employee:", "")}`} key={e}>
                 <Button variant='outline' className='flex items-center gap-2'>
-                  {allTeachers.find(t => t.id == e).name} <SquareArrowOutUpRight />
+                  {e.name} <SquareArrowOutUpRight />
                 </Button>
               </Link>
             )
@@ -142,13 +115,13 @@ export default function LessonDetails() {
         <div>
           <h3 className='font-bold'>Helyszín</h3>
           {/* <Combobox data={allLocations} name={"lessonLocation"} displayName={"name"} value={location} setValue={setLocation} /> */}
-          { selectedGroup &&
-            <Link to={`/locations/${selectedGroup.location.id.replace("location:", "")}`} key={selectedGroup.location.id}>
-              <Button variant='outline' className='flex items-center gap-2'>
-                {selectedGroup.location.name} <SquareArrowOutUpRight />
-              </Button>
-            </Link>
-          }
+          
+          <Link to={`/locations/${lesson.group.location.id.replace("location:", "")}`} key={lesson.group.location.id}>
+            <Button variant='outline' className='flex items-center gap-2'>
+              {lesson.group.location.name} <SquareArrowOutUpRight />
+            </Button>
+          </Link>
+        
         </div>
         <div>
           <h3 className='font-bold'>Szülő E-mail címe</h3>
@@ -162,13 +135,11 @@ export default function LessonDetails() {
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Csoport</h3>
-        { selectedGroup &&
-          <Link to={`/groups/${selectedGroup.id.replace("group:", "")}`} key={selectedGroup.id}>
-            <Button variant='outline' className='flex items-center gap-2'>
-              {selectedGroup.name} <SquareArrowOutUpRight />
-            </Button>
-          </Link>
-        }
+        <Link to={`/groups/${lesson.group.id.replace("group:", "")}`} key={lesson.group.id}>
+          <Button variant='outline' className='flex items-center gap-2'>
+            {lesson.group.name} <SquareArrowOutUpRight />
+          </Button>
+        </Link>
       </div>
     </form>
   )

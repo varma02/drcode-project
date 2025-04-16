@@ -36,7 +36,7 @@ export async function get(token: string, endpoint: Endpoint, ids: string[], fetc
   ).data;
 }
 
-export async function update(token: string, endpoint: Endpoint, id: string, data: Object) {
+export async function update(token: string, endpoint: Endpoint, id: string, data: object) {
   return (
     await axios.post(
       API_URL + `/${endpoint}/remove`,
@@ -62,7 +62,7 @@ export async function remove(token: string, endpoint: Endpoint, ids: string[]) {
   ).data;
 }
 
-export async function create(token: string, endpoint: Endpoint, data: Object) {
+export async function create(token: string, endpoint: Endpoint, data: object) {
   return (
     await axios.post(
       API_URL + `/${endpoint}/create`,

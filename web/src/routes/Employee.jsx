@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { getAll } from '@/lib/api/api';
+import { getAll, remove } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
@@ -26,7 +26,6 @@ export default function Employee() {
   const [invites, setInvites] = useState([]);
   const [selectedInvite, setSelectedInvite] = useState(null);
   const [rowSelection, setRowSelection] = useState({})
-  console.log(rowSelection)
 
   useEffect(() => {
     getAll(auth.token, 'invite').then(i => setInvites(i.data.invites))
@@ -156,7 +155,7 @@ export default function Employee() {
   }
 
   function handleDelete() {
-    removeEmployee(auth.token, ...Object.keys(rowSelection).map(e => employees[+e].id)).then(resp => {
+    remove(auth.token, 'employee', ...Object.keys(rowSelection).map(e => employees[+e].id)).then(resp => {
       console.log(resp);
       setEmployees(p => p.filter(e => !resp.data.employees.find(f => f.id == e.id)))
     })

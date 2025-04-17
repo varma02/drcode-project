@@ -22,6 +22,5 @@ export function getMonogram(name: string): string {
 }
 
 export function convertToMultiSelectData(data: Object[], displayKey = "name", valuekey = "id") : Object[] {
-  console.log("MS: ", [...data.map(e => ({label:e[displayKey], value:e[valuekey]}) )]);
   return [...data.map(e => ({label:e[displayKey], value:e[valuekey]}) )];
 }

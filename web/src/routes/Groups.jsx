@@ -18,19 +18,8 @@ export default function Groups() {
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
-    getAll(auth.token, 'group').then(data => setGroups(data.data.groups))
+    getAll(auth.token, 'group', "teachers").then(data => setGroups(data.data.groups))
   }, [])
-
-  useEffect(() => {
-    const tids = new Set()
-    groups.forEach(e => e.teachers.forEach(t => tids.add(t)))
-    if (tids.size === 0) return;
-    get(auth.token, 'employee', Array.from(tids)).then(data => {
-      const temp = {}
-      data.data.employees.forEach(e => temp[e.id] = e.name)
-      setTeachers(temp)
-    });
-  }, [groups])
 
   function handleDelete() {
     remove(auth.token, 'group', ...Object.keys(rowSelection).map(e => groups[+e].id)).then(resp => {
@@ -102,7 +91,7 @@ export default function Groups() {
       displayName: "Oktatók",
       accessorKey: "teachers",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => row.getValue("teachers")?.map(e => teachers[e]).join(", ") || "N/A",
+      cell: ({ row }) => row.getValue("teachers")?.map(e => e.name).join(", ") || "N/A",
     },
     {
       displayName: "Létrehozva",

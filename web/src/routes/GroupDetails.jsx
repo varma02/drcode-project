@@ -29,7 +29,13 @@ export default function GroupDetails() {
   const [editTeachers, setEditTeachers] = useState(false)
 
   useEffect(() => {
-    get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers", "lessons,subjects,enroled").then(data => setGroup(data.data.groups[0]))
+    get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers", "lessons,subjects,enroled")
+    .then(data => {
+      const groupData = data.data.groups[0]
+      setGroup(groupData)
+      get(auth.token, "student", groupData.enroled.map(e => e.in)).then(resp2 => setStudents(resp2.data.students))
+      get(auth.token, "subject", groupData.enroled.map(e => e.subject)).then(resp2 => setSubjects(resp2.data.subjects))
+    });
     getAll(auth.token, 'subject').then(resp => setAllSubjects(resp.data.subjects))
     getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
   }, [auth.token, params.id])
@@ -113,13 +119,13 @@ export default function GroupDetails() {
       id: "name",
       displayName: "Név",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => students.find(s => s.id == row.original.in)?.name,
+      cell: ({ row }) => students?.find(s => s.id == row.original.in)?.name,
     },
     {
       id: "grade",
       displayName: "Évfolyam",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => students.find(s => s.id == row.original.in)?.grade,
+      cell: ({ row }) => students?.find(s => s.id == row.original.in)?.grade,
       
     },
     {
@@ -208,7 +214,7 @@ export default function GroupDetails() {
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Tanulók</h3>
-        {group.students?.length > 0 ? (
+        {group.enroled?.length > 0 ? (
           <DataTable className="-mt-4" columns={studentColumns} data={group.enroled} />
         ) : (
           <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>

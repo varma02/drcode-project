@@ -7,11 +7,14 @@ export type Endpoint = typeof endpoints[number];
 
 // MARK: Common
 
-export async function getAll(token: string, endpoint: Endpoint) {
+export async function getAll(token: string, endpoint: Endpoint, fetch?: string) {
   return (
     await axios.get(
       API_URL + `/${endpoint}/all`,
       {
+        params: {
+          fetch
+        },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }

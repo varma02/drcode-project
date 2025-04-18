@@ -93,7 +93,8 @@ export class Thing {
   public getAll() {
     return errorHandler(async (req, res) => {      
       validateRequest(req, `GET ${getReqURI(req)}`);
-      const fetch = new Set(Object.keys(this.fields).filter(v => this.fields[v]?.fetch));
+      const fetch = new Set((req.query?.fetch as string)?.trim().split(","))
+                    .union(new Set(Object.keys(this.fields).filter(v => this.fields[v]?.fetch)));
       const result = (await db.query(`
         IF ${this.permissions.getAll.general} {
           RETURN SELECT * FROM type::table($table)

@@ -16,35 +16,51 @@ DR.CODE Kecskemét provides interactive, hands-on programming courses for kids. 
 
 ### Running the application
 
-This guide assumes that you have `git` and `Docker` already on your system.
+**The project is under active development and is not ready for production use yet.**
 
-1. **Clone the repository:**  
-	Open a terminal in a directory of your chosing on you machine and type:
-	```bash
-	git clone https://github.com/varma02/drcode-project
-	```
-	 
-3. **Navigate to the project directory:**   
-	You can do this by running the following command:
-	```bash
-	cd drcode-project
-	```
+## Developer Documentation
 
-5. **Make the necessary configurations**   
-	Edit enviornment variables in the `docker-compose.yml` file (line 31-37)
+### Devcontainer
 
-6. **Run docker-compose:**  
-	Make sure that the 80 and 443 port is not occupied on your machine. And run:
-	```bash
-	docker-compose up -d
-	```
+The devcontainer is a configured development enviornment for the project using docker. This makes collaboration and consistency with the future production enviornment easier.
 
-### Developer Documentation
+The easiest way to get started with the devcontainer (assuming you already have docker installed and running on your machine) is by:
+ 1. Cloning the repo on your machine
+ 2. Opening the folder in VSCode
+ 3. Installing the [Devcontainers](https://marketplace.visualstudio.com/items/?itemName=ms-vscode-remote.remote-containers) extension
+ 4. And running `Reopen in container`
 
-The developer documentation is currently under construction, if you need information about the API endpoints please consult the [`openapi.spec.json`](https://github.com/varma02/drcode-project/blob/main/server/openapi.spec.json) file.  
-~~For more detailed information about the architecture, API endpoints, and how to contribute to the development of this project, please refer to the [Developer Documentation](https://github.com/varma02/drcode-project/blob/main/docs/dev.md).~~
+Once the containers are downloaded and running, inside the devcontainer you should have access to a surrealdb instance on `http://db:8000/` and NGINX is also configured to proxy ports `5173` at `/` and `3000` at `/api`. Note that the NGINX port is not forwarded by default so you need to do that from VSCode by adding `nginx:80` to the ports tab.
 
-### Authors
+### Repo structure
+
+This repository contains every part of the application, kind-of like a monorepo.  
+ - The `server` folder has the API written in ExpressJS
+ - And the `web` folder has the React frontend with shadcn/ui
+ - Also there is an `nginx.conf` and a `docker-compose.yaml` file in the root folder, which contain the production config
+
+### Server environment
+
+The ExpressJS API part of the app needs a few environment variables to work. There is a `.env.template` file that explains what the variables do.  
+After configutring the environment, you will need to apply migrations to the database and optionally seed data aswell. To do that, open a terminal, `cd` into the `server` directory and run `bun db reset`.
+
+### Starting the dev server 
+
+Now you are ready to start the devserver. Both the frontend and backend are configured to automatically refresh whem you make changes to the code. To start them, open 2 terminals and -
+ - In the first one run the server by `cd`-ing into it's directory and running `bun dev`
+ - In the second one run the frontend by `cd`-ing into it's directory and running `bun dev`
+
+Now the application should be accessible on `localhost:PORT` where `PORT` is the NGINX port you forwarded earlier.
+
+### REST API endpoints
+
+The ExpressJS API validates every endpoint at input and output phase to match the OpenAPI configuration file found in the `server` directory. This file (`openapi.spec.json`) also acts as the documentation for the APi routes. You can open it with any OpenAPI 3.0 viewer you like, for example [this VSCode extension](https://marketplace.visualstudio.com/items/?itemName=AndrewButson.vscode-openapi-viewer).
+
+The developer documentation is currently under construction, if you need information about the API endpoints please consult the [`openapi.spec.json`](https://github.com/varma02/drcode-project/blob/main/server/openapi.spec.json) file.
+
+### Dev docs to be continued...
+
+## Authors
 
 - **Kovács Tamás** – Front-end developer  
 	[MaalnaKeX@GitHub](https://github.com/MaalnaKeX)

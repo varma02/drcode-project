@@ -5,7 +5,7 @@ import { TimePicker } from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import { createGroup, getAllEmployees, getAllLocations } from '@/lib/api/api'
+import { create, getAll } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import React, { useEffect, useState } from 'react'
@@ -22,8 +22,8 @@ export default function AddCalendarGroup() {
   const [locations, setLocations] = useState([])
   
   useEffect(() => {
-    getAllEmployees(auth.token).then(e => setEmployees(e.data.employees))
-    getAllLocations(auth.token).then(data => setLocations(data.data.locations))
+    getAll(auth.token, 'employee').then(e => setEmployees(e.data.employees))
+    getAll(auth.token, 'location').then(data => setLocations(data.data.locations))
   }, [])
 
   function generateLessons(startDate, lessonCount, startTime, endTime) {
@@ -45,7 +45,7 @@ export default function AddCalendarGroup() {
     const formData = new FormData(event.target)
     console.log(formData)
     const lessons = generateLessons(formData.get("startDate"), formData.get("lessonNum"), formData.get("startTime"), formData.get("endTime"))
-    createGroup(auth.token, formData.get("name"), formData.get("location"), formData.get("employees").split(","), lessons).then(
+    create(auth.token, 'group', formData.get("name"), formData.get("location"), formData.get("employees").split(","), lessons).then(
       () => { 
         toast.success("Csoport sikeresen létrehozva!")
       },

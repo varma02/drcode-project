@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { createStudent } from '@/lib/api/api'
+import { create } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import React from 'react'
 import { Link } from 'react-router-dom'
@@ -17,7 +17,7 @@ export default function AddStudent() {
     console.log(!Object.values(parent).every(e => e == undefined));
     
     //console.log(formData.get("email") || undefined);
-    createStudent(auth.token,
+    create(auth.token, 'student',
       formData.get("name"),
       +formData.get("grade"),
       formData.get("email") || undefined,

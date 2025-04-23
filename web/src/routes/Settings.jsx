@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { getAllEmployees, updateUser } from '@/lib/api/api';
+import { update } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { Pen } from 'lucide-react';
-import React, { useState } from 'react'
+import React from 'react'
 import { toast } from 'sonner';
 
 export default function Settings() {
@@ -25,7 +25,7 @@ export default function Settings() {
       old_password: formData.get("old_password"),
       new_password: formData.get("new_password"),
     }
-    updateUser(auth.token, data)
+    update(auth.token, 'auth', data)
     .then(() => toast.success("Profil módosítva!"))
     .catch((error) => { 
       console.error(error);

@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { get } from "@/lib/api/api"
-
+import { get, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { Edit, LoaderCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -49,7 +48,7 @@ export default function SubjectDetails() {
       description: data.get("description"),
     };
     console.log("AAAA: ", subjectData)
-    updateSubject(auth.token, subjectData)
+    update(auth.token, "subject", subjectData)
     .then((v) => {
       setLocation((o) => ({...o, ...v.data.location}));
       toast.success("Kurzus mentve");

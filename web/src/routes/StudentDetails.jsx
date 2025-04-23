@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { get } from "@/lib/api/api"
+import { get, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
@@ -82,7 +82,7 @@ export default function StudentDetails() {
         phone: data.get("parentPhone"),
       },
     };
-    updateStudent(auth.token, studentData)
+    update(auth.token, "student", studentData)
     .then((v) => {
       setStudent((o) => ({...o, ...v.data.student}));
       toast.success("Tanuló mentve");

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { get } from "@/lib/api/api"
+import { get, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { Edit, LoaderCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -49,7 +49,7 @@ export default function LocationDetails() {
       contact_phone: data.get("locationPhone"),
     };
     console.log("AAAA: ", locationData)
-    updateLocation(auth.token, locationData)
+    update(auth.token, "location", locationData)
     .then((v) => {
       setLocation((o) => ({...o, ...v.data.location}));
       toast.success("Helyszín mentve");

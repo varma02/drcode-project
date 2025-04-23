@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { get, getAll } from "@/lib/api/api"
+import { get, getAll, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
@@ -69,9 +69,9 @@ export default function GroupDetails() {
     const groupData = {
       id: "group:" + params.id,
       name: data.get("groupName"),
-      teachers: data.get("groupTeachers") || teachers.map(e => e.id)
+      teachers: data.get("groupTeachers") || teachers?.map(e => e.id) || null
     };
-    updateGroup(auth.token, groupData)
+    update(auth.token, "group", groupData)
     .then((v) => {
       setLesson((o) => ({...o, ...v.data.group}));
       toast.success("Csoport mentve");

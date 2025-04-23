@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { createSubject } from '@/lib/api/api'
+import { create } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import React from 'react'
 import { Link } from 'react-router-dom'
@@ -14,7 +14,7 @@ export default function AddNewSubject() {
     event.preventDefault()
     const formData = new FormData(event.target)
     console.log(formData)
-    createSubject(auth.token, formData.get("name"), formData.get("description")).then(
+    create(auth.token, 'subject', formData.get("name"), formData.get("description")).then(
       () => { 
         toast.success("Kurzus sikeresen létrehozva!")
       },

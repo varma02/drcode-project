@@ -3,8 +3,7 @@ import { MultiSelect } from '@/components/MultiSelect'
 import { TimePicker } from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { createLesson, createSubject, getAllEmployees, getAllGroups, getAllLocations } from '@/lib/api/api'
+import { create, getAll } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -20,16 +19,16 @@ export default function AddNewSubject() {
   const [groups, setGroups] = useState([])
 
   useEffect(() => {
-    getAllEmployees(auth.token).then(resp => setTeachers(resp.data.employees))
-    getAllLocations(auth.token).then(resp => setLocations(resp.data.locations))
-    getAllGroups(auth.token).then(resp => setGroups(resp.data.groups))
+    getAll(auth.token, 'employee').then(resp => setTeachers(resp.data.employees))
+    getAll(auth.token, 'location').then(resp => setLocations(resp.data.locations))
+    getAll(auth.token, 'group').then(resp => setGroups(resp.data.groups))
   }, [auth.token])
 
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
     console.log(formData)
-    // createLesson(auth.token, formData.get("name"), formData.get("note")).then(
+    // create(auth.token, 'lesson', formData.get("name"), formData.get("note")).then(
     //   () => { 
     //     toast.success("Óra sikeresen létrehozva!")
     //   },

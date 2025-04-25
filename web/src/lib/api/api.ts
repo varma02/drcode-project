@@ -42,7 +42,7 @@ export async function get(token: string, endpoint: Endpoint, ids: string[], fetc
 export async function update(token: string, endpoint: Endpoint, id: string, data: object) {
   return (
     await axios.post(
-      API_URL + `/${endpoint}/remove`,
+      API_URL + `/${endpoint}/update`,
       {
         params: { id, ...data },
         headers: { Authorization: `Bearer ${token}` },

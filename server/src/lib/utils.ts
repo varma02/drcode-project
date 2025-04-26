@@ -3,7 +3,6 @@ import AjvAddFormats from 'ajv-formats';
 import express from 'express';
 import JsonRefs from 'json-refs';
 import { BadRequestError, ServerError } from './errors';
-// @ts-expect-error
 import mergeAllOf from 'json-schema-merge-allof';
 
 export const spec: any = mergeAllOf((await JsonRefs.resolveRefs((await import("../openapi.spec.json")).default)).resolved);

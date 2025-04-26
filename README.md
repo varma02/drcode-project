@@ -16,7 +16,29 @@ DR.CODE Kecskemét provides interactive, hands-on programming courses for kids. 
 
 ### Running the application
 
-**The project is under active development and is not ready for production use yet.**
+***!! The project is under active development and is not ready for production use yet !!***
+
+ 1. Download or clone this repository.  
+    `git clone https://github.com/varma02/drcode-project`
+ 2. Modify the environment variables in `docker-compose.yaml`, especially the secrets and passwords.
+ 3. Run the containers.  
+    `docker-compose up -d`
+ 4. Login with the default credentials
+```
+	Username: admin@example.com
+	Password: 1234
+```
+
+### Administrator's guide
+
+As an administrator you have the power to manage every part of the organization.
+
+#### Registering new employees
+
+Navigate to the employees tab via the sidabar and click on `+ Invite`. Select what roles the new employee should have and click submit. You will be presented with a link, copy it and send it to the new employee.  
+Note that every invite is single use only and gets deleted after use. You can see active/unused invites in the top of the employees tab.
+
+to be continued...
 
 ## Developer Documentation
 
@@ -56,9 +78,21 @@ Now the application should be accessible on `localhost:PORT` where `PORT` is the
 
 The ExpressJS API validates every endpoint at input and output phase to match the OpenAPI configuration file found in the `server` directory. This file (`openapi.spec.json`) also acts as the documentation for the APi routes. You can open it with any OpenAPI 3.0 viewer you like, for example [this VSCode extension](https://marketplace.visualstudio.com/items/?itemName=AndrewButson.vscode-openapi-viewer).
 
-The developer documentation is currently under construction, if you need information about the API endpoints please consult the [`openapi.spec.json`](https://github.com/varma02/drcode-project/blob/main/server/openapi.spec.json) file.
+#### Tests
 
-### Dev docs to be continued...
+Tests are also defined in the OpenAPI specification file. Every response can have an `x-tests` key, where the value is an array of tests for that response. One item of that list (a testcase) must be like this:
+```
+interface TestCase {
+  description: string,
+  request?: {
+      auth?: "teacher" | "administrator",
+      body?: object,
+      query?: object,
+    },
+    response?: object,
+}
+```
+Then you can run the tests by opening a terminal in the `server` directory and running `bun test`
 
 ## Authors
 

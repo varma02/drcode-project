@@ -3613,7 +3613,10 @@
             "example": "Kodály 16:00 Scratch"
           },
           "location": {
-            "$ref": "#/components/schemas/Location"
+            "anyOf": [
+              {"$ref": "#/components/schemas/Location"},
+              {"$ref": "#/components/schemas/Location/properties/id"}
+            ]
           },
           "archived": {
             "type": "boolean",

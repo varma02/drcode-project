@@ -2305,6 +2305,64 @@
         }
       }
     },
+    "/lesson/attendance": {
+      "post": {
+        "tags": ["lesson"],
+        "summary": "Update attendance",
+        "description": "This endpoint is used for updating the attendance record on lessons.",
+        "security": [{"BearerJwt": []}],
+        "operationId": "lessonUpdateAttendance",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Request body for updating attendance",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id", "students"],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/Lesson/properties/id"
+                  },
+                  "students": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Student/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the attendance was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
     "/lesson/create": {
       "post": {
         "summary": "Create a new lesson",

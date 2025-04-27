@@ -1,3 +1,4 @@
+import { Combobox } from "@/components/ComboBox"
 import DataTable from "@/components/DataTable"
 import { MultiSelect } from "@/components/MultiSelect"
 import { Button } from "@/components/ui/button"
@@ -9,7 +10,7 @@ import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
-import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
+import { Edit, LoaderCircle, Plus, Save, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { toast } from "sonner"
@@ -19,14 +20,15 @@ export default function GroupDetails() {
   const params = useParams()
 
   const [group, setGroup] = useState(null)
-  const [allSubjects, setAllSubjects] = useState([])
   const [allTeachers, setAllTeachers] = useState([])
+  const [allLocations, setAllLocations] = useState([])
   const [students, setStudents] = useState(null)
   const [teachers, setTeachers] = useState(null)
   const [subjects, setSubjects] = useState(null)
 
   const [editName, setEditName] = useState(false)
   const [editTeachers, setEditTeachers] = useState(false)
+  const [editLocation, setEditLocation] = useState(false)
 
   useEffect(() => {
     get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers", "lessons,subjects,enroled")
@@ -36,9 +38,11 @@ export default function GroupDetails() {
       get(auth.token, "student", groupData.enroled.map(e => e.in)).then(resp2 => setStudents(resp2.data.students))
       get(auth.token, "subject", groupData.enroled.map(e => e.subject)).then(resp2 => setSubjects(resp2.data.subjects))
     });
-    getAll(auth.token, 'subject').then(resp => setAllSubjects(resp.data.subjects))
     getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
+    getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
   }, [auth.token, params.id])
+
+  console.log(group)
   
   const [saveTimer, setSaveTimer] = useState(0)
   function handleChange(e) {
@@ -67,11 +71,11 @@ export default function GroupDetails() {
     const data = new FormData(e.target);
     console.log(data)
     const groupData = {
-      id: "group:" + params.id,
-      name: data.get("groupName"),
-      teachers: data.get("groupTeachers") || teachers?.map(e => e.id) || null
+      name: data.get("groupName") || group.name,
+      location: data.get("groupLocation"),
+      teachers: data.get("groupTeachers").split(",")
     };
-    update(auth.token, "group", groupData)
+    update(auth.token, "group", "group:" + params.id, groupData)
     .then((v) => {
       setLesson((o) => ({...o, ...v.data.group}));
       toast.success("Csoport mentve");
@@ -81,13 +85,11 @@ export default function GroupDetails() {
     setSaveLoading(false)
   }
 
-
   if (!group) return (
     <div className='h-screen w-full bg-background flex items-center justify-center'>
       <LoaderCircle className='animate-spin' />
     </div>
   )
-
 
   const studentColumns = [
     {
@@ -190,6 +192,35 @@ export default function GroupDetails() {
         </div>
 
         <div className="flex flex-col gap-2 py-4 group">
+          <h3 className='font-bold'>Helyszín</h3>
+          <div className="flex gap-2">
+            <Combobox 
+              data={allLocations}
+              displayName={"name"}
+              value={group.location} 
+              name="groupLocation" className={`${!editLocation ? "hidden" : "flex"}`} />
+            {group.location ? (
+              <ScrollArea className={`pb-2 overflow-x-auto ${editLocation ? "hidden" : "block"}`}>
+                <div className='flex w-max gap-4 pb-1'>
+                  <Link to={`/location/${group.location.id.replace("location:", "")}`} key={group.location.id}>
+                    <Button variant='outline' className='flex items-center gap-2'>
+                      {group.location.name} <SquareArrowOutUpRight />
+                    </Button>
+                  </Link>
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            ) : (
+              <p>Ehhez a csoporthoz még nem tartozik helyszín.</p>
+            )}
+            <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+            onClick={() => setEditLocation((o) => !o)} type="button">
+              <Edit />
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 py-4 group">
           <h3 className='font-bold'>Kurzusok</h3>
           <div className="flex gap-2">
             {group.subjects?.length > 0 ? (
@@ -215,7 +246,13 @@ export default function GroupDetails() {
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Tanulók</h3>
         {group.enroled?.length > 0 ? (
-          <DataTable className="-mt-4" columns={studentColumns} data={group.enroled} />
+          <DataTable 
+            className="-mt-4" 
+            columns={studentColumns} 
+            data={group.enroled}
+            headerAfter={
+              <Button variant="outline" type="button" disabled>Hozzáadás <Plus /></Button>
+            } />
         ) : (
           <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>
         )}

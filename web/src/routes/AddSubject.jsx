@@ -14,7 +14,7 @@ export default function AddNewSubject() {
     event.preventDefault()
     const formData = new FormData(event.target)
     console.log(formData)
-    create(auth.token, 'subject', formData.get("name"), formData.get("description")).then(
+    create(auth.token, 'subject', { name: formData.get("name") }).then(
       () => { 
         toast.success("Kurzus sikeresen létrehozva!")
       },

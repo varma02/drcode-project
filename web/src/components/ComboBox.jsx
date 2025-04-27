@@ -6,20 +6,21 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useState } from "react"
 
-export function Combobox({data, displayName, placeholder = "Válassz...", value, setValue, name}) {
+export function Combobox({data, displayName, placeholder = "Válassz...", value, setValue, name, defaultValue, className}) {
   const [open, setOpen] = useState(false)
+  const [ivalue, isetValue] = useState(value ? value : defaultValue)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <input type="text" name={name} defaultValue={value} className="hidden" />
+      <input type="text" name={name} defaultValue={value ? value : ivalue} className="hidden" />
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between overflow-x-hidden text-ellipsis"
+          className={`w-[200px] justify-between overflow-x-hidden text-ellipsis ${className}`}
         >
-          { value ? data.find(e => e.id === value)?.[displayName] : placeholder }
+          { ivalue ? data.find(e => e.id === ivalue)?.[displayName] : placeholder }
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -35,14 +36,15 @@ export function Combobox({data, displayName, placeholder = "Válassz...", value,
                   value={e.id}
                   onSelect={(currentValue) => {
                     console.log(currentValue)
-                    setValue(currentValue == value ? "" : currentValue)
+                    if (setValue) setValue(currentValue == ivalue ? "" : currentValue)
+                    isetValue(currentValue == ivalue ? "" : currentValue)
                     setOpen(false)
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === e.id ? "opacity-100" : "opacity-0"
+                      ivalue === e.id ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {e.name}

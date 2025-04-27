@@ -1,9 +1,6 @@
-import AreYouSureAlert from "@/components/AreYouSureAlert"
 import DataTable from "@/components/DataTable"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { get, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
@@ -23,28 +20,13 @@ export default function StudentDetails() {
 
   useEffect(() => {
     get(auth.token, 'student', ["student:" + params.id], null, "enroled")
-    .then(data => setStudent(data.data.students[0]))
-  }, [auth.token, params.id]);
-
-  useEffect(() => {
-    if (!student) return;
-
-    const gids = new Set()
-    student.enroled?.forEach(s => gids.add(s.out))
-    if (gids.size !== 0)
-      get(auth.token, 'group', Array.from(gids))
-      .then(data => setGroups(data.data.groups))
-    else
-      setGroups([])
-
-    const stids = new Set()
-    student.enroled?.forEach(s => stids.add(s.subject))
-    if (stids.size !== 0)
-      get(auth.token, 'subject', Array.from(stids))
-      .then(data => setSubjects(data.data.subjects))
-    else
-      setSubjects([])
-  }, [student]);
+    .then(data => {
+      const studentData = data.data.students[0]
+      setStudent(studentData)
+      get(auth.token, "group", studentData.enroled.map(e => e.out)).then(resp => setGroups(resp.data.groups))
+      get(auth.token, "subject", studentData.enroled.map(e => e.subject)).then(resp => setSubjects(resp.data.subjects))
+    })
+  }, [auth.token, params.id])
 
   const [saveTimer, setSaveTimer] = useState(0);
   function handleChange(e) {
@@ -71,7 +53,6 @@ export default function StudentDetails() {
     setSaveLoading(true);
     const data = new FormData(e.target);
     const studentData = {
-      id: "student:" + params.id,
       name: data.get("studentName"),
       grade: data.get("studentGrade"),
       email: data.get("studentEmail"),
@@ -82,7 +63,7 @@ export default function StudentDetails() {
         phone: data.get("parentPhone"),
       },
     };
-    update(auth.token, "student", studentData)
+    update(auth.token, "student", "student:" + params.id, studentData)
     .then((v) => {
       setStudent((o) => ({...o, ...v.data.student}));
       toast.success("Tanuló mentve");
@@ -99,31 +80,6 @@ export default function StudentDetails() {
   )
 
   const columns = [
-    {
-      id: "select",
-      ignoreClickEvent: true,
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          className="float-left"
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          className="float-left"
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       displayName: "Csoport neve",
       accessorKey: "out",
@@ -164,11 +120,6 @@ export default function StudentDetails() {
       displayName: "Ár",
       header: "Ár",
       accessorKey: "price",
-    },
-    {
-      displayName: "Megjegyzés",
-      header: "Megjegyzés",
-      accessorKey: "notes",
     },
     {
       displayName: "Beiratkozás",
@@ -227,18 +178,10 @@ export default function StudentDetails() {
       </div>
 
       <div className="flex flex-col gap-2 py-4">
-        <h3 className='font-bold'>Megjegyzés</h3>
-        <Textarea placeholder="Lorem ipsum dolor..." className="h-20 max-h-48" defaultValue={student.notes} name="notes" />
-      </div>
-
-      <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Csoportok</h3>
         {student.enroled.length > 0 ? (
           <DataTable data={student.enroled} columns={columns}
-          className="-mt-14"
-          headerAfter={<div className='flex gap-4 pl-4'>
-            <AreYouSureAlert />
-          </div>} />
+          className="-mt-14" />
         ) : (
           <p>Ez a tanuló még nem tagja egy csoportnak sem</p>
         )}

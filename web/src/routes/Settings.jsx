@@ -25,7 +25,7 @@ export default function Settings() {
       old_password: formData.get("old_password"),
       new_password: formData.get("new_password"),
     }
-    update(auth.token, 'auth', data)
+    update(auth.token, 'auth', auth.user.id, data)
     .then(() => toast.success("Profil módosítva!"))
     .catch((error) => { 
       console.error(error);
@@ -69,8 +69,8 @@ export default function Settings() {
               <Input name="email" type="email" id="email" placeholder="minta.peter@example.com" required defaultValue={auth.user.email} />
             </div>
             <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="old_password" className="text-left">Jelenlegi jelszó *</Label>
-              <Input name="old_password" type="password" id="old_password" required />
+              <Label htmlFor="old_password" className="text-left">Jelenlegi jelszó</Label>
+              <Input name="old_password" type="password" id="old_password" />
             </div>
             <Separator />
             <div className="grid w-full max-w-sm items-center gap-1.5">

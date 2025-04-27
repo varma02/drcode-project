@@ -43,8 +43,8 @@ export async function update(token: string, endpoint: Endpoint, id: string, data
   return (
     await axios.post(
       API_URL + `/${endpoint}/update`,
+      {...{ id, ...data }},
       {
-        params: { id, ...data },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }
@@ -69,8 +69,8 @@ export async function create(token: string, endpoint: Endpoint, data: object) {
   return (
     await axios.post(
       API_URL + `/${endpoint}/create`,
+      data,
       {
-        params: { ...data },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }

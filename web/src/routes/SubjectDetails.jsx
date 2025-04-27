@@ -43,16 +43,13 @@ export default function SubjectDetails() {
     setSaveLoading(true);
     const data = new FormData(e.target);
     const subjectData = {
-      id: "subject:" + params.id,
-      name: data.get("subjectName"),
-      description: data.get("description"),
+      name: data.get("subjectName") || subject.name,
+      description: data.get("description") || subject.description,
     };
     console.log("AAAA: ", subjectData)
-    update(auth.token, "subject", subjectData)
-    .then((v) => {
-      setLocation((o) => ({...o, ...v.data.location}));
-      toast.success("Kurzus mentve");
-    }).catch(() => toast.error("Hiba történt mentés közben!"))
+    update(auth.token, "subject", "subject:" + params.id, subjectData)
+    .then((v) => { toast.success("Kurzus mentve") })
+    .catch((err) => toast.error("Hiba történt mentés közben!"))
     .finally(() => setSaveLoading(false))
     setSaveLoading(false)
   }
@@ -68,10 +65,8 @@ export default function SubjectDetails() {
 
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
-      <div className="group flex gap-2 my-4">
-        <Input defaultValue={subject.name} type="text" name="subjectName"
-        placeholder="tanuló neve" className={editName ? "w-max" : "hidden"}/>
-        <h1 className={editName ? "hidden" : "text-4xl"}>{subject.name}</h1>
+      <div className="group flex gap-2 my-4 items-center">
+        <Input defaultValue={subject.name} name="subjectName" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} disabled={!editName} />
         <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
         onClick={() => setEditName((o) => !o)} type="button">
           <Edit />

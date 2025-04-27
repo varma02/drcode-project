@@ -19,20 +19,20 @@ export default function LocationDetails() {
 
   const [saveTimer, setSaveTimer] = useState(0);
   function handleChange(e) {
-    if (saveTimer == 0) {
-      const interval = setInterval(() => {
-        setSaveTimer((o) => {
-          if (o >= 50) {
-            clearInterval(interval);
-            handleSave({preventDefault: e.preventDefault, target: e.target.form});
-            return 0;
-          } else {
-            return o + 1;
-          }
-        })
-      }, 50);
-    }
-    setSaveTimer(1);
+    // if (saveTimer == 0) {
+    //   const interval = setInterval(() => {
+    //     setSaveTimer((o) => {
+    //       if (o >= 50) {
+    //         clearInterval(interval);
+    //         handleSave({preventDefault: e.preventDefault, target: e.target.form});
+    //         return 0;
+    //       } else {
+    //         return o + 1;
+    //       }
+    //     })
+    //   }, 50);
+    // }
+    // setSaveTimer(1);
   }
 
   const [saveLoading, setSaveLoading] = useState(false);
@@ -42,14 +42,13 @@ export default function LocationDetails() {
     setSaveLoading(true);
     const data = new FormData(e.target);
     const locationData = {
-      id: "location:" + params.id,
       name: data.get("locationName"),
       address: data.get("locationAddress"),
       contact_email: data.get("locationEmail"),
       contact_phone: data.get("locationPhone"),
     };
     console.log("AAAA: ", locationData)
-    update(auth.token, "location", locationData)
+    update(auth.token, "location", "location:" + params.id, locationData)
     .then((v) => {
       setLocation((o) => ({...o, ...v.data.location}));
       toast.success("Helyszín mentve");
@@ -69,10 +68,8 @@ export default function LocationDetails() {
 
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
-      <div className="group flex gap-2 my-4">
-        <Input defaultValue={location.name} type="text" name="locationName"
-        placeholder="tanuló neve" className={editName ? "w-max" : "hidden"}/>
-        <h1 className={editName ? "hidden" : "text-4xl"}>{location.name}</h1>
+      <div className="group flex gap-2 my-4 items-center">
+        <Input defaultValue={location.name} name="locationName" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} disabled={!editName} onInput={(e) => e.target.style.width = e.target.value.length * 2.5 + "rem"} />
         <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
         onClick={() => setEditName((o) => !o)} type="button">
           <Edit />

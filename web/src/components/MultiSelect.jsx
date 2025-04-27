@@ -48,7 +48,7 @@ export const MultiSelect = forwardRef((props, ref) => {
   const {
     name,
     options,
-    onValueChange = () => {},
+    onValueChange  = () => {},
     variant,
     defaultValue = [],
     placeholder = "Select options",
@@ -114,7 +114,7 @@ export const MultiSelect = forwardRef((props, ref) => {
       onOpenChange={setIsPopoverOpen}
       modal={modalPopover}
     >
-      <input type="text" name={name} value={selectedValues.map(e => e.id)} onChange={() => {}} className="hidden" />
+      <input type="text" name={name} value={selectedValues.join(",")} onChange={() => {}} className="hidden" />
       <PopoverTrigger asChild>
         <Button
           ref={ref}

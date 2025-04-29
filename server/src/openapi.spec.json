@@ -2126,6 +2126,64 @@
         "operationId": "getLessonsBetweenDates"
       }
     },
+    "/lesson/next": {
+      "get": {
+        "summary": "Get the next lesson",
+        "description": "Retrieves the next upcoming lesson of a teacher.",
+        "tags": ["lesson"],
+        "security": [{"BearerJwt": []}],
+        "operationId": "getNextLesson",
+        "parameters": [
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful, the lesson can be found in the response.",
+            "content": {
+              "application/json":{
+                "schema": {
+                  "title": "GetNextLessonOk",
+                  "type": "object",
+                  "required": ["data", "code"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "lesson": {
+                          "$ref": "#/components/schemas/LessonExtended"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "x-tests": [
+              {
+                "description": "Test for success",
+                "request": {
+                  "auth": "teacher"
+                }
+              }
+            ]
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
     "/lesson/remove": {
       "post": {
         "summary": "Remove lessons",
@@ -4112,11 +4170,6 @@
                 "$ref": "#/components/schemas/Lesson"
               }
             ]
-          },
-          "paid": {
-            "type": "boolean",
-            "description": "Whether the lesson was paid for or not",
-            "example": true
           }
         }
       },

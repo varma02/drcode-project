@@ -80,7 +80,10 @@ export async function tests() {
                   const resp = await agent
                     .query(xtest.request?.query || {})
                     .send(xtest.request?.body || {})
-                  const validate = ajv.compile(xtest.response || rv.content["application/json"].schema);
+                  const validate = ajv.compile({
+                    ...rv.content["application/json"].schema,
+                    ...(xtest.response || {})
+                  });
                   expect(resp.status).toBe(parseInt(response));
                   const isValid = validate(resp.body);
                   if (!isValid) console.error("Validation errors:", validate.errors);

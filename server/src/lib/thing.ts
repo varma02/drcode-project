@@ -64,16 +64,18 @@ export class Thing {
       validateRequest(req, `POST ${getReqURI(req)}`);
       const adtq = additionalQuery?.(req);
       for (const [k,v] of Object.entries(this.fields)) 
-        !req.body[k] && v.default ? req.body[k] = v.default : null;
+        !req.body[k] && v.default ? req.body[k] = null : null;
       const result = (await db.query(`
         IF ${this.permissions.create.general} {
           ${adtq ? "BEGIN TRANSACTION;": ""}
           $original = CREATE ONLY type::table($table) CONTENT {
             ${
               Object.keys(req.body).map((k:any) => `${k}: ${
-                this.fields[k]?.CONVERTER
-                ? this.fields[k]?.CONVERTER?.replace("$field", `$fields.${k}`) || `$fields.${k}`
-                : `$fields.${k}`
+                req.body[k] == null && this.fields[k]?.default
+                ? this.fields[k]?.default
+                : this.fields[k]?.CONVERTER
+                  ? this.fields[k]?.CONVERTER?.replace("$field", `$fields.${k}`) || `$fields.${k}`
+                  : `$fields.${k}`
               }`).join(",")
             }
           };
@@ -106,7 +108,12 @@ export class Thing {
     });
   }
 
-  public get({WHERE}: {WHERE?: (req: express.Request) => string} = {}) {
+  public get({WHERE, extraFields, ORDER = "", LIMIT = "", postProcess}: {
+    WHERE?: (req: express.Request) => string,
+    ORDER?: string, LIMIT?: string,
+    postProcess?: (result: any[]) => any,
+    extraFields?: (req: express.Request) => {[key: string]: any}
+  } = {}) {
     return errorHandler(async (req, res) => {
       validateRequest(req, `GET ${getReqURI(req)}`);
       const ids = (req.query?.ids as string)?.trim().split(",");
@@ -121,13 +128,14 @@ export class Thing {
             .join(",")
           } FROM ${WHERE ? this.table :"array::map($ids, |$id| type::thing($id))"}
           WHERE ${this.permissions.getById.perRecord || "true"} AND ${WHERE?.(req) || "true"}
+          ${ORDER ? `ORDER BY ${ORDER}` : ""} ${LIMIT ? `LIMIT ${LIMIT}` : ""}
           ${fetch.size ? "FETCH type::fields($fetch)" : ""};
         } ELSE {
           THROW "x-permission-denied";
         }
-      `, { user: req.user, ids, fetch: [...fetch] }))[0];
+      `, { user: req.user, ids, fetch: [...fetch], ...(extraFields?.(req) || {}) }))[0];
       if (!result || !result.length) throw new NotFoundError();
-      respond200(res, `GET ${getReqURI(req)}`, { [`${this.table}s`]: result });
+      respond200(res, `GET ${getReqURI(req)}`, postProcess ? postProcess(result) : { [`${this.table}s`]: result });
     });
   }
 

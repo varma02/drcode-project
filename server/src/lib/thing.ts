@@ -70,14 +70,11 @@ export class Thing {
           ${adtq ? "BEGIN TRANSACTION;": ""}
           $original = CREATE ONLY type::table($table) CONTENT {
             ${
-              req.body.map((k:any) => `${k}: ${
-                  req.body[k] ?
-                    this.fields[k]?.CONVERTER
-                    ? this.fields[k]?.CONVERTER?.replace("$field", `$fields.${k}`) || `$fields.${k}`
-                    : `$fields.${k}`
-                  : this.fields[k]?.default
-                }`)
-              .join(",")
+              Object.keys(req.body).map((k:any) => `${k}: ${
+                this.fields[k]?.CONVERTER
+                ? this.fields[k]?.CONVERTER?.replace("$field", `$fields.${k}`) || `$fields.${k}`
+                : `$fields.${k}`
+              }`).join(",")
             }
           };
           ${adtq || ""}

@@ -86,7 +86,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
           {
-            Object.keys(items).map(e => 
+            Object.keys(items).filter(e => getTopRole(auth.user.roles) != "Adminisztrátor" ? e != "Admin" : true).map(e => 
             <SidebarGroup key={e}>
               <SidebarGroupLabel>{e}</SidebarGroupLabel>
               <SidebarGroupContent>

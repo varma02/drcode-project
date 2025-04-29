@@ -3,20 +3,21 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { getAll, remove } from '@/lib/api/api';
+import { create, getAll, remove } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, ArrowUpDown, Copy, LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { getMonogram, getTopRole, role_map } from '@/lib/utils';
+import { convertToMultiSelectData, getMonogram, getTopRole, role_map } from '@/lib/utils';
 import { GroupComboBox } from '@/components/GroupComboBox';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import AreYouSureAlert from '@/components/AreYouSureAlert';
 import { useNavigate } from 'react-router-dom';
+import { MultiSelect } from '@/components/MultiSelect';
 
 export default function Employee() {
   const auth = useAuth();
@@ -122,8 +123,10 @@ export default function Employee() {
     event.preventDefault();
     setInviteLoading(true);
     const formdata = new FormData(event.target);
-    const roles = formdata.get("roles").split(",");
-    createInvite(auth.token, roles).then((v) => {
+    const roles = {
+      roles: formdata.get("roles").split(",")
+    }
+    create(auth.token, "invite", roles).then((v) => {
       setInviteLoading(false);
       setSelectedInvite(v.data.invite);
       setInvites([...invites, v.data.invite]);
@@ -141,7 +144,7 @@ export default function Employee() {
   function handleInviteRemove(event) {
     event.preventDefault();
     console.log(selectedInvite);
-    removeInvite(auth.token, selectedInvite.id).then((v) => {
+    remove(auth.token, 'invite', [selectedInvite.id]).then((v) => {
       setInvites(invites.filter(i => i.id != selectedInvite.id));
       setInviteDialogOpen(false);
       toast.success("Meghívó visszavonva");
@@ -221,8 +224,8 @@ export default function Employee() {
                 <Button variant="destructive" onClick={handleInviteRemove}>Meghívó visszavonása</Button>
               </div>
             ) : (<form className='flex flex-col gap-4' onSubmit={handleInvite}>
-              <GroupComboBox data={Object.entries(role_map).map(v => ({id: v[0], name:v[1]}))} displayName={"name"} placeholder='Válassz Szerepkört...' title={"Szerepkörök"} className={"w-full"} name="roles" />
-                <Button type="submit" className="ml-auto" disabled={inviteLoading}>{inviteLoading && <LoaderCircle className='animate-spin ' />} Új meghívó</Button>
+              <MultiSelect options={Object.entries(role_map).map(e => ({label:e[1], value:e[0]}) )} placeholder='Válassz Szerepkört...' className={"w-full"} name="roles" />
+              <Button type="submit" className="ml-auto" disabled={inviteLoading}>{inviteLoading && <LoaderCircle className='animate-spin ' />} Új meghívó</Button>
             </form>)}
           </DialogContent>
         </Dialog>

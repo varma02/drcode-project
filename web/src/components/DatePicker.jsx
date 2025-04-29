@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
 import { CalendarIcon } from 'lucide-react'
@@ -7,32 +7,39 @@ import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 
-export const DatePicker = ({numberOfMonths = 1, date, setDate, dateFormat = "PPP", showTimePicker, name, includeTime, required = false}) => {
+export const DatePicker = ({numberOfMonths = 1, date = new Date(), setDate, dateFormat = "PPP", showTimePicker, name, includeTime, required = false}) => {
+  const [value, setValue] = useState(date)
+
+  function changeDate(newDate) {
+    if (setDate) setDate(newDate)
+    setValue(newDate)
+  }
+
   return (
     <Popover>
-      <input type="text" name={name} value={includeTime ? date.toISOString() : date.toISOString().slice(0, 10)} onChange={() => {}} className="hidden" />
+      <input type="text" name={name} value={includeTime ? value.toISOString() : value.toISOString().slice(0, 10)} onChange={() => {}} className="hidden" />
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
           className={cn(
             "w-[280px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !value && "text-muted-foreground"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, dateFormat, {locale: hu}) : <span>Válassz egy dátumot</span>}
+          {value ? format(value, dateFormat, {locale: hu}) : <span>Válassz egy dátumot</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
           required={required}
           mode="single"
-          selected={date}
+          selected={value}
           initialFocus
           numberOfMonths={numberOfMonths}
           showTimePicker={showTimePicker}
-          date={date}
-          setDate={setDate}
+          date={value}
+          setDate={changeDate}
         />
       </PopoverContent>
     </Popover>

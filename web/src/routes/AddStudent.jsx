@@ -17,13 +17,14 @@ export default function AddStudent() {
     console.log(!Object.values(parent).every(e => e == undefined));
     
     //console.log(formData.get("email") || undefined);
-    create(auth.token, 'student',
-      formData.get("name"),
-      +formData.get("grade"),
-      formData.get("email") || undefined,
-      formData.get("phone") || undefined,
-      !Object.values(parent).every(e => e == undefined) ? parent : undefined
-    ).then(
+    const studentData = {
+      name: formData.get("name"),
+      grade: +formData.get("grade"),
+      email: formData.get("email") || undefined,
+      phone: formData.get("phone") || undefined,
+      parent
+    }
+    create(auth.token, 'student', studentData).then(
       () => {
         toast.success("Tanuló sikeresen létrehozva!")
       },

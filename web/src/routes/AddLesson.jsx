@@ -1,10 +1,12 @@
 import { Combobox } from '@/components/ComboBox'
+import { DatePicker } from '@/components/DatePicker'
 import { MultiSelect } from '@/components/MultiSelect'
 import { TimePicker } from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { create, getAll } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
+import { convertToMultiSelectData, generateLessons } from '@/lib/utils'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -28,25 +30,34 @@ export default function AddNewSubject() {
     event.preventDefault()
     const formData = new FormData(event.target)
     console.log(formData)
-    // create(auth.token, 'lesson', formData.get("name"), formData.get("note")).then(
-    //   () => { 
-    //     toast.success("Óra sikeresen létrehozva!")
-    //   },
-    //   (error) => { 
-    //     console.error(error)
-    //     switch (error.response?.data?.code) {
-    //       case "fields_required":
-    //         return toast.error("Valamelyik mező üres!")
-    //       case "unauthorized":
-    //         return toast.error("Ehhez hincs jogosultsága!")
-    //       default:
-    //         return toast.error("Ismeretlen hiba történt!")
-    //     }
-    //   }
-    // )
+    const lessonTime = generateLessons(formData.get("lessonDate"), 1, formData.get("start"), formData.get("end"))[0]
+    const lessondata = {
+      name: formData.get("name"),
+      group: formData.get("group"),
+      location: formData.get("location"),
+      teachers: [
+        "employee:abc123"
+      ],
+      ...lessonTime
+    }
+    console.log(lessondata)
+    create(auth.token, 'lesson', lessondata).then(
+      () => { 
+        toast.success("Óra sikeresen létrehozva!")
+      },
+      (error) => { 
+        console.error(error)
+        switch (error.response?.data?.code) {
+          case "fields_required":
+            return toast.error("Valamelyik mező üres!")
+          case "unauthorized":
+            return toast.error("Ehhez hincs jogosultsága!")
+          default:
+            return toast.error("Ismeretlen hiba történt!")
+        }
+      }
+    )
   }
-
-  console.log(teachers)
 
   return (
     <form className='flex flex-col max-w-screen-xl md:w-full mx-auto p-4 gap-6' onSubmit={handleSubmit}>
@@ -54,6 +65,7 @@ export default function AddNewSubject() {
       <div className='flex gap-4 items-end'>
         <Input type="text" placeholder="Név" name="name" />
         <div className='flex gap-4 items-end'>
+          <DatePicker name={"lessonDate"} />
           <TimePicker name={"start"} />
           <p className='mb-2'>-</p>
           <TimePicker name={"end"} />
@@ -61,7 +73,7 @@ export default function AddNewSubject() {
       </div>
 
       <div className='flex gap-4'>
-        <MultiSelect options={[...teachers.map(e => ({label:e.name, value:e}) )]} name={"teachers"} placeholder='Válassz oktatót...' className="w-fit" />
+        <MultiSelect options={convertToMultiSelectData(teachers, "name")} name={"teachers"} placeholder='Válassz oktatót...' className="w-fit" />
         <Combobox data={groups} displayName={"name"} name={"group"} placeholder='Válassz csoportot...' />
         <Combobox data={locations} displayName={"address"} name={"location"} placeholder='Válassz helyszínt...' />
       </div>

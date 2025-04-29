@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { create, getAll } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
+import { convertToMultiSelectData, generateLessons } from '@/lib/utils'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -26,26 +27,18 @@ export default function AddCalendarGroup() {
     getAll(auth.token, 'location').then(data => setLocations(data.data.locations))
   }, [])
 
-  function generateLessons(startDate, lessonCount, startTime, endTime) {
-    const generated = []
-    for (let index = 0; index < lessonCount; index++) {
-      generated.push(
-        {
-          start: new Date(new Date(`${startDate}T${startTime}`).setDate(new Date(`${startDate}T${startTime}`).getDate() + index * 7)).toISOString(),
-          end: new Date(new Date(`${startDate}T${endTime}`).setDate(new Date(`${startDate}T${endTime}`).getDate() + index * 7)).toISOString(),
-        }
-      )
-    }
-    console.log(generated)
-    return generated
-  }
-
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
     console.log(formData)
     const lessons = generateLessons(formData.get("startDate"), formData.get("lessonNum"), formData.get("startTime"), formData.get("endTime"))
-    create(auth.token, 'group', formData.get("name"), formData.get("location"), formData.get("employees").split(","), lessons).then(
+    const groupData = {
+      name: formData.get("name"),
+      location: formData.get("location"),
+      teachers: formData.get("employees").split(","),
+      lessons
+    }
+    create(auth.token, 'group', groupData).then(
       () => { 
         toast.success("Csoport sikeresen létrehozva!")
       },
@@ -70,7 +63,7 @@ export default function AddCalendarGroup() {
         <Input type="text" placeholder="Név" name="name" />
         <Combobox data={locations} displayName={"name"} placeholder='Válassz helyszínt...' value={location} setValue={setLocation} className={"w-full"} name="location" />
       </div>
-      <MultiSelect options={[...employees.map(e => ({label:e.name, value:e}) )]} name={"employees"} placeholder='Válassz oktatót...' />
+      <MultiSelect options={convertToMultiSelectData(employees)} name={"employees"} placeholder='Válassz oktatót...' />
 
       <div className='flex gap-4'>
         <h4>Órák generálása</h4>

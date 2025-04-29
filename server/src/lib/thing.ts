@@ -63,13 +63,14 @@ export class Thing {
     return errorHandler(async (req, res) => {
       validateRequest(req, `POST ${getReqURI(req)}`);
       const adtq = additionalQuery?.(req);
+      for (const [k,v] of Object.entries(this.fields)) 
+        !req.body[k] && v.default ? req.body[k] = v.default : null;
       const result = (await db.query(`
         IF ${this.permissions.create.general} {
           ${adtq ? "BEGIN TRANSACTION;": ""}
           $original = CREATE ONLY type::table($table) CONTENT {
             ${
-              [...new Set(req.body).union(new Set(Object.keys(this.fields).filter(v => this.fields[v]?.default)))]
-              .map((k:any) => `${k}: ${
+              req.body.map((k:any) => `${k}: ${
                   req.body[k] ?
                     this.fields[k]?.CONVERTER
                     ? this.fields[k]?.CONVERTER?.replace("$field", `$fields.${k}`) || `$fields.${k}`

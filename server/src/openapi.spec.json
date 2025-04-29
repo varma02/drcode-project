@@ -1384,9 +1384,10 @@
                     "$ref": "#/components/schemas/Subject/properties/id"
                   },
                   "name": {
-                    "type": "string",
-                    "example": "Scratch 1",
-                    "description": "The name of the subject"
+                    "$ref": "#/components/schemas/Subject/properties/name"
+                  },
+                  "description": {
+                    "$ref": "#/components/schemas/Subject/properties/description"
                   }
                 }
               }
@@ -1457,13 +1458,15 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "name"
+                  "name",
+                  "description"
                 ],
                 "properties": {
                   "name": {
-                    "type": "string",
-                    "example": "Scratch 1",
-                    "description": "The name of the subject"
+                    "$ref": "#/components/schemas/Subject/properties/name"
+                  },
+                  "description": {
+                    "$ref": "#/components/schemas/Subject/properties/description"
                   }
                 }
               }
@@ -2274,17 +2277,17 @@
                 ],
                 "properties": {
                   "id": {
-                    "$ref": "#/components/schemas/Employee/properties/id"
+                    "$ref": "#/components/schemas/Lesson/properties/id"
                   },
                   "name": {
                     "type": "string",
                     "example": "Scratch lesson 1"
                   },
                   "group": {
-                    "$ref": "#/components/schemas/Group"
+                    "$ref": "#/components/schemas/Group/properties/id"
                   },
                   "location": {
-                    "$ref": "#/components/schemas/Location"
+                    "$ref": "#/components/schemas/Location/properties/id"
                   },
                   "teachers": {
                     "type": "array",
@@ -2965,7 +2968,7 @@
                     "example": "Kodály 16:00 Scratch"
                   },
                   "location": {
-                    "$ref": "#/components/schemas/Location"
+                    "$ref": "#/components/schemas/Location/properties/id"
                   },
                   "archived": {
                     "type": "boolean",

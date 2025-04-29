@@ -252,7 +252,7 @@
         ],
         "summary": "Create a new user with an invite",
         "responses": {
-          "201": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
@@ -1029,7 +1029,7 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The request was successful, and the location was created.",
             "content": {
               "application/json": {
@@ -1409,7 +1409,7 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The request was successful, and the subject was created.",
             "content": {
               "application/json": {
@@ -1807,7 +1807,7 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The request was successful, and the student was created.",
             "content": {
               "application/json": {
@@ -2379,7 +2379,7 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The request was successful, and the lesson was created.",
             "content": {
               "application/json": {
@@ -2615,7 +2615,7 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The request was successful, and the invite was created.",
             "content": {
               "application/json": {
@@ -3001,7 +3001,7 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The request was successful, and the group was created.",
             "content": {
               "application/json": {
@@ -3264,7 +3264,7 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The request was successful, and the file was created. Now you can upload the file to the server.",
             "content": {
               "application/json": {

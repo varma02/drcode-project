@@ -22,9 +22,9 @@ export default function Students() {
   }, [])
 
   function handleDelete() {
-    remove(auth.token, 'student', ...Object.keys(rowSelection).map(e => students[+e].id)).then(resp => {
-      console.log(resp);
-      setStudents(p => p.filter(e => !resp.data.students.find(f => f.id == e.id)))
+    remove(auth.token, 'student', Object.keys(rowSelection).map(e => students[+e].id)).then(resp => {
+      setStudents(p => p.filter(e => !resp.data.students.includes(e.id)))
+      setRowSelection({})
     })
   }
 
@@ -107,7 +107,7 @@ export default function Students() {
       <DataTable data={students} columns={columns} rowSelection={rowSelection} setRowSelection={setRowSelection}
       rowOnClick={(row) => navigate(`/students/${row.original.id.replace("student:", "")}`)}
       headerAfter={<div className='flex gap-4'>
-        <AreYouSureAlert onConfirm={handleDelete} />
+        <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>
         </Link>

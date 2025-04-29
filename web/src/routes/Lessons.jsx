@@ -33,8 +33,9 @@ export default function Lessons() {
     }, [lessons]);
 
   function handleDelete() {
-    remove(auth.token, 'lesson', ...Object.keys(rowSelection).map(e => lessons[+e].id)).then(resp => {
-      setLessons(p => p.filter(e => !resp.data.lessons.find(f => f.id == e.id)))
+    remove(auth.token, 'lesson', Object.keys(rowSelection).map(e => lessons[+e].id)).then(resp => {
+      setLessons(p => p.filter(e => !resp.data.lessons.includes(e.id)))
+      setRowSelection({})
     })
   }
 
@@ -104,7 +105,7 @@ export default function Lessons() {
       <DataTable data={lessons} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("lesson:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={<div className='flex gap-4'>
-        <AreYouSureAlert onConfirm={handleDelete} />
+        <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>
         </Link>

@@ -7,7 +7,7 @@ import { getAll, remove } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { ArrowDown, ArrowUp, ArrowUpDown, Copy, LoaderCircle, Plus, SquareArrowOutUpRight, Trash } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Copy, LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { getMonogram, getTopRole, role_map } from '@/lib/utils';
@@ -155,9 +155,9 @@ export default function Employee() {
   }
 
   function handleDelete() {
-    remove(auth.token, 'employee', ...Object.keys(rowSelection).map(e => employees[+e].id)).then(resp => {
-      console.log(resp);
-      setEmployees(p => p.filter(e => !resp.data.employees.find(f => f.id == e.id)))
+    remove(auth.token, 'employee', Object.keys(rowSelection).map(e => employees[+e].id)).then(resp => {
+      setEmployees(p => p.filter(e => !resp.data.employees.includes(e.id)))
+      setRowSelection({})
     })
   }
 
@@ -184,7 +184,7 @@ export default function Employee() {
       rowSelection={rowSelection} setRowSelection={setRowSelection}
       rowOnClick={(v)=>navigate(v.original.id.replace("employee:", ""))}
       headerAfter={<div className='flex gap-4'>
-        <AreYouSureAlert onConfirm={handleDelete} />
+        <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
         <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
           <DialogTrigger asChild onClick={() => setSelectedInvite(null)}>
             <Button variant="outline"><Plus />Meghívás</Button>

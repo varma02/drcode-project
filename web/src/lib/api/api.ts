@@ -56,8 +56,8 @@ export async function remove(token: string, endpoint: Endpoint, ids: string[]) {
   return (
     await axios.post(
       API_URL + `/${endpoint}/remove`,
+      { ids },
       {
-        params: { ids: [...ids].join(",") },
         headers: { Authorization: `Bearer ${token}` },
         timeout: defaultTimeout
       }

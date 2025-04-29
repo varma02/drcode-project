@@ -22,9 +22,9 @@ export default function Groups() {
   }, [])
 
   function handleDelete() {
-    remove(auth.token, 'group', ...Object.keys(rowSelection).map(e => groups[+e].id)).then(resp => {
-      console.log(resp);
-      setGroups(p => p.filter(e => !resp.data.groups.find(f => f.id == e.id)))
+    remove(auth.token, 'group', Object.keys(rowSelection).map(e => groups[+e].id)).then(resp => {
+      setGroups(p => p.filter(e => !resp.data.groups.includes(e.id)))
+      setRowSelection({})
     })
   }
 
@@ -109,7 +109,7 @@ export default function Groups() {
       <DataTable data={groups} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("group:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={<div className='flex gap-4'>
-        <AreYouSureAlert onConfirm={handleDelete} />
+        <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>
         </Link>

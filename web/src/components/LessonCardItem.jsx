@@ -19,7 +19,7 @@ export const LessonCardItem = ({course = "Scratch", teachers = ["Legfőbb Ügyé
               <div className='flex'>
                 {
                   teachers.map(e => 
-                    <Tooltip>
+                    <Tooltip key={e}>
                       <TooltipTrigger asChild>
                         <Avatar className="-mr-4 border-4 border-background h-10 rounded-full w-auto">
                           <AvatarImage src="https://uploads.dailydot.com/2024/07/wet-owl-1.jpg?auto=compress&fm=pjpg" className="rounded-full" />

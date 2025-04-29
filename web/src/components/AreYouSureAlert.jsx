@@ -3,13 +3,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "./ui/button";
 
 export default function AreYouSureAlert({ 
-  title, description, trigger, cancelText, confirmText, onConfirm, onCancel
+  title, description, trigger, cancelText, confirmText, onConfirm, onCancel, disabled
 }) {
   
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        {trigger || <Button variant="outline" className="hover:bg-destructive">
+        {trigger || <Button variant="outline" className="hover:bg-destructive" disabled={disabled}>
           <Trash /> Törlés
         </Button>}
       </AlertDialogTrigger>

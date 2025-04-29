@@ -21,9 +21,9 @@ export default function Locations() {
   }, [])
 
   function handleDelete() {
-    remove(auth.token, 'subject', ...Object.keys(rowSelection).map(e => subjects[+e].id)).then(resp => {
-      console.log(resp);
-      setSubjects(p => p.filter(e => !resp.data.subjects.find(f => f.id == e.id)))
+    remove(auth.token, 'subject', Object.keys(rowSelection).map(e => subjects[+e].id)).then(resp => {
+      setSubjects(p => p.filter(e => !resp.data.subjects.includes(e.id)))
+      setRowSelection({})
     })
   }
 
@@ -89,7 +89,7 @@ export default function Locations() {
       <DataTable data={subjects} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("subject:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={<div className='flex gap-4'>
-        <AreYouSureAlert onConfirm={handleDelete} />
+        <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
         <Link to='add'>
           <Button variant="outline"><Plus /> Hozzáadás</Button>
         </Link>

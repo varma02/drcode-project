@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator'
 import { getAllLessonsBetweenDates } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 
 export default function CalendarPage() {
   const auth = useAuth()
@@ -28,6 +28,7 @@ export default function CalendarPage() {
   useEffect(() => {
     getAllLessonsBetweenDates(auth.token, getWeek(selectedDate).start, getWeek(selectedDate).end, "group,group.location,group.teachers", "enroled").then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
   }, [selectedDate])
+  console.log(lessons)
   
   return (
     <div className='flex items-center flex-col gap-2 m-4 w-full'>
@@ -36,7 +37,7 @@ export default function CalendarPage() {
       </div>
       { 
         days.map((day, i) => 
-          <>
+          <Fragment key={day + i}>
             <Separator />
             <p className='w-full text-left text-3xl'>{day}</p>
             <div className="flex flex-wrap w-full gap-2 py-2 mb-4 ml-8">
@@ -46,6 +47,7 @@ export default function CalendarPage() {
                 :
                 lessons.filter(l => new Date(l.start).getDay()-1 == i).map(lesson => 
                   <LessonCardItem 
+                    key={lesson.id}
                     location={lesson.group.location.name} 
                     time_start={format(new Date(lesson.start), "p").split(" ")[0]} 
                     time_end={format(new Date(lesson.end), "p").split(" ")[0]} 
@@ -54,7 +56,7 @@ export default function CalendarPage() {
                 ) 
               }
             </div>
-          </>
+          </Fragment>
         )
       }
     </div>

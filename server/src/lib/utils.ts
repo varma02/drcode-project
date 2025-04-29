@@ -45,7 +45,7 @@ export function validateRequest(req: express.Request, bodySchema: object | strin
       console.warn(req.query, validate.errors);
       throw new BadRequestError("An invalid query parameter was provided");
     }
-  } else if (Object.keys(req.body).length) {
+  } else if (Object.keys(req.query).length) {
     req.query = {};
     throw new BadRequestError("No query parameters are allowed with this request.")
   }

@@ -1,32 +1,39 @@
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, Play } from 'lucide-react'
+import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, Play, SendHorizonal, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ToggleButton } from '@/components/ToggleButton'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/lib/api/AuthProvider'
-import { get, getAllLessonsBetweenDates } from '@/lib/api/api'
+import { attendLesson, get, getAllLessonsBetweenDates, getNextLesson } from '@/lib/api/api'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 import WorkInProgress from '@/components/WorkInProgress'
+import { toast } from 'sonner'
 
 export default function Home() {
   const auth = useAuth()
   const [nextLesson, setNextLesson] = useState(null)
   const [nextLessonStudents, setNextLessonStudents] = useState([])
+  const [attended, setAttended] = useState([])
 
   useEffect(() => {
-    const today = new Date()
-    const nextWeek = new Date()
-    nextWeek.setDate(today.getDate() + 7)
-    getAllLessonsBetweenDates(auth.token, today, nextWeek, "group,group.location", "enroled").then(resp => setNextLesson(resp.data.lessons[0]))
+    getNextLesson(auth.token, "group,group.location", "enroled,attended")
+    .then(resp => {
+      const nl = resp.data.lesson
+      setNextLesson(nl)
+      setAttended(nl.attended)
+      get(auth.token, 'student', [...nl.enroled.map(e => e.in)], null, "enroled").then(resp => setNextLessonStudents(resp.data.students))
+    })
   }, [auth.token])
+  console.log(attended)
 
-  useEffect(() => {
-    if (!nextLesson) return
-    get(auth.token, 'student', [...nextLesson.enroled.map(e => e.in)], null, "enroled").then(resp => setNextLessonStudents(resp.data.students))
-  }, [nextLesson])
+  function endLesson() {
+    attendLesson(auth.token, nextLesson.id, attended).then(
+      () => toast.success("Sikeres mentés")
+    )
+  }
   
   const columns = [
     {
@@ -77,7 +84,10 @@ export default function Home() {
       accessorKey: "status",
       header: "Jelenlét",
       cell: ({ row }) => (
-        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} />
+        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} value={attended.filter(v => row.original.id == v).length != 0} onch={(e) => {
+          if (!e) setAttended(p => [...p, row.original.id])
+          else setAttended(p => p.filter(v => v != row.original.id))
+        }} />
       ),
     },
   ]
@@ -123,9 +133,9 @@ export default function Home() {
               </div>
             </CardContent>
           </div>
-          <Button className="m-4 xl:ml-auto xl:h-28 xl:aspect-square flex xl:flex-col gap-4" variant="outline">
-            <Play />
-            Kezdés
+          <Button className="m-4 xl:ml-auto xl:h-28 xl:aspect-square flex xl:flex-col gap-4" variant="outline" onClick={endLesson}>
+            <X />
+            Befejezés
           </Button>
           </> 
           :

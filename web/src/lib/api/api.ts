@@ -110,3 +110,35 @@ export async function getAllLessonsBetweenDates(token: string, start: Date, end:
     )
   ).data;
 }
+
+export async function attendLesson(token: string, lessonID: string, students: Array<string>) {
+  return (
+    await axios.post(
+      API_URL + "/lesson/attendance",
+      {
+        id: lessonID,
+        students
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
+export async function getNextLesson(token: string, fetch?: string, include?: string) {
+  return (
+    await axios.get(
+      API_URL + "/lesson/next",
+      {
+        params: { 
+          include,
+          fetch
+        },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}

@@ -13,7 +13,7 @@ const group = new Thing({
     enroled: {SELECT:"<-enroled.* as enroled"},
     subjects: {SELECT:"array::group(<-enroled.subject) as subjects"},
     lessons: {SELECT:"(SELECT VALUE id FROM lesson WHERE $parent.id = group.id) AS lessons"},
-    location: {fetch: true}
+    location: {fetch: true, CONVERTER: "type::thing($field)"}
   }
 })
 

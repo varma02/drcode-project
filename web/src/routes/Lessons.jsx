@@ -104,6 +104,7 @@ export default function Lessons() {
 
       <DataTable data={lessons} columns={columns} rowOnClick={(row) => navigate(row.original.id.replace("lesson:", ""))}
       rowSelection={rowSelection} setRowSelection={setRowSelection}
+      hasFooter
       headerAfter={<div className='flex gap-4'>
         <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
         <Link to='add'>

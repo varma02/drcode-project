@@ -1,12 +1,18 @@
+import AreYouSureAlert from "@/components/AreYouSureAlert"
 import { Combobox } from "@/components/ComboBox"
+import DataTable from "@/components/DataTable"
 import { MultiSelect } from "@/components/MultiSelect"
 import { TimePicker } from "@/components/TimePicker"
+import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { get, getAll, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
-import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
+import { format } from "date-fns"
+import { hu } from "date-fns/locale"
+import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { toast } from "sonner"
@@ -21,7 +27,7 @@ export default function LessonDetails() {
   const [allGroups, setAllGroups] = useState([])
 
   useEffect(() => {
-    get(auth.token, 'lesson', ["lesson:" + params.id], "group,group.teachers,group.location", "enroled").then(data => setLesson(data.data.lessons[0]))
+    get(auth.token, 'lesson', ["lesson:" + params.id], "group,group.teachers,group.location,enroled.in,enroled.subject", "enroled,attended").then(data => setLesson(data.data.lessons[0]))
     getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
     getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
     getAll(auth.token, 'group').then(resp => setAllGroups(resp.data.groups))
@@ -79,6 +85,87 @@ export default function LessonDetails() {
     </div>
   )
 
+  const columns = [
+    {
+      displayName: "Diák neve",
+      accessorKey: "name",
+      cell: ({ row }) => row.getValue("in").name,
+      header: ({ column }) => {
+        return (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {column.columnDef.displayName}
+            {!column.getIsSorted() ? <ArrowUpDown /> 
+            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
+          </Button>
+        )
+      },
+    },
+    {
+      displayName: "Évfolyam",
+      accessorKey: "in",
+      cell: ({ row }) => row.getValue("in").grade,
+      header: ({ column }) => {
+        return (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {column.columnDef.displayName}
+            {!column.getIsSorted() ? <ArrowUpDown /> 
+            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
+          </Button>
+        )
+      },
+    },
+    {
+      displayName: "Tanult tárgy",
+      accessorKey: "subject",
+      cell: ({ row }) => row.getValue("subject").name,
+      header: ({ column }) => {
+        return (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {column.columnDef.displayName}
+            {!column.getIsSorted() ? <ArrowUpDown /> 
+            : column.getIsSorted() === "asc" ? <ArrowDown /> : <ArrowUp />}
+          </Button>
+        )
+      },
+    },
+    {
+      displayName: "Ár",
+      header: "Ár",
+      accessorKey: "price",
+    },
+    {
+      displayName: "Létrehozás",
+      header: "Létrehozás",
+      accessorKey: "created",
+      cell: ({ row }) => (
+        <div className="capitalize text-center">{format(new Date(row.getValue("created")), "PPP", {locale: hu} )}</div>
+      ),
+    },
+    {
+      displayName: "Jelenlét",
+      accessorKey: "status",
+      header: "Jelenlét",
+      cell: ({ row }) => (
+        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} value={lesson.attended.find(v => row.getValue("in").id == v)} onch={(e) => {
+          if (!e) setAttended(p => [...p, row.original.id])
+          else setAttended(p => p.filter(v => v != row.original.id))
+        }} />
+      ),
+    },
+  ]
+
   console.log(lesson)
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
@@ -95,31 +182,53 @@ export default function LessonDetails() {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <h3 className='font-bold'>Oktatók</h3>
-        <div className="flex gap-2 group">
-          <MultiSelect 
-            name={"lessonTeachers"} 
-            options={convertToMultiSelectData(allTeachers, "name")} 
-            defaultValue={lesson.group.teachers.map(e => e.id)} 
-            className={`${editTeachers ? "block" : "hidden"}`} />
-          {
-            lesson.group.teachers.map(e => 
-              <Link to={`/employee/${e.id.replace("employee:", "")}`} key={e} className={`${!editTeachers ? "block" : "hidden"}`} >
-                <Button variant='outline' className='flex items-center gap-2'>
-                  {e.name} <SquareArrowOutUpRight />
-                </Button>
-              </Link>
-            )
-          }
-          <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-          onClick={() => setEditTeachers((o) => !o)} type="button">
-            <Edit />
-          </Button>
+      <div className="flex gap-4 py-4">
+        <div className="flex flex-col gap-2">
+          <h3 className='font-bold'>Oktatók</h3>
+          <div className="flex gap-2 group">
+            <MultiSelect
+              name={"lessonTeachers"}
+              options={convertToMultiSelectData(allTeachers, "name")}
+              defaultValue={lesson.group.teachers.map(e => e.id)}
+              className={`${editTeachers ? "block" : "hidden"}`} />
+            {
+              lesson.group.teachers.map(e =>
+                <Link to={`/employee/${e.id.replace("employee:", "")}`} key={e} className={`${!editTeachers ? "block" : "hidden"}`} >
+                  <Button variant='outline' className='flex items-center gap-2'>
+                    {e.name} <SquareArrowOutUpRight />
+                  </Button>
+                </Link>
+              )
+            }
+            <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+            onClick={() => setEditTeachers((o) => !o)} type="button">
+              <Edit />
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <h3 className='font-bold'>Csoport</h3>
+          <div className="flex gap-4 items-center group">
+            <Combobox
+              data={allGroups}
+              name={"lessonGroup"}
+              displayName={"name"}
+              defaultValue={lesson.group.id}
+              className={`${editGroups ? "flex" : "hidden"}`} />
+            <Link to={`/groups/${lesson.group.id.replace("group:", "")}`} key={lesson.group.id} className={`${!editGroups ? "block" : "hidden"}`}>
+              <Button variant='outline' className='flex items-center gap-2'>
+                {lesson.group.name} <SquareArrowOutUpRight />
+              </Button>
+            </Link>
+            <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+            onClick={() => setEditGroups((o) => !o)} type="button">
+              <Edit />
+            </Button>
+          </div>
         </div>
       </div>
       
-      <div className="flex flex-wrap gap-12 py-4">
+      <div className="flex flex-wrap gap-12">
         <div>
           <h3 className='font-bold'>Kezdés</h3>
           <TimePicker date={new Date(lesson.start)} name={"lessonStart"} />
@@ -150,29 +259,7 @@ export default function LessonDetails() {
           </div>
         </div>
       </div>
-
-      <div className="flex flex-col gap-2 py-4">
-        <h3 className='font-bold'>Csoport</h3>
-        <div className="flex gap-4 items-center group">
-          <Combobox 
-            data={allGroups} 
-            name={"lessonGroup"} 
-            displayName={"name"}
-            defaultValue={lesson.group.id} 
-            className={`${editGroups ? "flex" : "hidden"}`} />
-
-          <Link to={`/groups/${lesson.group.id.replace("group:", "")}`} key={lesson.group.id} className={`${!editGroups ? "block" : "hidden"}`}>
-            <Button variant='outline' className='flex items-center gap-2'>
-              {lesson.group.name} <SquareArrowOutUpRight />
-            </Button>
-          </Link>
-
-          <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-          onClick={() => setEditGroups((o) => !o)} type="button">
-            <Edit />
-          </Button>
-        </div>
-      </div>
+      <DataTable data={lesson.enroled} columns={columns} hideColumns={["created", "price"]} />
     </form>
   )
 }

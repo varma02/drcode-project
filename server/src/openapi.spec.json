@@ -3152,6 +3152,199 @@
         }
       }
     },
+    "/enrolment/create": {
+      "post": {
+        "summary": "Enrol a student into a group",
+        "description": "Update a group's enrolments to add a student",
+        "tags": ["enrolment"],
+        "operationId": "groupPostEnrol",
+        "security": [{"BearerJwt": []}],
+        "parameters": [],
+        "requestBody": {
+          "description": "Request body for enroling students",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "group", "student", "subject", "price"
+                ],
+                "properties": {
+                  "group": {
+                    "$ref": "#/components/schemas/Group/properties/id"
+                  },
+                  "student": {
+                    "$ref": "#/components/schemas/Student/properties/id"
+                  },
+                  "subject": {
+                    "$ref": "#/components/schemas/Subject/properties/id"
+                  },
+                  "price": {
+                    "$ref": "#/components/schemas/EnroledRelation/properties/price"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the students were enrolled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "data"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": ["enrolment"],
+                      "properties": {
+                        "enrolment": {
+                          "$ref": "#/components/schemas/EnroledRelation"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/enrolment/update": {
+      "post": {
+        "summary": "Update a student's enrolment",
+        "description": "Update a student's enrolment",
+        "tags": ["enrolment"],
+        "operationId": "groupPostEnrolUpdate",
+        "security": [{"BearerJwt": []}],
+        "parameters": [],
+        "requestBody": {
+          "description": "Request body for enroling students",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/EnroledRelation/properties/id"
+                  },
+                  "subject": {
+                    "$ref": "#/components/schemas/Subject/properties/id"
+                  },
+                  "price": {
+                    "$ref": "#/components/schemas/EnroledRelation/properties/price"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the students were enrolled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "data"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": ["enrolment"],
+                      "properties": {
+                        "enrolment": {
+                          "$ref": "#/components/schemas/EnroledRelation"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/enrolment/remove": {
+      "post": {
+        "summary": "Unenrol a student from a group",
+        "description": "Update a group's enrolments to remove a student",
+        "tags": ["enrolment"],
+        "operationId": "groupPostUnenrol",
+        "security": [{"BearerJwt": []}],
+        "parameters": [],
+        "requestBody": {
+          "description": "Request body for unenroling students",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/EnroledRelation/properties/id"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the students were unenrolled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
     "/file/get": {
       "get": {
         "summary": "Get files by id",

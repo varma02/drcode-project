@@ -1,8 +1,9 @@
 import type { RequestHandler, Request } from 'express';
+import { DBRole } from '../database/models';
 
 export const isAdmin = (req: Request): boolean => {
   try {
-    if (!req.user || !req.user.roles.includes("administrator")) {
+    if (!req.user || !req.user.roles.includes(DBRole.Admin)) {
       throw new Error("unauthorized");
     }
     return true;

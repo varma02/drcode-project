@@ -46,7 +46,7 @@ lesson.router.post('/attendance', errorHandler(async (req, res) => {
   await db.query(`
     BEGIN TRANSACTION;
     DELETE attended WHERE out = type::thing($id);
-    RELATE (array::map($students, type::thing))->attended->(type::thing($id));
+    RELATE (array::map($students, |$v| type::thing($v)))->attended->(type::thing($id));
     COMMIT TRANSACTION;
   `, {id, students});
   respond200(res, 'POST /lesson/attendance');

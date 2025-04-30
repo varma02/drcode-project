@@ -80,6 +80,8 @@ DEFINE FIELD created ON TABLE enroled TYPE datetime DEFAULT time::now() READONLY
 DEFINE FIELD subject ON TABLE enroled TYPE record<subject> ASSERT $value.exists();
 DEFINE FIELD price ON TABLE enroled TYPE int;
 
+DEFINE INDEX enroled_unique ON enroled FIELDS in, out UNIQUE;
+
 
 DEFINE TABLE lesson SCHEMAFULL CHANGEFEED 4w;
 
@@ -103,6 +105,8 @@ DEFINE TABLE attended SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 
 DEFINE FIELD created ON TABLE attended TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD paid ON TABLE attended TYPE bool DEFAULT false;
 
+DEFINE INDEX attended_unique ON attended FIELDS in, out UNIQUE;
+
 
 DEFINE TABLE worked_at SCHEMAFULL TYPE RELATION IN employee OUT lesson CHANGEFEED 4w;
 
@@ -111,6 +115,7 @@ DEFINE FIELD paid ON TABLE worked_at TYPE bool DEFAULT false;
 DEFINE FIELD start ON TABLE worked_at TYPE datetime DEFAULT out.start;
 DEFINE FIELD end ON TABLE worked_at TYPE datetime DEFAULT out.end;
 
+DEFINE INDEX worked_at_unique ON worked_at FIELDS in, out UNIQUE;
 
 
 -- COMMIT TRANSACTION;

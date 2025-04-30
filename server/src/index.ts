@@ -11,6 +11,7 @@ import inviteRouter from './routes/invite';
 import subjectRouter from './routes/subject';
 import studentRouter from './routes/student';
 import fileRouter from './routes/file';
+import worksheetRouter from './routes/worksheet';
 
 export const app = express();
 
@@ -56,6 +57,7 @@ export async function setup(): Promise<string | null> {
   app.use('/subject', subjectRouter);
   app.use('/student', studentRouter);
   app.use('/file', fileRouter);
+  app.use('/worksheet', worksheetRouter);
   
   app.use((req, res, next) => {
     res.status(404).json({

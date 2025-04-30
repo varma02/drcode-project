@@ -3495,6 +3495,230 @@
           }
         }
       }
+    },
+    "/worksheet/get": {
+      "get": {
+        "summary": "Get worsheet of an employee",
+        "description": "Get the worksheet of an employee",
+        "tags": ["worksheet"],
+        "operationId": "AllWorksheets",
+        "security": [{"BearerJwt": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "The id of the employee",
+            "schema": {
+              "$ref": "#/components/schemas/Employee/properties/id"
+            }
+          },
+          {
+            "name": "paid",
+            "in": "query",
+            "required": false,
+            "description": "Wether to include paid records or not",
+            "schema": {
+              "type": "boolean",
+              "example": false
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "data"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "worksheet": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/WorksheetRelation"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/worksheet/remove": {
+      "post": {
+        "summary": "Remove worksheet items",
+        "description": "This endpoint is used for removing or deleting worksheet items(s) from the database. Only admins and the owners of the items can make this request.",
+        "tags": ["worksheet"],
+        "security": [{"BearerJwt": []}],
+        "parameters": [],
+        "operationId": "removeWorksheetItem",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/WorksheetRelation/properties/id"
+                    },
+                    "description": "The ids of the worksheet items you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested worksheet were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveworksheetOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "worksheet"
+                      ],
+                      "properties": {
+                        "worksheet": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Group"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/worksheet/update": {
+      "post": {
+        "summary": "Update a worksheet item",
+        "description": "This endpoint can be used to update a worksheet item.",
+        "tags": ["worksheet"],
+        "security": [{"BearerJwt": []}],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the worksheet item was updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateAworksheetOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "worksheet"
+                      ],
+                      "properties": {
+                        "worksheet": {
+                          "$ref": "#/components/schemas/WorksheetRelation"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "updateAworksheet",
+        "requestBody": {
+          "description": "The request body for updating a worksheet. NOTE: the paid property can only be updated by admins",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/WorksheetRelation/properties/id"
+                  },
+                  "paid": {
+                    "$ref": "#/components/schemas/WorksheetRelation/properties/paid"
+                  },
+                  "start": {
+                    "$ref": "#/components/schemas/WorksheetRelation/properties/start"
+                  },
+                  "end": {
+                    "$ref": "#/components/schemas/WorksheetRelation/properties/end"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4188,8 +4412,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "worksheet:abc123",
-            "pattern": "^worksheet:.+$"
+            "example": "worked_at:abc123",
+            "pattern": "^worked_at:.+$"
           },
           "created": {
             "$ref": "#/components/schemas/Datetime"

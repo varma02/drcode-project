@@ -26,6 +26,7 @@ lesson.router.get('/between_dates', lesson.get({
     ${req.params.start ? "start >= type::datetime($start)" : "true"}
     AND
     ${req.params.end ? "end <= type::datetime($end)" : "true"}`,
+  ORDER: `start ASC`,
   extraFields: (req) => ({start: req.query?.start, end: req.query?.end})
 }));
 
@@ -34,7 +35,7 @@ lesson.router.get("/next", lesson.get({
     (type::thing($user.id) IN group.teachers OR type::thing($user.id) IN teachers)
     AND array::len(<-worked_at[WHERE id = type::thing($user.id)]) == 0
   `,
-  ORDER: "start DESC",
+  ORDER: "start ASC",
   LIMIT: "1",
   postProcess: (res) => ({lesson: res[0]})
 }))

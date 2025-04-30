@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/lib/api/AuthProvider";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -17,7 +18,8 @@ export default function LoginPage() {
     const formData = new FormData(event.target);
     const email = formData.get('email');
     const password = formData.get('password');
-    auth.loginEmailPassword(email, password, false).then(
+    const remember = formData.get('remember') == "on";
+    auth.loginEmailPassword(email, password, remember).then(
       () => { 
         toast.success("Sikeres bejelentkezés!")
         navigate(redirectTo); 
@@ -44,6 +46,10 @@ export default function LoginPage() {
         <CardContent className="flex flex-col gap-4">
           <Input name="email" type="email" placeholder="Email" />
           <Input name="password" type="password" placeholder="Password" />
+          <div className="flex gap-2 justify-center">
+            <Switch name={"remember"} />
+            Maradjak bejelentkezve
+          </div>
         </CardContent>
         <CardFooter>
           <Button type="submit" className="font-bold flex-1">Bejelentkezés</Button>

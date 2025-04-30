@@ -66,8 +66,8 @@ export class Thing {
       for (const [k,v] of Object.entries(this.fields)) 
         !req.body[k] && v.default ? req.body[k] = null : null;
       const result = (await db.query(`
+        ${adtq ? "BEGIN TRANSACTION;": ""}
         IF ${this.permissions.create.general} {
-          ${adtq ? "BEGIN TRANSACTION;": ""}
           $original = CREATE ONLY type::table($table) CONTENT {
             ${
               Object.keys(req.body)
@@ -83,10 +83,10 @@ export class Thing {
           };
           ${adtq || ""}
           RETURN $original;
-          ${adtq ? "COMMIT TRANSACTION;": ""}
         } ELSE {
           THROW "x-permission-denied";
         }
+        ${adtq ? "COMMIT TRANSACTION;": ""}
       `, { user: req.user, table: this.table, fields: req.body }))[0];
       respond200(res, `POST ${getReqURI(req)}`, { [`${this.table}`]: result, ...addToData?.(req) });
     });

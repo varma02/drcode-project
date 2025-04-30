@@ -85,7 +85,7 @@ export class Thing {
           RETURN $original;
         } ELSE {
           THROW "x-permission-denied";
-        }
+        };
         ${adtq ? "COMMIT TRANSACTION;": ""}
       `, { user: req.user, table: this.table, fields: req.body }))[0];
       respond200(res, `POST ${getReqURI(req)}`, { [`${this.table}`]: result, ...addToData?.(req) });

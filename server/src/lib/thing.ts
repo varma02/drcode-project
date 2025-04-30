@@ -70,7 +70,9 @@ export class Thing {
           ${adtq ? "BEGIN TRANSACTION;": ""}
           $original = CREATE ONLY type::table($table) CONTENT {
             ${
-              Object.keys(req.body).map((k:any) => `${k}: ${
+              Object.keys(req.body)
+              .filter(k => this.fields[k]?.SELECT == undefined)
+              .map((k:any) => `${k}: ${
                 req.body[k] == null && this.fields[k]?.default
                 ? this.fields[k]?.default
                 : this.fields[k]?.CONVERTER

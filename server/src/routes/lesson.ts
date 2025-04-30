@@ -23,9 +23,9 @@ lesson.addDefaults({});
 
 lesson.router.get('/between_dates', lesson.get({
   WHERE: (req) => `
-    ${req.params.start ? "start >= type::datetime($start)" : "true"}
+    ${req.query?.start ? "start >= type::datetime($start)" : "true"}
     AND
-    ${req.params.end ? "end <= type::datetime($end)" : "true"}`,
+    ${req.query?.end ? "end <= type::datetime($end)" : "true"}`,
   ORDER: `start ASC`,
   extraFields: (req) => ({start: req.query?.start, end: req.query?.end})
 }));

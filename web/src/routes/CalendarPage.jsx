@@ -3,7 +3,6 @@ import { LessonCardItem } from '@/components/LessonCardItem'
 import { Separator } from '@/components/ui/separator'
 import { getAllLessonsBetweenDates } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
-import { format } from 'date-fns'
 import React, { Fragment, useEffect, useState } from 'react'
 
 export default function CalendarPage() {
@@ -26,7 +25,7 @@ export default function CalendarPage() {
   }
 
   useEffect(() => {
-    getAllLessonsBetweenDates(auth.token, getWeek(selectedDate).start, getWeek(selectedDate).end, "group,group.location,group.teachers", "enroled").then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
+    getAllLessonsBetweenDates(auth.token, getWeek(selectedDate).start, getWeek(selectedDate).end, "group,group.location,group.teachers,enroled.subject", "enroled").then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
   }, [selectedDate])
   console.log(lessons)
   
@@ -48,11 +47,7 @@ export default function CalendarPage() {
                 lessons.filter(l => new Date(l.start).getDay()-1 == i).map(lesson => 
                   <LessonCardItem 
                     key={lesson.id}
-                    location={lesson.group.location.name} 
-                    time_start={format(new Date(lesson.start), "p").split(" ")[0]} 
-                    time_end={format(new Date(lesson.end), "p").split(" ")[0]} 
-                    teachers={lesson.group.teachers.map(t => t.name)} 
-                    student_count={lesson.enroled.length} />
+                    lesson={lesson} />
                 ) 
               }
             </div>

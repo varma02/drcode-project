@@ -2149,13 +2149,11 @@
                   "properties": {
                     "code": {
                       "type": "string",
-                      "enum": [
-                        "success"
-                      ],
-                      "example": "success"
+                      "enum": ["success"]
                     },
                     "data": {
                       "type": "object",
+                      "required": ["lesson"],
                       "properties": {
                         "lesson": {
                           "$ref": "#/components/schemas/LessonExtended"
@@ -4477,7 +4475,7 @@
                 "type": "array",
                 "description": "The student enrolments to this lesson",
                 "items": {
-                  "$ref": "#/components/schemas/AttendedRelation"
+                  "$ref": "#/components/schemas/EnroledRelation"
                 }
               },
               "replaced": {

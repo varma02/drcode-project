@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -14,13 +14,17 @@ import { Input } from "./ui/input";
 import { Plus } from "lucide-react";
 import { Combobox } from "./ComboBox";
 import { toast } from "sonner";
+import { getAll } from "@/lib/api/api";
+import { useAuth } from "@/lib/api/AuthProvider";
 
 export function CreateEnrolment({
   enrolment,
-  allStudents,
-  allSubjects,
   handleAddStudent
 }) {
+  const auth = useAuth()
+  const [allStudents, setAllStudents] = useState(null)
+  const [allSubjects, setAllSubjects] = useState(null)
+  
   function handleCreateEnrolment(e) {
     const formData = new FormData(e.target);
     const enr = {
@@ -30,6 +34,12 @@ export function CreateEnrolment({
     }
     if (Object.values(enr).some(e => e == undefined)) return toast.error("Valamelyik mező üres!")
     handleAddStudent(enr)
+  }
+
+  function onOpenChange(e, what, endpoint) {
+    if (!e || what != null) return
+    if (endpoint == "student") getAll(auth.token, endpoint).then(resp => setAllStudents(resp.data.students))
+    else if (endpoint == "subject") getAll(auth.token, endpoint).then(resp => setAllSubjects(resp.data.subjects))
   }
 
   return (
@@ -50,9 +60,10 @@ export function CreateEnrolment({
                 Diák
               </Label>
               <Combobox
-                data={allStudents}
+                data={allStudents || []}
                 displayName={"name"}
                 name={"student"}
+                onOpenChange={(e) => onOpenChange(e, allStudents, "student")}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -60,9 +71,10 @@ export function CreateEnrolment({
                 Kurzus
               </Label>
               <Combobox
-                data={allSubjects}
+                data={allSubjects || []}
                 displayName={"name"}
                 name={"subject"}
+                onOpenChange={(e) => onOpenChange(e, allSubjects, "subject")}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">

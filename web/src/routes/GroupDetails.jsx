@@ -21,8 +21,8 @@ export default function GroupDetails() {
   const params = useParams()
 
   const [group, setGroup] = useState(null)
-  const [allTeachers, setAllTeachers] = useState([])
-  const [allLocations, setAllLocations] = useState([])
+  const [allTeachers, setAllTeachers] = useState(null)
+  const [allLocations, setAllLocations] = useState(null)
 
   const [enrolment, setEnrolment] = useState({
     group: "group:" + params.id,
@@ -30,8 +30,6 @@ export default function GroupDetails() {
     subject: undefined,
     price: 14000
   })
-  const [allStudents, setAllStudents] = useState(null)
-  const [allSubjects, setAllSubjects] = useState(null)
 
   const [editName, setEditName] = useState(false)
   const [editTeachers, setEditTeachers] = useState(false)
@@ -40,11 +38,17 @@ export default function GroupDetails() {
   useEffect(() => {
     get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
       .then(data => {setGroup(data.data.groups[0])});
-    getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
-    getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
-    getAll(auth.token, 'student').then(resp => setAllStudents(resp.data.students))
-    getAll(auth.token, 'subject').then(resp => setAllSubjects(resp.data.subjects))
   }, [auth.token, params.id])
+
+  useEffect(() => {
+    if (!editTeachers || allTeachers) return
+    getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
+  }, [editTeachers])
+
+  useEffect(() => {
+    if (!editLocation || allLocations) return
+    getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
+  }, [editLocation])
 
   function handleAddStudent(data) {
     const enr = {...enrolment, ...data}
@@ -188,7 +192,7 @@ export default function GroupDetails() {
           <h3 className='font-bold'>Oktatók</h3>
           <div className="flex gap-2">
             <MultiSelect 
-              options={convertToMultiSelectData(allTeachers)} 
+              options={convertToMultiSelectData(allTeachers || [])} 
               defaultValue={[...group.teachers?.map(e => e.id)]} 
               name="groupTeachers" className={`${!editTeachers ? "hidden" : "block"}`} />
             {group.teachers?.length > 0 ? (
@@ -218,9 +222,9 @@ export default function GroupDetails() {
           <h3 className='font-bold'>Helyszín</h3>
           <div className="flex gap-2">
             <Combobox 
-              data={allLocations}
+              data={allLocations || []}
               displayName={"name"}
-              value={group.location} 
+              defaultValue={group.location.id} 
               name="groupLocation" className={`${!editLocation ? "hidden" : "flex"}`} />
             {group.location ? (
               <ScrollArea className={`pb-2 overflow-x-auto ${editLocation ? "hidden" : "block"}`}>
@@ -274,9 +278,7 @@ export default function GroupDetails() {
             columns={studentColumns} 
             data={group.enroled}
             headerAfter={
-              <CreateEnrolment enrolment={enrolment} setEnrolment={setEnrolment} 
-                allStudents={allStudents} allSubjects={allSubjects}
-                handleAddStudent={handleAddStudent} />  
+              <CreateEnrolment enrolment={enrolment} setEnrolment={setEnrolment} handleAddStudent={handleAddStudent} />  
             } />
         ) : (
           <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>

@@ -15,7 +15,9 @@ const lesson = new Thing({
   fields: {
     attended: {SELECT: "<-attended<-student as attended"},
     replaced: {SELECT: "<-replaced<-student as replaced"},
-    enroled: {SELECT: "group<-enroled.* as enroled"}
+    enroled: {SELECT: "group<-enroled.* as enroled"},
+    end: {CONVERTER: "type::datetime($end)"},
+    start: {CONVERTER: "type::datetime($start)"},
   }
 })
 

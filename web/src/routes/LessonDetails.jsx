@@ -7,9 +7,9 @@ import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { get, getAll, update } from "@/lib/api/api"
+import { attendLesson, get, getAll, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
-import { convertToMultiSelectData } from "@/lib/utils"
+import { convertToMultiSelectData, generateLessons } from "@/lib/utils"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
 import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
@@ -25,16 +25,24 @@ export default function LessonDetails() {
   const [allTeachers, setAllTeachers] = useState([])
   const [allLocations, setAllLocations] = useState([])
   const [allGroups, setAllGroups] = useState([])
+  const [attended, setAttended] = useState([])
 
   useEffect(() => {
-    get(auth.token, 'lesson', ["lesson:" + params.id], "group,group.teachers,group.location,enroled.in,enroled.subject", "enroled,attended").then(data => setLesson(data.data.lessons[0]))
+    get(auth.token, 'lesson', ["lesson:" + params.id], "group,group.teachers,group.location,enroled.in,enroled.subject", "enroled,attended").then(data => {
+      const less = data.data.lessons[0]
+      setLesson(less)
+      setAttended(less.attended)
+    })
     getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
     getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
     getAll(auth.token, 'group').then(resp => setAllGroups(resp.data.groups))
   }, [auth.token, params.id])
 
+  // console.log(attended)
+
   const [saveTimer, setSaveTimer] = useState(0);
   function handleChange(e) {
+    if (e.target.name == "") return
     if (saveTimer == 0) {
       const interval = setInterval(() => {
         setSaveTimer((o) => {
@@ -54,13 +62,14 @@ export default function LessonDetails() {
   const [saveLoading, setSaveLoading] = useState(false);
   function handleSave(e) {
     e.preventDefault();
-    if (saveLoading) return;
+    if (saveLoading || !e.target) return;
     setSaveLoading(true);
     const data = new FormData(e.target);
+    console.log(data.get("lessonGroup") == lesson.group.id)
     const lessonData = {
-      name: data.get("lessonName"),
-      start: data.get("lessonStart"),
-      end: data.get("lessonEnd"),
+      name: data.get("lessonName") || undefined,
+      start: lesson.start.split(":")[0] + ":" + data.get("lessonStart") + ".000Z",
+      end: lesson.end.split(":")[0] + ":" + data.get("lessonEnd") + ".000Z",
       location: data.get("lessonLocation"),
       teachers: data.get("lessonTeachers").split(","),
       group: data.get("lessonGroup"),
@@ -68,12 +77,15 @@ export default function LessonDetails() {
     console.table(lessonData)
     update(auth.token, "lesson", "lesson:" + params.id, lessonData)
     .then((v) => {
+      delete v.data.lesson.group
       setLesson((o) => ({...o, ...v.data.lesson}));
+      if (lesson.attended != attended) attendLesson(auth.token, "lesson:"+params.id, attended)
       toast.success("Óra mentve");
     }).catch(() => toast.error("Hiba történt mentés közben!"))
     .finally(() => setSaveLoading(false))
     setSaveLoading(false)
   }
+  console.log("L", lesson)
 
   const [editName, setEditName] = useState(false)
   const [editTeachers, setEditTeachers] = useState(false)
@@ -158,15 +170,15 @@ export default function LessonDetails() {
       accessorKey: "status",
       header: "Jelenlét",
       cell: ({ row }) => (
-        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} value={lesson.attended.find(v => row.getValue("in").id == v)} onch={(e) => {
-          if (!e) setAttended(p => [...p, row.original.id])
-          else setAttended(p => p.filter(v => v != row.original.id))
-        }} />
-      ),
-    },
-  ]
+        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} value={attended.includes(row.original.in.id)} onch={(e) => {
+          if (!e) setAttended(p => [...p, row.original.in.id])
+          else setAttended(p => p.filter(v => v != row.original.in.id))
+      }} />
+    ),
+  },
+]
+console.log(attended)
 
-  console.log(lesson)
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
       <div className="group flex gap-2 my-4 items-center">
@@ -189,7 +201,7 @@ export default function LessonDetails() {
             <MultiSelect
               name={"lessonTeachers"}
               options={convertToMultiSelectData(allTeachers, "name")}
-              defaultValue={lesson.group.teachers.map(e => e.id)}
+              defaultValue={lesson.group?.teachers.map(e => e.id)}
               className={`${editTeachers ? "block" : "hidden"}`} />
             {
               lesson.group.teachers.map(e =>

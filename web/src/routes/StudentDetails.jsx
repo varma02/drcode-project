@@ -15,17 +15,10 @@ export default function StudentDetails() {
   const params = useParams()
 
   const [student, setStudent] = useState(null)
-  const [groups, setGroups] = useState(null)
-  const [subjects, setSubjects] = useState(null)
 
   useEffect(() => {
-    get(auth.token, 'student', ["student:" + params.id], null, "enroled")
-    .then(data => {
-      const studentData = data.data.students[0]
-      setStudent(studentData)
-      get(auth.token, "group", studentData.enroled.map(e => e.out)).then(resp => setGroups(resp.data.groups))
-      get(auth.token, "subject", studentData.enroled.map(e => e.subject)).then(resp => setSubjects(resp.data.subjects))
-    })
+    get(auth.token, 'student', ["student:" + params.id], "enroled.out,enroled.subject", "enroled")
+      .then(data => {setStudent(data.data.students[0])})
   }, [auth.token, params.id])
 
   const [saveTimer, setSaveTimer] = useState(0);
@@ -83,7 +76,7 @@ export default function StudentDetails() {
     {
       displayName: "Csoport neve",
       accessorKey: "out",
-      cell: ({ row }) => groups?.find(g => g.id === row.getValue("out"))?.name || "n/a",
+      cell: ({ row }) => row.getValue("out").name || "n/a",
       header: ({ column }) => {
         return (
           <Button
@@ -101,7 +94,7 @@ export default function StudentDetails() {
     {
       displayName: "Tanult tárgy",
       accessorKey: "subject",
-      cell: ({ row }) => subjects?.find(s => s.id === row.getValue("subject"))?.name || "n/a",
+      cell: ({ row }) => row.getValue("subject").name || "n/a",
       header: ({ column }) => {
         return (
           <Button

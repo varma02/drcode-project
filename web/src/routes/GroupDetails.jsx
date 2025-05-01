@@ -22,27 +22,17 @@ export default function GroupDetails() {
   const [group, setGroup] = useState(null)
   const [allTeachers, setAllTeachers] = useState([])
   const [allLocations, setAllLocations] = useState([])
-  const [students, setStudents] = useState(null)
-  const [teachers, setTeachers] = useState(null)
-  const [subjects, setSubjects] = useState(null)
 
   const [editName, setEditName] = useState(false)
   const [editTeachers, setEditTeachers] = useState(false)
   const [editLocation, setEditLocation] = useState(false)
 
   useEffect(() => {
-    get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers", "lessons,subjects,enroled")
-    .then(data => {
-      const groupData = data.data.groups[0]
-      setGroup(groupData)
-      get(auth.token, "student", groupData.enroled.map(e => e.in)).then(resp2 => setStudents(resp2.data.students))
-      get(auth.token, "subject", groupData.enroled.map(e => e.subject)).then(resp2 => setSubjects(resp2.data.subjects))
-    });
+    get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
+      .then(data => {setGroup(data.data.groups[0])});
     getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
     getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
   }, [auth.token, params.id])
-
-  console.log(group)
   
   const [saveTimer, setSaveTimer] = useState(0)
   function handleChange(e) {
@@ -121,20 +111,20 @@ export default function GroupDetails() {
       id: "name",
       displayName: "Név",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => students?.find(s => s.id == row.original.in)?.name,
+      cell: ({ row }) => row.original.in.name,
     },
     {
       id: "grade",
       displayName: "Évfolyam",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => students?.find(s => s.id == row.original.in)?.grade,
+      cell: ({ row }) => row.original.in.grade || "n/a",
       
     },
     {
       id: "subject",
       displayName: "Kurzus",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => subjects?.find(s => s.id == row.original.subject)?.name,
+      cell: ({ row }) => row.original.subject.name || "n/a",
     },
     {
       displayName: "Csoportba felvéve",
@@ -166,7 +156,6 @@ export default function GroupDetails() {
             <MultiSelect 
               options={convertToMultiSelectData(allTeachers)} 
               defaultValue={[...group.teachers?.map(e => e.id)]} 
-              onValueChange={(e) => setTeachers(allTeachers.filter(item => e.includes(item.id)))} 
               name="groupTeachers" className={`${!editTeachers ? "hidden" : "block"}`} />
             {group.teachers?.length > 0 ? (
               <ScrollArea className={`pb-2 overflow-x-auto ${editTeachers ? "hidden" : "block"}`}>

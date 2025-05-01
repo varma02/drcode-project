@@ -16,7 +16,7 @@ const enrolment = new Thing({
     remove: PermissionDefaults.adminOnly,
   },
   fields: {
-    
+    subject: {CONVERTER: "type::thing($field)"}
   }
 })
 

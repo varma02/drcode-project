@@ -17,7 +17,8 @@ const worksheet = new Thing({
     remove: mineoradmin,
   },
   fields: {
-    
+    start: {CONVERTER: "type::datetime($field)"},
+    end: {CONVERTER: "type::datetime($field)"},
   }
 })
 

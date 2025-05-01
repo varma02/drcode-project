@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table"
 import { useState } from "react"
 
-export default function DataTable({ columns, data, hasFooter = false, className, headerAfter, rowOnClick, rowSelection = [], setRowSelection, hideColumns = ["created"] }) {
+export default function DataTable({ columns, data, hasFooter = false, className, headerAfter, rowOnClick, rowSelection = [], setRowSelection, hideColumns = ["created"], rowsPerPage = 100 }) {
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState(Object.fromEntries(hideColumns.map(e => [e, false])))
@@ -48,6 +48,10 @@ export default function DataTable({ columns, data, hasFooter = false, className,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: {
+        pageIndex: 0,
+        pageSize: rowsPerPage
+      }
     },
   })
 

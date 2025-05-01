@@ -16,7 +16,7 @@ export const LessonCardItem = ({lesson}) => {
       </div>
       <div className='flex gap-2'>
         <div>
-          <p className='text-left text-xl'>{lesson.enroled[0].subject.name}</p>
+          <p className='text-left text-xl'>{lesson.enroled[0] ? lesson.enroled[0].subject.name : "n/a"}</p>
           <div className='flex'>
             {
               lesson.group.teachers.map(t => t.name).map(e => 

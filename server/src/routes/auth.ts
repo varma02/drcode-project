@@ -1,6 +1,6 @@
 import express from 'express';
 import db from '../database/connection';
-import type { AccountJWT, DBEmployee, DBFile } from '../database/models';
+import type { AccountJWT, DBEmployee } from '../database/models';
 import jwt from 'jsonwebtoken';
 import ensureAuth from '../middleware/ensureauth';
 import { respond200, validateRequest } from '../lib/utils';

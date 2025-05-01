@@ -3689,21 +3689,12 @@
     },
     "/worksheet/get": {
       "get": {
-        "summary": "Get worsheet of an employee",
-        "description": "Get the worksheet of an employee",
+        "summary": "Get worsheet of the logged in employee",
+        "description": "Get the worksheet of the logged in employee",
         "tags": ["worksheet"],
-        "operationId": "AllWorksheets",
+        "operationId": "LoggedinWorksheets",
         "security": [{"BearerJwt": []}],
         "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": true,
-            "description": "The id of the employee",
-            "schema": {
-              "$ref": "#/components/schemas/Employee/properties/id"
-            }
-          },
           {
             "name": "paid",
             "in": "query",
@@ -3897,6 +3888,84 @@
                   },
                   "paid": {
                     "$ref": "#/components/schemas/WorksheetRelation/properties/paid"
+                  },
+                  "start": {
+                    "$ref": "#/components/schemas/WorksheetRelation/properties/start"
+                  },
+                  "end": {
+                    "$ref": "#/components/schemas/WorksheetRelation/properties/end"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/worksheet/create": {
+      "post": {
+        "summary": "Create a worksheet item",
+        "description": "This endpoint can be used to create a worksheet item.",
+        "tags": ["worksheet"],
+        "security": [{"BearerJwt": []}],
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the worksheet item was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateAworksheetOk",
+                  "required": [
+                    "data",
+                    "code"
+                  ],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "worksheet"
+                      ],
+                      "properties": {
+                        "worksheet": {
+                          "$ref": "#/components/schemas/WorksheetRelation"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createAworksheet",
+        "requestBody": {
+          "description": "The request body for creating a worksheet. NOTE: the employee property is only available to admins and is the current user by default.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "start", "end"
+                ],
+                "properties": {
+                  "employee": {
+                    "$ref": "#/components/schemas/Employee/properties/id"
+                  },
+                  "out": {
+                    "$ref": "#/components/schemas/Lesson/properties/id"
                   },
                   "start": {
                     "$ref": "#/components/schemas/WorksheetRelation/properties/start"

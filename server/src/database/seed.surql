@@ -57,6 +57,11 @@ $kodular = CREATE ONLY subject:kodular CONTENT {
   description: "Scratch-nél nehezebb, telefonos alkalmazás fejlesztés"
 };
 
+$appinventor = CREATE ONLY subject:appinventor CONTENT {
+  name: "App Inventor",
+  description: "Telefonos alkalmazás fejlesztés, javasolt a Scratch után"
+};
+
 $lego1 = CREATE ONLY subject:legowedo CONTENT {
   name: "Lego WeDo 1.0",
   description: "Belépő szintű kurzus, legozás 3-4. évfolyamnak"
@@ -83,10 +88,56 @@ $arany = CREATE ONLY location:arany CONTENT {
   contact_phone: "0676478549"
 };
 
+$dok2 = CREATE ONLY group:dok2 CONTENT {
+  name: "DOK Szombat 10:00",
+  location: $fohadiszallas.id,
+  teachers: [$deftchr.id, $kex.id],
+};
+
+$dok2ora0 = CREATE ONLY lesson:dok2ora0 CONTENT {
+  group: $dok2.id,
+  start: time::now() - 1w + 1d,
+  end:  time::now() - 1w + 1h + 1d,
+};
+
+RELATE [$deftchr, $kex]->worked_at->$dok2ora0 CONTENT {
+  start: $dok2ora0.start,
+  end:   $dok2ora0.end,
+};
+
+$dok2ora1 = CREATE ONLY lesson:dok2ora1 CONTENT {
+  group: $dok2.id,
+  start: time::now() + 1d,
+  end:  time::now() + 1h + 1d,
+};
+
+$dok2ora2 = CREATE ONLY lesson:dok2ora2 CONTENT {
+  group: $dok2.id,
+  start: time::now() + 1w + 1d,
+  end:  time::now() + 1w + 1h + 1d,
+};
+
+$dok2ora3 = CREATE ONLY lesson:dok2ora3 CONTENT {
+  group: $dok2.id,
+  start: time::now() + 2w + 1d,
+  end:  time::now() + 2w + 1h + 1d,
+};
+
 $dok1 = CREATE ONLY group:dok1 CONTENT {
   name: "DOK Hétfő 15:00",
   location: $fohadiszallas.id,
   teachers: [$vrolandd.id],
+};
+
+$cs1ora0 = CREATE ONLY lesson:dok1ora0 CONTENT {
+  group: $dok1.id,
+  start: time::now() - 1w,
+  end:  time::now() - 1w + 1h,
+};
+
+RELATE $vrolandd->worked_at->$cs1ora0 CONTENT {
+  start: $cs1ora0.start,
+  end:   $cs1ora0.end,
 };
 
 $cs1ora1 = CREATE ONLY lesson:dok1ora1 CONTENT {
@@ -215,14 +266,19 @@ RELATE $joska->enroled->$dok1 CONTENT {
   price: 1500,
 };
 
+RELATE $pisti->enroled->$dok1 CONTENT {
+  subject: $scratch.id,
+  price: 990,
+};
+
 RELATE $joska->enroled->$kodaly1 CONTENT {
   subject: $lego1.id,
   price: 1500,
 };
 
-RELATE $pisti->enroled->$dok1 CONTENT {
-  subject: $scratch.id,
-  price: 990,
+RELATE $ferko->enroled->$kodaly1 CONTENT {
+  subject: $lego1.id,
+  price: 1250,
 };
 
 RELATE $peti->enroled->$arany1 CONTENT {
@@ -234,5 +290,31 @@ RELATE $pisti->enroled->$arany1 CONTENT {
   subject: $kodular.id,
   price: 1400,
 };
+
+RELATE $pisti->enroled->$dok2 CONTENT {
+  subject: $scratch.id,
+  price: 1400,
+};
+RELATE $joska->enroled->$dok2 CONTENT {
+  subject: $scratch.id,
+  price: 1400,
+};
+RELATE $elek->enroled->$dok2 CONTENT {
+  subject: $scratch.id,
+  price: 1400,
+};
+RELATE $ferko->enroled->$dok2 CONTENT {
+  subject: $kodular.id,
+  price: 1400,
+};
+
+RELATE [$elek, $joska]->attended->$cs1ora0;
+
+RELATE $pisti->replaced->$dok2ora0 CONTENT {
+  original: $cs1ora0.id,
+  extension: 30m,
+};
+
+RELATE [$pisti, $ferko, $joska, $elek]->attended->$dok2ora0;
 
 -- COMMIT TRANSACTION;

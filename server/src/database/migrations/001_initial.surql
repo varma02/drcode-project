@@ -98,6 +98,7 @@ DEFINE TABLE replaced SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 
 
 DEFINE FIELD created ON TABLE replaced TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD original ON TABLE replaced TYPE record<lesson> ASSERT $value.exists();
+DEFINE FIELD extension ON TABLE replaced TYPE duration DEFAULT 0m;
 
 
 DEFINE TABLE attended SCHEMAFULL TYPE RELATION IN student OUT lesson CHANGEFEED 4w;

@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL, defaultTimeout } from "./constants";
 
 
-export const endpoints = ["auth", "employee", "location", "subject", "student", "lesson", "invite", "group", "file"] as const;
+export const endpoints = ["auth", "employee", "location", "subject", "student", "lesson", "invite", "group", "enrolment", "file", "worksheet"] as const;
 export type Endpoint = typeof endpoints[number];
 
 // MARK: Common
@@ -133,6 +133,26 @@ export async function getNextLesson(token: string, fetch?: string, include?: str
       API_URL + "/lesson/next",
       {
         params: { 
+          include,
+          fetch
+        },
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}
+
+// MARK: Worksheet
+
+export async function getWorksheet(token: string, id: string, paid?: boolean, fetch?: string, include?: string) {
+  return (
+    await axios.get(
+      API_URL + "/worksheet/get",
+      {
+        params: { 
+          id,
+          paid,
           include,
           fetch
         },

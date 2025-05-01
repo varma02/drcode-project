@@ -1,11 +1,12 @@
 import { Combobox } from "@/components/ComboBox"
+import { CreateEnrolment } from "@/components/CreateEnrolment"
 import DataTable from "@/components/DataTable"
 import { MultiSelect } from "@/components/MultiSelect"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { get, getAll, update } from "@/lib/api/api"
+import { create, get, getAll, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
@@ -23,6 +24,15 @@ export default function GroupDetails() {
   const [allTeachers, setAllTeachers] = useState([])
   const [allLocations, setAllLocations] = useState([])
 
+  const [enrolment, setEnrolment] = useState({
+    group: "group:" + params.id,
+    student: undefined,
+    subject: undefined,
+    price: 14000
+  })
+  const [allStudents, setAllStudents] = useState(null)
+  const [allSubjects, setAllSubjects] = useState(null)
+
   const [editName, setEditName] = useState(false)
   const [editTeachers, setEditTeachers] = useState(false)
   const [editLocation, setEditLocation] = useState(false)
@@ -32,11 +42,35 @@ export default function GroupDetails() {
       .then(data => {setGroup(data.data.groups[0])});
     getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
     getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
+    getAll(auth.token, 'student').then(resp => setAllStudents(resp.data.students))
+    getAll(auth.token, 'subject').then(resp => setAllSubjects(resp.data.subjects))
   }, [auth.token, params.id])
+
+  function handleAddStudent(data) {
+    const enr = {...enrolment, ...data}
+    setEnrolment(enr)
+    create(auth.token, "enrolment", enr)
+      .then(
+        () => {
+          get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
+            .then(data => {setGroup(data.data.groups[0])});
+          toast.success("Sikeres hozzáadás")
+        },
+        (error) => {
+          switch (error.response?.data?.code) {
+            case "bad_request":
+              return toast.error("Valamelyik mező helytelen!")
+            case "unauthorized":
+              return toast.error("Ehhez hincs jogosultsága!")
+            default:
+              return toast.error("Ismeretlen hiba történt!")
+          }
+        }
+      )
+  }
   
   const [saveTimer, setSaveTimer] = useState(0)
   function handleChange(e) {
-    console.log(e)
     if (saveTimer == 0) {
       const interval = setInterval(() => {
         setSaveTimer((o) => {
@@ -56,7 +90,7 @@ export default function GroupDetails() {
   const [saveLoading, setSaveLoading] = useState(false)
   function handleSave(e) {
     e.preventDefault()
-    if (saveLoading) return;
+    if (saveLoading || !e.target) return;
     setSaveLoading(true);
     const data = new FormData(e.target);
     console.log(data)
@@ -240,7 +274,9 @@ export default function GroupDetails() {
             columns={studentColumns} 
             data={group.enroled}
             headerAfter={
-              <Button variant="outline" type="button" disabled>Hozzáadás <Plus /></Button>
+              <CreateEnrolment enrolment={enrolment} setEnrolment={setEnrolment} 
+                allStudents={allStudents} allSubjects={allSubjects}
+                handleAddStudent={handleAddStudent} />  
             } />
         ) : (
           <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>

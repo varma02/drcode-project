@@ -14,7 +14,6 @@ export default function Groups() {
   const auth = useAuth()
   const navigate = useNavigate()
   const [groups, setGroups] = useState([])
-  const [teachers, setTeachers] = useState({})
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {

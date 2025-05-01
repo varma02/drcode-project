@@ -18,6 +18,9 @@ const lesson = new Thing({
     enroled: {SELECT: "group<-enroled.* as enroled"},
     end: {CONVERTER: "type::datetime($field)"},
     start: {CONVERTER: "type::datetime($field)"},
+    group: {CONVERTER: "type::thing($field)"},
+    location: {CONVERTER: "type::thing($field)"},
+    teachers: {CONVERTER: "array::map($field, |$v| type::thing($v))"},
   }
 })
 

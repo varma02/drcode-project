@@ -17,7 +17,7 @@ export default function EmployeeDetails() {
   const [employee, setEmployee] = useState(null)
 
   useEffect(() => {
-    get(auth.token, 'employee', ["employee:" + params.id], "groups", "groups,worksheet")
+    get(auth.token, 'employee', ["employee:" + params.id], "groups,worksheet.out", "groups,worksheet")
     .then(data => setEmployee(data.data.employees[0]))
   }, [auth.token, params.id])
 
@@ -60,6 +60,12 @@ export default function EmployeeDetails() {
       cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
     },
     {
+      displayName: "Csoport",
+      accessorKey: "group",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => employee.groups.find(e => e.id == row.original.out.group).name,
+    },
+    {
       displayName: "Érkezés",
       accessorKey: "start",
       header: ({ column }) => column.columnDef.displayName,
@@ -76,11 +82,6 @@ export default function EmployeeDetails() {
       accessorKey: "paid",
       header: ({ column }) => column.columnDef.displayName,
       cell: ({ row }) => row.getValue("paid") ? "Igen" : "Nem",
-    },
-    {
-      displayName: "Megjegyzés",
-      accessorKey: "notes",
-      header: ({ column }) => column.columnDef.displayName,
     },
   ]
 

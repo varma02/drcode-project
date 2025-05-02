@@ -11,18 +11,23 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { Link, useHref, useNavigate } from "react-router-dom"
+import { Link, useHref, useLocation, useNavigate } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { toast } from "sonner"
-import { getMonogram, getTopRole } from "@/lib/utils"
+import { getMonogram, getTopRole, route_map } from "@/lib/utils"
 import { Button } from "./ui/button"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "./ui/breadcrumb"
+import { Fragment } from "react"
 
 
 export function AppSidebar() {
   const navigate = useNavigate();
   const auth = useAuth();
   const href = useHref();
+  const { pathname } = useLocation();
+
+  console.log(pathname)
 
   const items = {
     "Dr Code": [
@@ -84,6 +89,27 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel className={"-mb-0"}>
+            <Breadcrumb>
+              <BreadcrumbList>
+              {
+                pathname.slice(1, pathname.length).split("/").map((e, i) => (
+                  <Fragment key={e+i}>
+                  <BreadcrumbItem>
+                    <Link to={"/"+e}>{e in route_map ? route_map[e] : e[0].toUpperCase() + e.substring(1, e.length)}</Link>
+                  </BreadcrumbItem>
+                  { i != pathname.slice(1, pathname.length).split("/").length-1 &&
+                    <BreadcrumbSeparator />
+                  }
+                  </Fragment>
+                ))
+              }
+              </BreadcrumbList>
+            </Breadcrumb>
+            {/* <p>{ pathname }</p> */}
+          </SidebarGroupLabel>
+        </SidebarGroup>
           {
             Object.keys(items).filter(e => getTopRole(auth.user.roles) != "Adminisztrátor" ? e != "Admin" : true).map(e => 
             <SidebarGroup key={e}>

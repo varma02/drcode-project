@@ -10,6 +10,18 @@ export const role_map = {
   "teacher" : "Oktató",
 }
 
+export const route_map = {
+  "": "Főoldal",
+  calendar: "Beosztás", 
+  worksheet: "Jelenléti ív", 
+  employee: "Alkalmazottak", 
+  students: "Tanulók", 
+  groups: "Csoportok", 
+  lessons: "Órák", 
+  locations: "Helyszínek", 
+  subjects: "Kurzusok", 
+}
+
 export function getTopRole(roles: string[] | Set<string>): string {
   roles = new Set(roles);
   if (roles.has("administrator")) return role_map.administrator;

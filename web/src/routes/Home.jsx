@@ -1,12 +1,12 @@
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, Play, SendHorizonal, X } from 'lucide-react'
+import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ToggleButton } from '@/components/ToggleButton'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/lib/api/AuthProvider'
-import { attendLesson, get, getAllLessonsBetweenDates, getNextLesson } from '@/lib/api/api'
+import { attendLesson, get, getNextLesson } from '@/lib/api/api'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 import WorkInProgress from '@/components/WorkInProgress'
@@ -84,7 +84,7 @@ export default function Home() {
       accessorKey: "status",
       header: "Jelenlét",
       cell: ({ row }) => (
-        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} value={attended.filter(v => row.original.id == v).length != 0} onch={(e) => {
+        <ToggleButton onText={"Jelen"} offText={"Hiányzik"} value={attended.includes(row.original.id)} onch={(e) => {
           if (!e) setAttended(p => [...p, row.original.id])
           else setAttended(p => p.filter(v => v != row.original.id))
         }} />

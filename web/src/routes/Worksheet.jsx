@@ -4,14 +4,14 @@ import { getWorksheet } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
-import { LoaderCircle, Plug, Plus } from 'lucide-react'
+import { LoaderCircle, Plus } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 export default function Worksheet() {
   const auth = useAuth()
   const [worksheet, setWorksheet] = useState(null)
 
   useEffect(() => {
-    getWorksheet(auth.token, auth.user.id).then(resp => setWorksheet(resp.data.worksheet))
+    getWorksheet(auth.token, auth.user.id, undefined, "out,out.group").then(resp => setWorksheet(resp.data.worksheet))
   }, [auth.token])
 
   if (!worksheet) return (
@@ -21,31 +21,37 @@ export default function Worksheet() {
   )
 
   const workColumns = [
-      {
-        displayName: "Dátum",
-        accessorKey: "date",
-        header: ({ column }) => column.columnDef.displayName,
-        cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
-      },
-      {
-        displayName: "Érkezés",
-        accessorKey: "start",
-        header: ({ column }) => column.columnDef.displayName,
-        cell: ({ row }) => format(new Date(row.getValue("start")), "p", {locale: hu}),
-      },
-      {
-        displayName: "Távozás",
-        accessorKey: "end",
-        header: ({ column }) => column.columnDef.displayName,
-        cell: ({ row }) => format(new Date(row.getValue("end")), "p", {locale: hu}),
-      },
-      {
-        displayName: "Fizetett",
-        accessorKey: "paid",
-        header: ({ column }) => column.columnDef.displayName,
-        cell: ({ row }) => row.getValue("paid") ? "Igen" : "Nem",
-      },
-    ]
+    {
+      displayName: "Csoport",
+      accessorKey: "group",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => row.original.out.group.name,
+    },
+    {
+      displayName: "Dátum",
+      accessorKey: "date",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
+    },
+    {
+      displayName: "Érkezés",
+      accessorKey: "start",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => format(new Date(row.getValue("start")), "p", {locale: hu}),
+    },
+    {
+      displayName: "Távozás",
+      accessorKey: "end",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => format(new Date(row.getValue("end")), "p", {locale: hu}),
+    },
+    {
+      displayName: "Fizetett",
+      accessorKey: "paid",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => row.getValue("paid") ? "Igen" : "Nem",
+    },
+  ]
   
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>

@@ -16,7 +16,7 @@ const Home = lazy(() => import('@/routes/Home'))
 const Helper = lazy(() => import('@/routes/Helper'))
 const CalendarPage = lazy(() => import('@/routes/CalendarPage'))
 const Settings = lazy(() => import('@/routes/Settings'))
-const Inbox = lazy(() => import('@/routes/Inbox'))
+const Worksheet = lazy(() => import('@/routes/Worksheet'))
 const Employee = lazy(() => import('@/routes/Employee'))
 const EmployeeDetails = lazy(() => import('@/routes/EmployeeDetails'))
 const AddCalendarGroup = lazy(() => import('@/routes/AddGroup'))
@@ -76,7 +76,7 @@ const router = createBrowserRouter([
     element: <SidebarWrapper />,
     children: [
       {path: "/", element: <Home />},
-      {path: "/inbox/:id?", element: <Inbox />},
+      {path: "/worksheet", element: <Worksheet />},
       {path: "/calendar", element: <CalendarPage />},
       {path: "/helper", element: <Helper />},
       {path: "/settings", element: <Settings />},

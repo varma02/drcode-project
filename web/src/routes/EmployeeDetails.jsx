@@ -1,25 +1,52 @@
+import AreYouSureAlert from "@/components/AreYouSureAlert"
 import DataTable from "@/components/DataTable"
+import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { get } from "@/lib/api/api"
+import { get, remove, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
 import { LoaderCircle, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
+import { toast } from "sonner"
 
 export default function EmployeeDetails() {
   const auth = useAuth()
   const params = useParams()
 
   const [employee, setEmployee] = useState(null)
+  const [worksheet, setWorksheet] = useState(null)
+
+  const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
     get(auth.token, 'employee', ["employee:" + params.id], "groups,worksheet.out", "groups,worksheet")
-    .then(data => setEmployee(data.data.employees[0]))
+    .then(data => {
+      const emp = data.data.employees[0]
+      setEmployee(emp)
+      setWorksheet(data.data.employees[0].worksheet)
+    })
   }, [auth.token, params.id])
+
+  function handleDelete() {
+    remove(auth.token, 'worksheet', Object.keys(rowSelection).map(e => worksheet[+e].id)).then(resp => {
+      console.log("resp: ", resp)
+      setWorksheet(p => p.filter(e => !resp.data.worksheet.map(v => v.id).includes(e.id)))
+      setRowSelection({})
+    })
+  }
+  console.log("W", worksheet)
+
+  function setWorksheetPaid(id, newPaidValue) {
+    setWorksheet(p =>
+      p.map((worksheet) =>
+        worksheet.id == id ? { ...worksheet, paid: newPaidValue } : worksheet
+      )
+    )
+  }
 
   if (!employee) return (
     <div className='h-screen w-full bg-background flex items-center justify-center'>
@@ -54,16 +81,16 @@ export default function EmployeeDetails() {
       enableHiding: false,
     },
     {
-      displayName: "Dátum",
-      accessorKey: "date",
-      header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
-    },
-    {
       displayName: "Csoport",
       accessorKey: "group",
       header: ({ column }) => column.columnDef.displayName,
       cell: ({ row }) => employee.groups.find(e => e.id == row.original.out.group).name,
+    },
+    {
+      displayName: "Dátum",
+      accessorKey: "date",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
     },
     {
       displayName: "Érkezés",
@@ -81,9 +108,16 @@ export default function EmployeeDetails() {
       displayName: "Fizetett",
       accessorKey: "paid",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => row.getValue("paid") ? "Igen" : "Nem",
+      cell: ({ row }) => <ToggleButton onText={"Igen"} offText={"Nem"} value={row.getValue("paid")} onch={e => {
+        update(auth.token, "worksheet", row.original.id, {paid: !e})
+          .then(resp => {
+            setWorksheetPaid(row.original.id, !e)
+            toast.success("Fizetés módosítva!")
+          })
+      }} />,
     },
   ]
+  console.log(worksheet[0])
 
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
@@ -112,7 +146,12 @@ export default function EmployeeDetails() {
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Jelenléti Ív</h3>
-        <DataTable className="-mt-4" columns={workColumns} data={employee.worksheet || []} />
+        <DataTable className="-mt-4" columns={workColumns} data={worksheet || []} 
+          rowSelection={rowSelection} setRowSelection={setRowSelection} 
+          headerAfter={
+            <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
+          }
+          />
       </div>
     </div>
   )

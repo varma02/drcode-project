@@ -1,6 +1,6 @@
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X } from 'lucide-react'
+import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, LoaderCircle, Coffee } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ToggleButton } from '@/components/ToggleButton'
@@ -25,7 +25,18 @@ export default function Home() {
       setNextLesson(nl)
       setAttended(nl.attended)
       get(auth.token, 'student', [...nl.enroled.map(e => e.in)], null, "enroled").then(resp => setNextLessonStudents(resp.data.students))
-    })
+    },
+    (error) => {
+      switch (error.response?.data?.code) {
+        case "not_found":
+          return null
+        case "unauthorized":
+          return toast.error("Ehhez hincs jogosultsága!")
+        default:
+          return toast.error("Ismeretlen hiba történt!")
+      }
+    }
+    )
   }, [auth.token])
   console.log(attended)
 
@@ -139,13 +150,18 @@ export default function Home() {
           </Button>
           </> 
           :
-          <CardContent>
-            <p>Nincs Közelgő óra</p>
+          <CardContent className="flex gap-2 justify-center w-full mt-4">
+            <p>Nincs közelgő óra </p>
+            <Coffee />
           </CardContent>
           }
         </Card>
-        <Textarea placeholder="Jegyzetek" className="h-28 max-h-48" />
-        <DataTable columns={columns} data={nextLessonStudents} hideColumns={["created", "parent_name"]} />
+        { nextLesson && nextLesson.length != 0 &&
+        <>
+          <Textarea placeholder="Jegyzetek" className="h-28 max-h-48" />
+          <DataTable columns={columns} data={nextLessonStudents} hideColumns={["created", "parent_name"]} />
+        </>
+        }
       </div>
 
       <div className='row-span-3 overflow-y-hidden bg-primary-foreground rounded-xl'>

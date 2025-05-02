@@ -4,8 +4,9 @@ import { getWorksheet } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
-import { LoaderCircle, Plus } from 'lucide-react'
+import { LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 export default function Worksheet() {
   const auth = useAuth()
   const [worksheet, setWorksheet] = useState(null)
@@ -25,7 +26,7 @@ export default function Worksheet() {
       displayName: "Csoport",
       accessorKey: "group",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => row.original.out.group.name,
+      cell: ({ row }) => <Link to={"/groups/"+row.original.out.group.id.replace("group:", "")}><Button variant="outline">{row.original.out.group.name} <SquareArrowOutUpRight /></Button></Link>,
     },
     {
       displayName: "Dátum",

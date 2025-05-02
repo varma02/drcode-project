@@ -82,7 +82,10 @@ export default function EmployeeDetails() {
       displayName: "Csoport",
       accessorKey: "group",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => employee.groups.find(e => e.id == row.original.out.group).name,
+      cell: ({ row }) => {
+        const group = employee.groups.find(e => e.id == row.original.out.group)
+        return <Link to={"/groups/"+group.id.replace("group:", "")}><Button variant="outline">{group.name} <SquareArrowOutUpRight /></Button></Link>
+      },
     },
     {
       displayName: "Dátum",

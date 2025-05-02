@@ -7,12 +7,27 @@ import { hu } from 'date-fns/locale'
 import { LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
+
 export default function Worksheet() {
   const auth = useAuth()
   const [worksheet, setWorksheet] = useState(null)
 
   useEffect(() => {
-    getWorksheet(auth.token, auth.user.id, undefined, "out,out.group").then(resp => setWorksheet(resp.data.worksheet))
+    getWorksheet(auth.token, auth.user.id, undefined, "out,out.group")
+      .then(
+        resp => setWorksheet(resp.data.worksheet),
+        (error) => {
+          switch (error.response?.data?.code) {
+            case "not_found":
+              return toast.error("Nincs megjeleníthető adat!")
+            case "unauthorized":
+              return toast.error("Ehhez hincs jogosultsága!")
+            default:
+              return toast.error("Ismeretlen hiba történt!")
+          }
+        }
+      )
   }, [auth.token])
 
   if (!worksheet) return (

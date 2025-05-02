@@ -162,7 +162,7 @@ export class Thing {
     });
   }
 
-  public remove() {
+  public remove({postProcess}: {postProcess?: (result: any[]) => any} = {}) {
     return errorHandler(async (req, res) => {
       validateRequest(req, `POST ${getReqURI(req)}`);
       const removed = (await db.query<any[][]>(`
@@ -175,7 +175,7 @@ export class Thing {
         }
         `, { user: req.user, ids: req.body.ids }))[0];
       if (!removed || !removed.length) throw new NotFoundError();
-      respond200(res, `POST ${getReqURI(req)}`, { [`${this.table}s`]: removed.map(v => v.id) });
+      respond200(res, `POST ${getReqURI(req)}`, postProcess ? postProcess(removed) : { [`${this.table}s`]: removed.map(v => v.id) });
     });
   }
 }

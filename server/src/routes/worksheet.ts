@@ -24,6 +24,7 @@ worksheet.addDefaults({
   create: false,
   getAll: false,
   getById: false,
+  remove: false,
 });
 
 worksheet.router.post('/create', errorHandler(async (req, res) => {
@@ -50,5 +51,9 @@ worksheet.router.get("/get", worksheet.get({
   `},
   postProcess: (res) => ({ worksheet: res }),
 }));
+
+worksheet.router.post("/remove", worksheet.remove({
+  postProcess: (res) => ({ worksheet: res.filter(v => v.id) }),
+}))
 
 export default worksheet.router;

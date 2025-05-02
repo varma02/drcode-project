@@ -25,7 +25,6 @@ export default function LoginPage() {
         navigate(redirectTo); 
       },
       (error) => { 
-        console.error(error);
         switch (error.response?.data?.code) {
           case "fields_required":
             return toast.error("Az email vagy a jelszó mező üres!")

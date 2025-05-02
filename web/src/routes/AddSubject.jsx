@@ -13,13 +13,11 @@ export default function AddNewSubject() {
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
-    console.log(formData)
     create(auth.token, 'subject', { name: formData.get("name"), description: formData.get("description") }).then(
       () => { 
         toast.success("Kurzus sikeresen létrehozva!")
       },
       (error) => { 
-        console.error(error)
         switch (error.response?.data?.code) {
           case "fields_required":
             return toast.error("Valamelyik mező üres!")

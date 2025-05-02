@@ -33,12 +33,10 @@ export default function EmployeeDetails() {
 
   function handleDelete() {
     remove(auth.token, 'worksheet', Object.keys(rowSelection).map(e => worksheet[+e].id)).then(resp => {
-      console.log("resp: ", resp)
       setWorksheet(p => p.filter(e => !resp.data.worksheet.map(v => v.id).includes(e.id)))
       setRowSelection({})
     })
   }
-  console.log("W", worksheet)
 
   function setWorksheetPaid(id, newPaidValue) {
     setWorksheet(p =>
@@ -117,7 +115,6 @@ export default function EmployeeDetails() {
       }} />,
     },
   ]
-  console.log(worksheet[0])
 
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>

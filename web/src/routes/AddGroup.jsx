@@ -31,7 +31,6 @@ export default function AddCalendarGroup() {
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
-    console.log(formData)
     const lessons = generateToggle ? generateLessons(formData.get("startDate"), formData.get("lessonNum"), formData.get("startTime"), formData.get("endTime")) : undefined
     const groupData = {
       name: formData.get("name"),
@@ -44,7 +43,6 @@ export default function AddCalendarGroup() {
         toast.success("Csoport sikeresen létrehozva!")
       },
       (error) => { 
-        console.error(error)
         switch (error.response?.data?.code) {
           case "fields_required":
             return toast.error("Valamelyik mező üres!")

@@ -1,6 +1,6 @@
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, LoaderCircle, Coffee } from 'lucide-react'
+import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, Coffee } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ToggleButton } from '@/components/ToggleButton'
@@ -38,7 +38,6 @@ export default function Home() {
     }
     )
   }, [auth.token])
-  console.log(attended)
 
   function endLesson() {
     attendLesson(auth.token, nextLesson.id, attended).then(

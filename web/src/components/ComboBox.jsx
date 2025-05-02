@@ -35,7 +35,6 @@ export function Combobox({data, displayName, placeholder = "Válassz...", value,
                   key={i}
                   value={e.id}
                   onSelect={(currentValue) => {
-                    console.log(currentValue)
                     if (setValue) setValue(currentValue == ivalue ? "" : currentValue)
                     isetValue(currentValue == ivalue ? "" : currentValue)
                     setOpen(false)

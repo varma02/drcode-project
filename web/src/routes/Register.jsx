@@ -28,7 +28,6 @@ export default function RegisterPage() {
         auth.loginEmailPassword(email, password).then(() => {
           toast.success("Sikeres bejelentkezés!");
         }).catch((error) => {
-          console.error(error);
           switch (error.response?.data?.code) {
             case "fields_required":
               return toast.error("Az email vagy a jelszó mező üres!")
@@ -40,7 +39,6 @@ export default function RegisterPage() {
         }).finally(() => navigate("/"));
       },
       (error) => { 
-        console.error(error);
         switch (error.response?.data?.code) {
           case "fields_required":
             return toast.error("Az email vagy a jelszó mező üres!")

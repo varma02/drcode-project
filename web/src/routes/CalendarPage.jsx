@@ -27,7 +27,6 @@ export default function CalendarPage() {
   useEffect(() => {
     getAllLessonsBetweenDates(auth.token, getWeek(selectedDate).start, getWeek(selectedDate).end, "group,group.location,group.teachers,enroled.subject", "enroled").then(resp => setLessons(resp.data.lessons)).catch(err => setLessons([]))
   }, [selectedDate])
-  console.log(lessons)
   
   return (
     <div className='flex items-center flex-col gap-2 m-4 w-full'>

@@ -13,10 +13,7 @@ export default function AddStudent() {
     event.preventDefault()
     const formData = new FormData(event.target)
     const parent = { name: formData.get("parentName") || undefined, email: formData.get("parentEmail") || undefined, phone: formData.get("parentPhone") || undefined }
-    console.log(formData)
-    console.log(!Object.values(parent).every(e => e == undefined));
     
-    //console.log(formData.get("email") || undefined);
     const studentData = {
       name: formData.get("name"),
       grade: +formData.get("grade"),
@@ -29,7 +26,6 @@ export default function AddStudent() {
         toast.success("Tanuló sikeresen létrehozva!")
       },
       (error) => {
-        console.error(error)
         switch (error.response?.data?.code) {
           case "fields_required":
             return toast.error("Valamelyik mező üres!")

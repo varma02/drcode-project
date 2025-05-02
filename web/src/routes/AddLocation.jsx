@@ -12,13 +12,11 @@ export default function AddNewLocation() {
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
-    console.log(formData)
     create(auth.token, 'location', {name: formData.get("name"), address: formData.get("address"), contact_email: formData.get("contact_email"), contact_phone: formData.get("contact_phone")}).then(
       () => { 
         toast.success("Helyszín sikeresen létrehozva!")
       },
       (error) => { 
-        console.error(error)
         switch (error.response?.data?.code) {
           case "fields_required":
             return toast.error("Valamelyik mező üres!")

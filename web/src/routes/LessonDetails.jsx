@@ -1,15 +1,13 @@
-import AreYouSureAlert from "@/components/AreYouSureAlert"
 import { Combobox } from "@/components/ComboBox"
 import DataTable from "@/components/DataTable"
 import { MultiSelect } from "@/components/MultiSelect"
 import { TimePicker } from "@/components/TimePicker"
 import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { attendLesson, get, getAll, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
-import { convertToMultiSelectData, generateLessons } from "@/lib/utils"
+import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
 import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
@@ -38,8 +36,6 @@ export default function LessonDetails() {
     getAll(auth.token, 'group').then(resp => setAllGroups(resp.data.groups))
   }, [auth.token, params.id])
 
-  // console.log(attended)
-
   const [saveTimer, setSaveTimer] = useState(0);
   function handleChange(e) {
     if (e.target.name == "") return
@@ -65,7 +61,6 @@ export default function LessonDetails() {
     if (saveLoading || !e.target) return;
     setSaveLoading(true);
     const data = new FormData(e.target);
-    console.log(data.get("lessonGroup") == lesson.group.id)
     const lessonData = {
       name: data.get("lessonName") || undefined,
       start: lesson.start.split(":")[0] + ":" + data.get("lessonStart") + ".000Z",
@@ -74,7 +69,6 @@ export default function LessonDetails() {
       teachers: data.get("lessonTeachers").split(","),
       group: data.get("lessonGroup"),
     };
-    console.table(lessonData)
     update(auth.token, "lesson", "lesson:" + params.id, lessonData)
     .then((v) => {
       delete v.data.lesson.group
@@ -85,7 +79,6 @@ export default function LessonDetails() {
     .finally(() => setSaveLoading(false))
     setSaveLoading(false)
   }
-  console.log("L", lesson)
 
   const [editName, setEditName] = useState(false)
   const [editTeachers, setEditTeachers] = useState(false)
@@ -177,7 +170,6 @@ export default function LessonDetails() {
     ),
   },
 ]
-console.log(attended)
 
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>

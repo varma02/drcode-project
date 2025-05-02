@@ -47,7 +47,6 @@ export default function LocationDetails() {
       contact_email: data.get("locationEmail"),
       contact_phone: data.get("locationPhone"),
     };
-    console.log("AAAA: ", locationData)
     update(auth.token, "location", "location:" + params.id, locationData)
     .then((v) => {
       setLocation((o) => ({...o, ...v.data.location}));
@@ -56,8 +55,6 @@ export default function LocationDetails() {
     .finally(() => setSaveLoading(false))
     setSaveLoading(false)
   }
-
-  console.log(location)
 
   const [editName, setEditName] = useState(false)
   if (!location) return (

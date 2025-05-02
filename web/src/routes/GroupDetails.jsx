@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
-import { Edit, LoaderCircle, Plus, Save, SquareArrowOutUpRight } from "lucide-react"
+import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { toast } from "sonner"
@@ -97,7 +97,6 @@ export default function GroupDetails() {
     if (saveLoading || !e.target) return;
     setSaveLoading(true);
     const data = new FormData(e.target);
-    console.log(data)
     const groupData = {
       name: data.get("groupName") || group.name,
       location: data.get("groupLocation"),

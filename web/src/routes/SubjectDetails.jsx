@@ -46,15 +46,12 @@ export default function SubjectDetails() {
       name: data.get("subjectName") || subject.name,
       description: data.get("description") || subject.description,
     };
-    console.log("AAAA: ", subjectData)
     update(auth.token, "subject", "subject:" + params.id, subjectData)
     .then((v) => { toast.success("Kurzus mentve") })
     .catch((err) => toast.error("Hiba történt mentés közben!"))
     .finally(() => setSaveLoading(false))
     setSaveLoading(false)
   }
-
-  console.log(subject)
 
   const [editName, setEditName] = useState(false)
   if (!subject) return (

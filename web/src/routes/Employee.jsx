@@ -143,7 +143,6 @@ export default function Employee() {
 
   function handleInviteRemove(event) {
     event.preventDefault();
-    console.log(selectedInvite);
     remove(auth.token, 'invite', [selectedInvite.id]).then((v) => {
       setInvites(invites.filter(i => i.id != selectedInvite.id));
       setInviteDialogOpen(false);

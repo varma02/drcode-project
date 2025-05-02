@@ -3,7 +3,6 @@ import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { getAll, remove } from '@/lib/api/api'
-
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -27,8 +26,6 @@ export default function Students() {
       setRowSelection({})
     })
   }
-
-  console.log(students)
 
   const columns = [
     {

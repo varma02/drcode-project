@@ -1,7 +1,6 @@
 import DataTable from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { get, getWorksheet } from '@/lib/api/api'
+import { getWorksheet } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -14,8 +13,6 @@ export default function Worksheet() {
   useEffect(() => {
     getWorksheet(auth.token, auth.user.id).then(resp => setWorksheet(resp.data.worksheet))
   }, [auth.token])
-
-  console.log(worksheet)
 
   if (!worksheet) return (
     <div className='h-screen w-full bg-background flex items-center justify-center'>
@@ -30,12 +27,6 @@ export default function Worksheet() {
         header: ({ column }) => column.columnDef.displayName,
         cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
       },
-      // {
-      //   displayName: "Csoport",
-      //   accessorKey: "group",
-      //   header: ({ column }) => column.columnDef.displayName,
-      //   cell: ({ row }) => employee.groups.find(e => e.id == row.original.out.group).name,
-      // },
       {
         displayName: "Érkezés",
         accessorKey: "start",

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ChevronLeft, ChevronRight, ChevronUp } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
 import { hu } from 'date-fns/locale'
 
@@ -10,9 +10,6 @@ import { setHours, setMinutes } from "date-fns"
 
 function Calendar({ className, classNames, showOutsideDays = true, showTimePicker = false, date, setDate, ...props }) {
   const [timeValue, setTimeValue] = useState(`${date.getHours()}:${date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes()}`)
-
-  // console.log("timeValaue: ", timeValue)
-  // console.log("date: ", date)
 
   const handleTimeChange = (e) => {
     const time = e.target.value

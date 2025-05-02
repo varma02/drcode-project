@@ -28,7 +28,6 @@ export default function Settings() {
     update(auth.token, 'auth', auth.user.id, data)
     .then(() => toast.success("Profil módosítva!"))
     .catch((error) => { 
-      console.error(error);
       switch (error.response?.data?.code) {
         case "fields_required":
         case "fields_invalid":

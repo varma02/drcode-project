@@ -17,7 +17,7 @@ import { useAuth } from "@/lib/api/AuthProvider"
 import { toast } from "sonner"
 import { getMonogram, getTopRole, route_map } from "@/lib/utils"
 import { Button } from "./ui/button"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "./ui/breadcrumb"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "./ui/breadcrumb"
 import { Fragment } from "react"
 
 
@@ -26,8 +26,6 @@ export function AppSidebar() {
   const auth = useAuth();
   const href = useHref();
   const { pathname } = useLocation();
-
-  console.log(pathname)
 
   const items = {
     "Dr Code": [

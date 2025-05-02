@@ -29,7 +29,6 @@ export default function AddNewSubject() {
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
-    console.log(formData)
     const lessonTime = generateLessons(formData.get("lessonDate"), 1, formData.get("start"), formData.get("end"))[0]
     const lessondata = {
       name: formData.get("name"),
@@ -40,13 +39,11 @@ export default function AddNewSubject() {
       ],
       ...lessonTime
     }
-    console.log(lessondata)
     create(auth.token, 'lesson', lessondata).then(
       () => { 
         toast.success("Óra sikeresen létrehozva!")
       },
       (error) => { 
-        console.error(error)
         switch (error.response?.data?.code) {
           case "fields_required":
             return toast.error("Valamelyik mező üres!")

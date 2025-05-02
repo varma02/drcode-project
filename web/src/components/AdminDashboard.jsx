@@ -1,8 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from './ui/chart'
 import { Bar, BarChart, CartesianGrid, Label, Pie, PieChart, XAxis } from 'recharts'
+import { useAuth } from '@/lib/api/AuthProvider'
+import { getAll } from '@/lib/api/api'
+import Employee from '@/routes/Employee'
 
 export default function AdminDashboard() {
+  const auth = useAuth()
+
+  const [groups, setGroups] = useState(null)
+  const [teacherGroups, setTeacherGroups] = useState([])
+
+  const mapGroupsToTeachers = (groups) => {
+    const map = {}
+  
+    groups.map((group) => {
+      group.teachers.map((teacher) => {
+        if (!map[teacher.id]) {
+          map[teacher.id] = []
+        }
+        map[teacher.id].push({name: teacher.name, groups: group.id})
+      })
+    })
+  
+    return map
+  }
+
+  useEffect(() => {
+    getAll(auth.token, 'group', "teachers").then(resp => {
+      const groups = resp.data.groups
+      setGroups(groups)
+      setTeacherGroups(mapGroupsToTeachers(groups))
+    })
+
+  },[])
+  console.log(groups)
+  console.log(teacherGroups)
 
   const chartData = [
     { year: "2020", wedo: 186, scratch: 80, web: 90, unity: 100 },
@@ -32,13 +65,9 @@ export default function AdminDashboard() {
     },
   }
 
-  const chartData2 = [
-    { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-    { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-    { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-    { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-    { browser: "other", visitors: 190, fill: "var(--color-other)" },
-  ]
+  const chartData2 = groups?.map(e => (
+    { employee: e.name, visitors: e.groups?.length || 0, fill: "var(--color-chrome)" }
+  )) 
   
   const chartConfig2 = {
     visitors: {
@@ -122,7 +151,7 @@ export default function AdminDashboard() {
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 20}
+                          y={(viewBox.cy || 0) + 15}
                           className="fill-muted-foreground"
                         >
                           heti óraszáma

@@ -1,5 +1,6 @@
 import { Combobox } from "@/components/ComboBox"
 import DataTable from "@/components/DataTable"
+import { DatePicker } from "@/components/DatePicker"
 import { MultiSelect } from "@/components/MultiSelect"
 import { TimePicker } from "@/components/TimePicker"
 import { ToggleButton } from "@/components/ToggleButton"
@@ -61,10 +62,12 @@ export default function LessonDetails() {
     if (saveLoading || !e.target) return;
     setSaveLoading(true);
     const data = new FormData(e.target);
+    "2025-05-06T15:00.000Z"
+    "2023-10-15T14:30:00.000Z"
     const lessonData = {
       name: data.get("lessonName") || undefined,
-      start: lesson.start.split(":")[0] + ":" + data.get("lessonStart") + ".000Z",
-      end: lesson.end.split(":")[0] + ":" + data.get("lessonEnd") + ".000Z",
+      start: data.get("dateStart") + "T" + data.get("lessonStart") + ":00.000Z",
+      end: data.get("dateEnd") + "T" + data.get("lessonEnd") + ":00.000Z",
       location: data.get("lessonLocation"),
       teachers: data.get("lessonTeachers").split(","),
       group: data.get("lessonGroup"),
@@ -84,6 +87,7 @@ export default function LessonDetails() {
   const [editTeachers, setEditTeachers] = useState(false)
   const [editLocation, setEditLocation] = useState(false)
   const [editGroups, setEditGroups] = useState(false)
+
   if (!lesson) return (
     <div className='h-screen w-full bg-background flex items-center justify-center'>
       <LoaderCircle className='animate-spin ' />
@@ -167,9 +171,11 @@ export default function LessonDetails() {
           if (!e) setAttended(p => [...p, row.original.in.id])
           else setAttended(p => p.filter(v => v != row.original.in.id))
       }} />
-    ),
-  },
-]
+      )
+    },
+  ]
+
+console.log(lesson)
 
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
@@ -230,19 +236,8 @@ export default function LessonDetails() {
             </Button>
           </div>
         </div>
-      </div>
-      
-      <div className="flex flex-wrap gap-12">
         <div>
-          <h3 className='font-bold'>Kezdés</h3>
-          <TimePicker date={new Date(lesson.start)} name={"lessonStart"} />
-        </div>
-        <div>
-          <h3 className='font-bold'>Befejezés</h3>
-          <TimePicker date={new Date(lesson.end)} name={"lessonEnd"} />
-        </div>
-        <div>
-          <h3 className='font-bold'>Helyszín</h3>
+          <h3 className='font-bold mb-2'>Helyszín</h3>
           <div className="flex gap-4 items-center group">
             <Combobox 
               data={allLocations} 
@@ -261,6 +256,25 @@ export default function LessonDetails() {
               <Edit />
             </Button>
           </div>
+        </div>
+      </div>
+      
+      <div className="flex flex-wrap gap-4 items-end">
+        <div>
+          <h3 className='font-bold mb-2'>Kezdés</h3>
+          <DatePicker date={new Date(lesson.start)} name={"dateStart"} />
+        </div>
+        <div>
+          <TimePicker date={new Date(lesson.start)} name={"lessonStart"} />
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-4 items-end">
+        <div>
+          <h3 className='font-bold mb-2'>Befejezés</h3>
+          <DatePicker date={new Date(lesson.end)} name={"dateEnd"} />
+        </div>
+        <div>
+          <TimePicker date={new Date(lesson.end)} name={"lessonEnd"} />
         </div>
       </div>
       <DataTable data={lesson.enroled} columns={columns} hideColumns={["created", "price"]} />

@@ -31,7 +31,7 @@ export default function Worksheet() {
   }, [auth.token])
 
   if (!worksheet) return (
-    <div className='h-screen w-full bg-background flex items-center justify-center'>
+    <div className='size-full bg-background flex items-center justify-center'>
       <LoaderCircle className='animate-spin ' />
     </div>
   )

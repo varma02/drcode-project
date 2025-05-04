@@ -33,6 +33,10 @@ export function isAdmin(roles: string[]): boolean {
   return roles.includes("administrator")
 }
 
+export function isTeacher(roles: string[]): boolean {
+  return roles.includes("teacher")
+}
+
 export function getMonogram(name: string): string {
   return name.split(" ").slice(0, 2).map(v => v[0]).join("");
 }

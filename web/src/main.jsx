@@ -13,6 +13,7 @@ import { Toaster } from '@/components/ui/sonner'
 const CommandMenu = lazy(() => import('./components/CommandMenu'))
 
 const Home = lazy(() => import('@/routes/Home'))
+const AdminHome = lazy(() => import('@/routes/AdminHome'))
 const Helper = lazy(() => import('@/routes/Helper'))
 const CalendarPage = lazy(() => import('@/routes/CalendarPage'))
 const Settings = lazy(() => import('@/routes/Settings'))
@@ -59,7 +60,9 @@ function SidebarWrapper() {
           <LoaderCircle className='animate-spin ' />
         </div>
       }>
-        <Outlet />
+        <div className='flex-1 p-4'>
+          <Outlet />
+        </div>
       </Suspense>
       <CommandMenu />
     </SidebarProvider>
@@ -76,6 +79,7 @@ const router = createBrowserRouter([
     element: <SidebarWrapper />,
     children: [
       {path: "/", element: <Home />},
+      {path: "/admin", element: <AdminHome />},
       {path: "/worksheet", element: <Worksheet />},
       {path: "/calendar", element: <CalendarPage />},
       {path: "/helper", element: <Helper />},

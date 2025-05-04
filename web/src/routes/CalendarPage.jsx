@@ -29,7 +29,7 @@ export default function CalendarPage() {
   }, [selectedDate])
   
   return (
-    <div className='flex items-center flex-col gap-2 m-4 w-full'>
+    <div className='flex items-center flex-col gap-2 size-full'>
       <div className='flex gap-2 w-full'>
         <DatePicker date={selectedDate} setDate={setSelectedDate} required />
       </div>

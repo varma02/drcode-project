@@ -52,6 +52,11 @@ export function AppSidebar() {
     ],
     "Admin": [
       {
+        title: "Admin Főoldal",
+        url: "/admin",
+        icon: Home,
+      },
+      {
         title: "Alkalmazottak",
         url: "/employee",
         icon: Users,

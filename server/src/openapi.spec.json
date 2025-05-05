@@ -12,6 +12,37 @@
     }
   ],
   "paths": {
+    "/": {
+      "get": {
+        "summary": "Hello world",
+        "description": "This is a test endpoint, it simply returns hello world.",
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Hello world",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "message"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": ["success"]
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Hello, World!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/me": {
       "get": {
         "tags": [
@@ -55,25 +86,10 @@
                 }
               }
             },
-            "description": "The request succeeded, user data can be found in the response.",
-            "x-tests": [
-              {
-                "description": "Get the logged in user",
-                "request": {
-                  "auth": "administrator"
-                }
-              }
-            ]
+            "description": "The request succeeded, user data can be found in the response."
           },
           "401": {
-            "allOf": [
-              {"$ref": "#/components/responses/Unauthorized"},
-              {"x-tests": [
-                {
-                  "description": "Try to access the endpoint without a token"
-                }
-              ]}
-            ]
+            "$ref": "#/components/responses/Unauthorized"
           }
         },
         "parameters": [],
@@ -207,6 +223,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "parameters": [],
@@ -258,18 +277,11 @@
                 "schema": {
                   "type": "object",
                   "title": "CreateANewUserWithAnInviteCreated",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code"],
                   "properties": {
                     "code": {
                       "type": "string",
-                      "example": "success"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Employee registered"
+                      "enum": ["success"]
                     }
                   }
                 }
@@ -2074,20 +2086,7 @@
                   }
                 }
               }
-            },
-            "x-tests": [
-              {
-                "description":  "Get lessons between two dates as admin with fetch",
-                "request": {
-                  "auth": "administrator",
-                  "query": {
-                    "start": "2025-04-10T00:00:00.000Z",
-                    "end": "2025-04-20T23:59:59.000Z",
-                    "fetch": "group"
-                  }
-                }
-              }
-            ]
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -2163,15 +2162,7 @@
                   }
                 }
               }
-            },
-            "x-tests": [
-              {
-                "description": "Test for success",
-                "request": {
-                  "auth": "teacher"
-                }
-              }
-            ]
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -5057,7 +5048,9 @@
                   "enum": [
                     "server_error",
                     "bad_request",
+                    "not_found",
                     "unauthorized",
+                    "forbidden",
                     "invalid_credentials",
                     "invalid_request_body",
                     "fields_required",

@@ -45,8 +45,8 @@ export async function setup(): Promise<string | null> {
 
   app.get('/', async (req, res) => {
     res.status(200).json({
-      code: "hello_world",
-      message: 'Hello, world!'
+      code: "success",
+      message: 'Hello, World!'
     });
   });
   

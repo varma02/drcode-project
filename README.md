@@ -80,19 +80,7 @@ The ExpressJS API validates every endpoint at input and output phase to match th
 
 #### Tests
 
-Tests are also defined in the OpenAPI specification file. Every response can have an `x-tests` key, where the value is an array of tests for that response. One item of that list (a testcase) must be like this:
-```
-interface TestCase {
-  description: string,
-  request?: {
-      auth?: "teacher" | "administrator",
-      body?: object,
-      query?: object,
-    },
-    response?: object,
-}
-```
-Then you can run the tests by opening a terminal in the `server` directory and running `bun test`
+Tests are defined in the `test/cases.test.ts` file. The testing framework used is [bun](https://bun.sh/)'s built in test module. You can run the tests by opening a terminal in the `server` directory and running `bun test`.
 
 ## Authors
 

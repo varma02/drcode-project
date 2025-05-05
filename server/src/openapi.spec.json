@@ -4221,13 +4221,13 @@
                 "required": ["start", "end"],
                 "properties": {
                   "student": {
-                    "$ref": "#/components/schemas/ReplacedRelation/properties/in"
+                    "$ref": "#/components/schemas/Student/properties/id"
                   },
                   "original_lesson": {
-                    "$ref": "#/components/schemas/ReplacedRelation/properties/original"
+                    "$ref": "#/components/schemas/Lesson/properties/id"
                   },
                   "replacement_lesson": {
-                    "$ref": "#/components/schemas/ReplacedRelation/properties/out"
+                    "$ref": "#/components/schemas/Lesson/properties/id"
                   },
                   "extension": {
                     "$ref": "#/components/schemas/ReplacedRelation/properties/extension"
@@ -4874,8 +4874,8 @@
             ]
           },
           "extension": {
-            "type": "integer",
-            "description": "The extension length in minutes"
+            "type": "string",
+            "description": "The extension length in surrealdb duration format"
           }
         }
       },

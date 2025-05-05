@@ -74,13 +74,26 @@ Now you are ready to start the devserver. Both the frontend and backend are conf
 
 Now the application should be accessible on `localhost:PORT` where `PORT` is the NGINX port you forwarded earlier.
 
-### REST API endpoints
+### REST API
+
+The application's main backend is a REST API written in ExpressJS. It is responsible for handling all the requests from the frontend and returning the appropriate data. The API is designed to be simple and easy to use.
+
+#### OpenAPI
 
 The ExpressJS API validates every endpoint at input and output phase to match the OpenAPI configuration file found in the `server` directory. This file (`openapi.spec.json`) also acts as the documentation for the APi routes. You can open it with any OpenAPI 3.0 viewer you like, for example [this VSCode extension](https://marketplace.visualstudio.com/items/?itemName=AndrewButson.vscode-openapi-viewer).
 
-#### Tests
+#### Testing
 
 Tests are defined in the `test/cases.test.ts` file. The testing framework used is [bun](https://bun.sh/)'s built in test module. You can run the tests by opening a terminal in the `server` directory and running `bun test`.
+
+### Frontend environment
+
+The frontend part is a React application using:
+   - [tailwindcss](https://tailwindcss.com) and [shadcn/ui](https://ui.shadcn.com/) for styling the UI components,
+   - [react-router](https://reactrouter.com/home) for routing between pages,
+   - [axios](https://axios-http.com/) for making requests to the API,
+   - and [lucide](https://lucide.dev/) for the icons.
+
 
 ## Authors
 

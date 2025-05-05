@@ -3805,7 +3805,7 @@
                         "worksheet": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/Group"
+                            "$ref": "#/components/schemas/WorksheetRelation/properties/id"
                           }
                         }
                       }
@@ -3972,6 +3972,274 @@
                   },
                   "end": {
                     "$ref": "#/components/schemas/WorksheetRelation/properties/end"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/replacement/get": {
+      "get": {
+        "summary": "Get a replacement by id",
+        "description": "Get a replacement by id",
+        "tags": ["replacement"],
+        "operationId": "replacementGetById",
+        "security": [{"BearerJwt": []}],
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated list of replacement IDs",
+              "example": "replaced:12345,replaced:67890",
+              "pattern": "^(replaced:\\w+,)*replaced:\\w+$"
+            }
+          },
+          {"$ref": "#/components/parameters/include"},
+          {"$ref": "#/components/parameters/fetch"}
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "data"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": ["replacements"],
+                      "properties": {
+                        "worksheet": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ReplacedRelation"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/replacement/remove": {
+      "post": {
+        "summary": "Remove replacements",
+        "description": "Remove replacements by id",
+        "tags": ["replacement"],
+        "security": [{"BearerJwt": []}],
+        "parameters": [],
+        "operationId": "removereplacementItem",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ids"],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ReplacedRelation/properties/id"
+                    },
+                    "description": "The ids of the replacement items you want to delete"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful, and the requested replacement were deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "RemoveReplacementOk",
+                  "required": ["data", "code"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": ["success"],
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": ["replacements"],
+                      "properties": {
+                        "replacements": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ReplacedRelation/properties/id"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/replacement/update": {
+      "post": {
+        "summary": "Update a replacement",
+        "description": "Update a replacement",
+        "tags": ["replacement"],
+        "security": [{"BearerJwt": []}],
+        "responses": {
+          "200": {
+            "description": "The request was successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UpdateAReplacementOk",
+                  "required": ["data","code"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": ["replacement"],
+                      "properties": {
+                        "replacement": {
+                          "$ref": "#/components/schemas/ReplacedRelation"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "updateAreplacement",
+        "requestBody": {
+          "description": "The request body for updating a replacement.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/ReplacedRelation/properties/id"
+                  },
+                  "extension": {
+                    "$ref": "#/components/schemas/ReplacedRelation/properties/extension"
+                  },
+                  "original": {
+                    "$ref": "#/components/schemas/ReplacedRelation/properties/original"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/replacement/create": {
+      "post": {
+        "summary": "Create a replacement",
+        "description": "Create a new replacement",
+        "tags": ["replacement"],
+        "security": [{"BearerJwt": []}],
+        "responses": {
+          "200": {
+            "description": "The request was successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "CreateAReplacementOk",
+                  "required": ["data","code"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": ["success"]
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": ["replacement"],
+                      "properties": {
+                        "replacement": {
+                          "$ref": "#/components/schemas/ReplacedRelation"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [],
+        "operationId": "createAReplacement",
+        "requestBody": {
+          "description": "The request body for creating a replacement",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["start", "end"],
+                "properties": {
+                  "student": {
+                    "$ref": "#/components/schemas/ReplacedRelation/properties/in"
+                  },
+                  "original_lesson": {
+                    "$ref": "#/components/schemas/ReplacedRelation/properties/original"
+                  },
+                  "replacement_lesson": {
+                    "$ref": "#/components/schemas/ReplacedRelation/properties/out"
+                  },
+                  "extension": {
+                    "$ref": "#/components/schemas/ReplacedRelation/properties/extension"
                   }
                 }
               }
@@ -4573,7 +4841,7 @@
           "created",
           "in",
           "out",
-          "replacement"
+          "original"
         ],
         "properties": {
           "id": {
@@ -4604,7 +4872,7 @@
               }
             ]
           },
-          "replacement": {
+          "original": {
             "anyOf": [
               {
                 "$ref": "#/components/schemas/Lesson/properties/id"
@@ -4613,6 +4881,10 @@
                 "$ref": "#/components/schemas/Lesson"
               }
             ]
+          },
+          "extension": {
+            "type": "integer",
+            "description": "The extension length in minutes"
           }
         }
       },

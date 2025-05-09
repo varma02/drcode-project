@@ -1,7 +1,11 @@
+import AreYouSureAlert from '@/components/AreYouSureAlert'
 import DataTable from '@/components/DataTable'
+import { DatePicker } from '@/components/DatePicker'
 import { Button } from '@/components/ui/button'
-import { getWorksheet } from '@/lib/api/api'
+import { Checkbox } from '@/components/ui/checkbox'
+import { create, getWorksheet, remove } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
+import { isTeacher } from '@/lib/utils'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 import { LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react'
@@ -12,6 +16,7 @@ import { toast } from 'sonner'
 export default function Worksheet() {
   const auth = useAuth()
   const [worksheet, setWorksheet] = useState(null)
+  const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
     getWorksheet(auth.token, auth.user.id, undefined, "out,out.group")
@@ -30,6 +35,26 @@ export default function Worksheet() {
       )
   }, [auth.token])
 
+  function handleDelete() {
+    remove(auth.token, 'worksheet', Object.keys(rowSelection).map(e => worksheet[+e].id)).then(resp => {
+      setWorksheet(p => p.filter(e => !resp.data.worksheet.map(v => v.id).includes(e.id)))
+      setRowSelection({})
+    })
+  }
+
+  function handleAdd(e) {
+    create(auth.token, 'worksheet', Object.keys(rowSelection).map(e => worksheet[+e].id)).then(resp => {
+      setWorksheet(p => p.filter(e => !resp.data.worksheet.map(v => v.id).includes(e.id)))
+      setRowSelection({})
+    })
+  }
+
+  if (!isTeacher(auth.user.roles)) return (
+    <div className='size-full bg-background flex items-center justify-center'>
+      <p>Nincs megjeleníthető adat</p>
+    </div>
+  )
+
   if (!worksheet) return (
     <div className='size-full bg-background flex items-center justify-center'>
       <LoaderCircle className='animate-spin ' />
@@ -37,6 +62,31 @@ export default function Worksheet() {
   )
 
   const workColumns = [
+    {
+      id: "select",
+      ignoreClickEvent: true,
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          className="float-left"
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          className="float-left"
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       displayName: "Csoport",
       accessorKey: "group",
@@ -72,9 +122,13 @@ export default function Worksheet() {
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Jelenléti ív</h1>
-      <DataTable data={worksheet} columns={workColumns} 
+      <DataTable data={worksheet} columns={workColumns} rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={
-        <Button variant="outline">Hozzáadás <Plus /></Button>
+        <>
+          <DatePicker showTimePicker includeTime />
+          <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
+          <Button variant="outline">Hozzáadás <Plus /></Button>
+        </>
       } />
     </div>
   )

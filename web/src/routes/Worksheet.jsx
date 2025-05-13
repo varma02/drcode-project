@@ -1,9 +1,11 @@
 import AreYouSureAlert from '@/components/AreYouSureAlert'
+import { Combobox } from '@/components/ComboBox'
 import DataTable from '@/components/DataTable'
 import { DatePicker } from '@/components/DatePicker'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { create, getWorksheet, remove } from '@/lib/api/api'
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { create, getAll, getWorksheet, remove } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { isTeacher } from '@/lib/utils'
 import { format } from 'date-fns'
@@ -16,6 +18,7 @@ import { toast } from 'sonner'
 export default function Worksheet() {
   const auth = useAuth()
   const [worksheet, setWorksheet] = useState(null)
+  const [allLessons, setAllLessons] = useState(null)
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
@@ -43,9 +46,37 @@ export default function Worksheet() {
   }
 
   function handleAdd(e) {
-    create(auth.token, 'worksheet', Object.keys(rowSelection).map(e => worksheet[+e].id)).then(resp => {
-      setWorksheet(p => p.filter(e => !resp.data.worksheet.map(v => v.id).includes(e.id)))
-      setRowSelection({})
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    const data = {
+      out: formData.get("group"),
+      start: formData.get("start"),
+      end: formData.get("end")
+    }
+    create(auth.token, 'worksheet', data).then(_ => {
+      getWorksheet(auth.token, auth.user.id, undefined, "out,out.group")
+      .then(
+        resp => setWorksheet(resp.data.worksheet),
+        (error) => {
+          switch (error.response?.data?.code) {
+            case "not_found":
+              return toast.error("Nincs megjeleníthető adat!")
+            case "unauthorized":
+              return toast.error("Ehhez hincs jogosultsága!")
+            default:
+              return toast.error("Ismeretlen hiba történt!")
+          }
+        }
+      )
+    }, (error) => {
+      switch (error.response?.data?.code) {
+        case "bad_request":
+          return toast.error("Valamelyik adat hibás!")
+        case "unauthorized":
+          return toast.error("Ehhez hincs jogosultsága!")
+        default:
+          return toast.error("Ismeretlen hiba történt!")
+      }
     })
   }
 
@@ -125,9 +156,26 @@ export default function Worksheet() {
       <DataTable data={worksheet} columns={workColumns} rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={
         <>
-          <DatePicker showTimePicker includeTime />
           <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
-          <Button variant="outline">Hozzáadás <Plus /></Button>
+          <Dialog>
+            <DialogTrigger asChild><Button variant="outline">Hozzáadás <Plus /></Button></DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Jelenléti ív hozzáadása</DialogTitle>
+              <form onSubmit={handleAdd} className='space-y-4'>
+                <Combobox data={allLessons || []} displayName={"name"} name={"group"} 
+                  onOpenChange={e => e && !allLessons && 
+                    getAll(auth.token, "lesson").then(resp => setAllLessons(resp.data.lessons))
+                  } 
+                  />
+                <DatePicker includeTime showTimePicker name={"start"} />
+                <DatePicker includeTime showTimePicker name={"end"} />
+                <DialogFooter>
+                  <DialogClose asChild><Button variant="outline">Mégse</Button></DialogClose>
+                  <DialogClose asChild><Button type="submit">Mentés</Button></DialogClose>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </>
       } />
     </div>

@@ -7,7 +7,7 @@ const lesson = new Thing({
   table: "lesson",
   permissions: {
     create: PermissionDefaults.adminOnly,
-    getAll: PermissionDefaults.adminOnly,
+    getAll: PermissionDefaults.everyone,
     getById: PermissionDefaults.everyone,
     update: PermissionDefaults.adminOnly,
     remove: PermissionDefaults.adminOnly,

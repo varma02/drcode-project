@@ -6,7 +6,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useState } from "react"
 
-export function Combobox({data, displayName, placeholder = "Válassz...", value, setValue, name, defaultValue, onOpenChange, className}) {
+export function Combobox({data, displayName, placeholder = "Válassz...", value, setValue, name, defaultValue, onOpenChange = () => {}, className}) {
   const [open, setOpen] = useState(false)
   const [ivalue, isetValue] = useState(value ? value : defaultValue)
 

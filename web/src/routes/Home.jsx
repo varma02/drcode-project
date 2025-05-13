@@ -1,17 +1,19 @@
 import DataTable from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, Coffee } from "lucide-react";
+import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, Coffee, Plus } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ToggleButton } from "@/components/ToggleButton";
 import { useAuth } from "@/lib/api/AuthProvider";
-import { attendLesson, get, getNextLesson } from "@/lib/api/api";
+import { attendLesson, create, get, getAll, getNextLesson } from "@/lib/api/api";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 import WorkInProgress from "@/components/WorkInProgress";
 import { toast } from "sonner";
 import { isAdmin, isTeacher } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Combobox } from "@/components/ComboBox";
 
 export default function Home() {
   const auth = useAuth();
@@ -20,10 +22,12 @@ export default function Home() {
   const [nextLesson, setNextLesson] = useState(null);
   const [nextLessonStudents, setNextLessonStudents] = useState([]);
   const [attended, setAttended] = useState([]);
+  const [replacement, setReplacement] = useState(null);
+  const [allStudents, setAllStudents] = useState(null)
 
   useEffect(() => {
     if (!isTeacher(auth.user.roles) && isAdmin(auth.user.roles)) navigate("/admin");
-    getNextLesson(auth.token, "group,group.location", "enroled,attended").then(
+    getNextLesson(auth.token, "group,group.location", "enroled,attended,replaced").then(
       (resp) => {
         const nl = resp.data.lesson;
         setNextLesson(nl);
@@ -48,6 +52,19 @@ export default function Home() {
       toast.success("Sikeres mentés")
     );
   }
+
+  function handleAddReplacement(e) {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    console.log(formData)
+    if (nextLessonStudents.some(l => l.id == formData.get("replacement") && l.replacement)) return
+    console.log(allStudents.find(v => v.id == formData.get("replacement")))
+      setNextLessonStudents(p => [...p, 
+        {...allStudents.find(v => v.id == formData.get("replacement")), replacement: true}
+      ])
+
+  }
+  console.log(nextLessonStudents)
 
   const columns = [
     {
@@ -109,6 +126,9 @@ export default function Home() {
       accessorKey: "status",
       header: "Jelenlét",
       cell: ({ row }) => (
+        row.original.replacement ? 
+        <p className="w-full rounded-full px-2 py-0.5 text-center bg-blue-500">Pótol</p>
+        :
         <ToggleButton
           onText={"Jelen"}
           offText={"Hiányzik"}
@@ -123,7 +143,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex size-full gap-4">
+    <div className="flex flex-col size-full gap-4 lg:flex-row">
       <div className="bg-primary-foreground rounded-xl size-full p-4">
         <Card className="w-full flex xl:flex-row flex-col mb-4">
           {nextLesson ? (
@@ -189,11 +209,30 @@ export default function Home() {
 
         { nextLesson && nextLesson.length != 0 &&
         <>
-          <DataTable columns={columns} data={nextLessonStudents} hideColumns={["created", "parent_name"]} />
+          <h2>Tanulók</h2>
+          <DataTable columns={columns} data={nextLessonStudents} 
+            hideColumns={["created", "parent_name"]} 
+            headerAfter={
+              <Dialog>
+                <DialogTrigger asChild><Button variant="outline">Pótlás <Plus /></Button></DialogTrigger>
+                <DialogContent>
+                  <DialogTitle>Pótlás hozzáadása</DialogTitle>
+                  <form onSubmit={handleAddReplacement}>
+                    <Combobox data={allStudents || []} displayName={"name"} name={"replacement"} 
+                      onOpenChange={e => e && !allStudents &&
+                        getAll(auth.token, "student").then(resp => setAllStudents(resp.data.students))
+                       } 
+                       />
+                    <DialogClose asChild><Button type="submit">Hozzáadás</Button></DialogClose>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            }
+            />
         </>
         }
       </div>
-      <div className="bg-primary-foreground rounded-xl size-full">
+      <div className="bg-primary-foreground rounded-xl size-full p-4">
         <WorkInProgress />
       </div>
     </div>

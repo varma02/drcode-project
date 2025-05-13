@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL, defaultTimeout } from "./constants";
 
 
-export const endpoints = ["auth", "employee", "location", "subject", "student", "lesson", "invite", "group", "enrolment", "file", "worksheet"] as const;
+export const endpoints = ["auth", "employee", "location", "subject", "student", "lesson", "invite", "group", "enrolment", "file", "worksheet", "replacement"] as const;
 export type Endpoint = typeof endpoints[number];
 
 // MARK: Common

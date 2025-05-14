@@ -225,4 +225,22 @@ describe("Employee", async () => {
       expect(resp.body?.data?.employees).not.toBeDefined();
     });
   });
+  // MARK: /employee/get
+  describe("/employee/get", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "get",
+        url: "/employee/get",
+        token: adminAuth.token,
+        query: {
+          ids: [adminAuth.user.id, teacherAuth.user.id].join(","),
+          include: ["groups", "worksheet"].join(","),
+          fetch: ["groups", "worksheet"].join(","),
+        }
+      });
+      console.log(JSON.stringify(resp.body));
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.employees?.length).toBeGreaterThan(0);
+    });
+  });
 });

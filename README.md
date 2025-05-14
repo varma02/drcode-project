@@ -14,6 +14,21 @@ DR.CODE Kecskemét provides interactive, hands-on programming courses for kids. 
 	Important documents can be stored in the app for easy access to all employees
 5. **And much more**
 
+## Contents
+- [Installation](#running-the-application)
+- [Administrator's guide](#administrators-guide)
+	- [Registering new employees](#registering-new-employees)
+	- [Management](#managing-stuff)
+- [Developer Documentation](#developer-documentation)
+	- [Devcontainer](#devcontainer)
+	- [Repo structure](#repo-structure)
+	- [Server environment](#server-environment)
+	- [Starting the dev server](#starting-the-dev-server)
+	- [REST API](#rest-api)
+		- [OpenAPI](#openapi)
+		- [Testing](#testing)
+	- [Frontend environment](#frontend-environment)
+
 ### Running the application
 
 ***!! The project is under active development and is not ready for production use yet !!***
@@ -31,14 +46,18 @@ DR.CODE Kecskemét provides interactive, hands-on programming courses for kids. 
 
 ### Administrator's guide
 
-As an administrator you have the power to manage every part of the organization.
+As an administrator you can manage everything in the application. You can create classes, assign students to them, assign teachers to classes, manage employees and their roles, and much more. The application is designed to be intuitive and easy to use. You can navigate through the different sections using the sidebar on the left.
+You will find all the management pages in the admin section of the sidebar.
 
 #### Registering new employees
 
-Navigate to the employees tab via the sidabar and click on `+ Invite`. Select what roles the new employee should have and click submit. You will be presented with a link, copy it and send it to the new employee.  
-Note that every invite is single use only and gets deleted after use. You can see active/unused invites in the top of the employees tab.
+Navigate to the `Alkalmazottak` tab via the sidabar and click on `+ Meghívás`. Select what roles the new employee should have and click submit. You will be presented with a link, copy it and send it to the new employee.  
+Note that every invite is single use only and gets deleted after. You can see active/unused invites in the top of the `Alkalmazottak` tab.
 
-to be continued...
+### Creating groups/classes
+
+Go to the `Csoportok` tab via the sidebar and click on `+ Hozzáadás`. Fill out the form and optionally select `Órák Generálása` to generate lessons. After you created the group you can assign students to it by selecting the group then clicking on `+ Hozzáadás` in the `Diákok` section.
+
 
 ## Developer Documentation
 

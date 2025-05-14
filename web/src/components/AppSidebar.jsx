@@ -1,4 +1,4 @@
-import { Album, BriefcaseBusiness, Calendar, ChevronsUpDown, Clock, Component, GraduationCap, Home, LogOut, MapPinned, Search, Settings, Users } from "lucide-react"
+import { Album, BriefcaseBusiness, Calendar, ChevronsUpDown, Clock, Component, GraduationCap, Home, LogOut, MapPinned, Settings, Users } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -43,12 +43,7 @@ export function AppSidebar() {
         title: "Jelenléti ív",
         url: "/worksheet",
         icon: BriefcaseBusiness,
-      },
-      {
-        title: "Statisztika",
-        url: "/helper",
-        icon: Search,
-      },
+      }
     ],
     "Admin": [
       {

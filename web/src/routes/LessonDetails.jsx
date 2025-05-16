@@ -21,9 +21,9 @@ export default function LessonDetails() {
   const params = useParams()
 
   const [lesson, setLesson] = useState(null)
-  const [allTeachers, setAllTeachers] = useState([])
-  const [allLocations, setAllLocations] = useState([])
-  const [allGroups, setAllGroups] = useState([])
+  const [allTeachers, setAllTeachers] = useState(null)
+  const [allLocations, setAllLocations] = useState(null)
+  const [allGroups, setAllGroups] = useState(null)
   const [attended, setAttended] = useState([])
 
   useEffect(() => {
@@ -32,9 +32,6 @@ export default function LessonDetails() {
       setLesson(less)
       setAttended(less.attended)
     })
-    getAll(auth.token, 'employee').then(resp => setAllTeachers(resp.data.employees))
-    getAll(auth.token, 'location').then(resp => setAllLocations(resp.data.locations))
-    getAll(auth.token, 'group').then(resp => setAllGroups(resp.data.groups))
   }, [auth.token, params.id])
 
   const [saveTimer, setSaveTimer] = useState(0);
@@ -175,8 +172,6 @@ export default function LessonDetails() {
     },
   ]
 
-console.log(lesson)
-
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
       <div className="group flex gap-2 my-4 items-center">
@@ -198,7 +193,7 @@ console.log(lesson)
           <div className="flex gap-2 group">
             <MultiSelect
               name={"lessonTeachers"}
-              options={convertToMultiSelectData(allTeachers, "name")}
+              options={convertToMultiSelectData(allTeachers || [], "name")}
               defaultValue={lesson.group?.teachers.map(e => e.id)}
               className={`${editTeachers ? "block" : "hidden"}`} />
             {
@@ -211,7 +206,7 @@ console.log(lesson)
               )
             }
             <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-            onClick={() => setEditTeachers((o) => !o)} type="button">
+            onClick={() => setEditTeachers((o) => {!o && !allTeachers && getAll(auth.token, "employee").then(resp => setAllTeachers(resp.data.employees)); return !o})} type="button">
               <Edit />
             </Button>
           </div>
@@ -220,7 +215,7 @@ console.log(lesson)
           <h3 className='font-bold'>Csoport</h3>
           <div className="flex gap-4 items-center group">
             <Combobox
-              data={allGroups}
+              data={allGroups || []}
               name={"lessonGroup"}
               displayName={"name"}
               defaultValue={lesson.group.id}
@@ -231,7 +226,7 @@ console.log(lesson)
               </Button>
             </Link>
             <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-            onClick={() => setEditGroups((o) => !o)} type="button">
+            onClick={() => setEditGroups((o) => {!o && !allGroups && getAll(auth.token, "group").then(resp => setAllGroups(resp.data.groups)); return !o})} type="button">
               <Edit />
             </Button>
           </div>
@@ -240,7 +235,7 @@ console.log(lesson)
           <h3 className='font-bold mb-2'>Helyszín</h3>
           <div className="flex gap-4 items-center group">
             <Combobox 
-              data={allLocations} 
+              data={allLocations || []} 
               name={"lessonLocation"} 
               displayName={"name"}
               defaultValue={lesson.group.location.id} 
@@ -252,7 +247,7 @@ console.log(lesson)
               </Button>
             </Link>
             <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-            onClick={() => setEditLocation((o) => !o)} type="button">
+            onClick={() => setEditLocation((o) => {!o && !allLocations && getAll(auth.token, "location").then(resp => setAllLocations(resp.data.locations)); return !o})} type="button">
               <Edit />
             </Button>
           </div>

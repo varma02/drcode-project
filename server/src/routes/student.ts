@@ -11,6 +11,7 @@ const student = new Thing({
   },
   fields: {
     enroled: {SELECT: "->enroled.* as enroled"},
+    attended: {SELECT: "->attended.* as attended"},
   }
 })
 

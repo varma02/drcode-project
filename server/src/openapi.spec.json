@@ -4218,7 +4218,6 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["start", "end"],
                 "properties": {
                   "student": {
                     "$ref": "#/components/schemas/Student/properties/id"

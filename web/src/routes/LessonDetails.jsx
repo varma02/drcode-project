@@ -2,6 +2,7 @@ import { Combobox } from "@/components/ComboBox"
 import DataTable from "@/components/DataTable"
 import { DatePicker } from "@/components/DatePicker"
 import { MultiSelect } from "@/components/MultiSelect"
+import ReplacementDialog from "@/components/ReplacementDialog"
 import { TimePicker } from "@/components/TimePicker"
 import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
@@ -240,7 +241,6 @@ export default function LessonDetails() {
               displayName={"name"}
               defaultValue={lesson.group.location.id} 
               className={`${editLocation ? "flex" : "hidden"}`} />
-            
             <Link to={`/locations/${lesson.group.location.id.replace("location:", "")}`} key={lesson.group.location.id} className={`${!editLocation ? "block" : "hidden"}`} >
               <Button variant='outline' className='flex items-center gap-2'>
                 {lesson.group.location.name} <SquareArrowOutUpRight />
@@ -257,22 +257,16 @@ export default function LessonDetails() {
       <div className="flex flex-wrap gap-4 items-end">
         <div>
           <h3 className='font-bold mb-2'>Kezdés</h3>
-          <DatePicker date={new Date(lesson.start)} name={"dateStart"} />
-        </div>
-        <div>
-          <TimePicker date={new Date(lesson.start)} name={"lessonStart"} />
+          <DatePicker date={new Date(lesson.start)} includeTime showTimePicker dateFormat="Pp" name={"dateStart"} />
         </div>
       </div>
       <div className="flex flex-wrap gap-4 items-end">
         <div>
           <h3 className='font-bold mb-2'>Befejezés</h3>
-          <DatePicker date={new Date(lesson.end)} name={"dateEnd"} />
-        </div>
-        <div>
-          <TimePicker date={new Date(lesson.end)} name={"lessonEnd"} />
+          <DatePicker date={new Date(lesson.end)} includeTime showTimePicker dateFormat="Pp" name={"dateEnd"} />
         </div>
       </div>
-      <DataTable data={lesson.enroled} columns={columns} hideColumns={["created", "price"]} />
+      <DataTable data={lesson.enroled} columns={columns} hideColumns={["created", "price"]} headerAfter={<ReplacementDialog originalLessonId={lesson.id} />} />
     </form>
   )
 }

@@ -57,3 +57,9 @@ export function generateLessons(startDate: Date, lessonCount: number, startTime:
   }
   return generated
 }
+
+export function getNestedValue(obj: object, path: string) {
+  let value = obj
+  for (const key of path.split(".")) value = value?.[key]
+  return value
+}

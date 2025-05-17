@@ -14,6 +14,7 @@ import { isAdmin, isTeacher } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Combobox } from "@/components/ComboBox";
+import ReplacementDialog from "@/components/ReplacementDialog";
 
 export default function Home() {
   const auth = useAuth();
@@ -62,9 +63,7 @@ export default function Home() {
       setNextLessonStudents(p => [...p, 
         {...allStudents.find(v => v.id == formData.get("replacement")), replacement: true}
       ])
-
   }
-  console.log(nextLessonStudents)
 
   const columns = [
     {
@@ -212,22 +211,7 @@ export default function Home() {
           <h2>Tanulók</h2>
           <DataTable columns={columns} data={nextLessonStudents} 
             hideColumns={["created", "parent_name"]} 
-            headerAfter={
-              <Dialog>
-                <DialogTrigger asChild><Button variant="outline">Pótlás <Plus /></Button></DialogTrigger>
-                <DialogContent>
-                  <DialogTitle>Pótlás hozzáadása</DialogTitle>
-                  <form onSubmit={handleAddReplacement}>
-                    <Combobox data={allStudents || []} displayName={"name"} name={"replacement"} 
-                      onOpenChange={e => e && !allStudents &&
-                        getAll(auth.token, "student").then(resp => setAllStudents(resp.data.students))
-                       } 
-                       />
-                    <DialogClose asChild><Button type="submit">Hozzáadás</Button></DialogClose>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            }
+            headerAfter={<ReplacementDialog originalLessonId={nextLesson.id} />}
             />
         </>
         }

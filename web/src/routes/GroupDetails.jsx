@@ -36,7 +36,7 @@ export default function GroupDetails() {
   const [editLocation, setEditLocation] = useState(false)
 
   useEffect(() => {
-    get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
+    get(auth.token, 'group', ["group:" + params.id], "location,lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
       .then(data => {setGroup(data.data.groups[0])});
   }, [auth.token, params.id])
 
@@ -56,7 +56,7 @@ export default function GroupDetails() {
     create(auth.token, "enrolment", enr)
       .then(
         () => {
-          get(auth.token, 'group', ["group:" + params.id], "lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
+          get(auth.token, 'group', ["group:" + params.id], "location,lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
             .then(data => {setGroup(data.data.groups[0])});
           toast.success("Sikeres hozzáadás")
         },

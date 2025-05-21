@@ -124,7 +124,7 @@ export default function Home() {
       header: "Jelenlét",
       cell: ({ row }) => (
         row.original.replacement ? 
-        <p className="w-full rounded-full px-2 py-0.5 text-center bg-blue-500">Pótol</p>
+        <p className="w-full rounded-full px-2 py-0.5 text-center bg-gradient-to-br from-blue-500 to-blue-800">Pótol</p>
         :
         <ToggleButton
           onText={"Jelen"}

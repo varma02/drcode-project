@@ -135,7 +135,7 @@ export function AppSidebar() {
         initial="hidden"
         animate="visible"
         variants={sidebarAnimation}
-        className="h-full flex flex-col justify-between"
+        className="h-full flex flex-col justify-between pt-6"
       >
         <div className="p-4 flex justify-between items-center">
           <motion.div 

@@ -22,12 +22,13 @@ export default function Worksheet() {
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
-    getWorksheet(auth.token, auth.user.id, undefined, "out,out.group")
+    getWorksheet(auth.token, auth.user.id, true, "out,out.group")
       .then(
         resp => setWorksheet(resp.data.worksheet),
         (error) => {
           switch (error.response?.data?.code) {
             case "not_found":
+              setWorksheet([])
               return toast.error("Nincs megjeleníthető adat!")
             case "unauthorized":
               return toast.error("Ehhez hincs jogosultsága!")

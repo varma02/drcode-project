@@ -24,10 +24,7 @@ function Calendar({ className, classNames, showOutsideDays = true, showTimePicke
   }
 
   const handleDaySelect = (date) => {
-    if (!timeValue || !date) {
-      setDate(date)
-      return
-    }
+    if (!date || !timeValue) return
     const [hours, minutes] = timeValue.split(":").map((str) => parseInt(str, 10))
     const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes)
     setDate(newDate)

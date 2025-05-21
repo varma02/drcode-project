@@ -111,7 +111,6 @@ export default function LoginPage() {
               type="submit" 
               className="w-full font-medium"
               variant="primaryGradient"
-              animated={true}
             >
               Bejelentkezés
             </Button>

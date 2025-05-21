@@ -7,6 +7,7 @@ import { Plus } from 'lucide-react'
 import { Combobox } from './ComboBox'
 import { DatePicker } from './DatePicker'
 import { toast } from 'sonner'
+import { Input } from './ui/input'
 
 export default function ReplacementDialog({students, originalLessonId}) {
   const auth = useAuth()
@@ -28,9 +29,10 @@ export default function ReplacementDialog({students, originalLessonId}) {
     const formData = new FormData(e.target)
     console.log(formData)
     create(auth.token, "replacement", {
-      students: formData.get("student"),
+      student: formData.get("student"),
       original_lesson: originalLessonId,
-      replacement_lesson: formData.get("lesson")
+      replacement_lesson: formData.get("lesson"),
+      extension: formData.get("extension") + "m",
     }).then(resp => {
       switch (resp.code) {
         case "success":
@@ -60,6 +62,8 @@ export default function ReplacementDialog({students, originalLessonId}) {
               getAll(auth.token, "student").then(resp => setAllStudents(resp.data.students))
             } 
             />
+          <p className='text-sm -mb-6 z-10 ml-3'>Hosszabbítás (perc)</p>
+          <Input name={"extension"} className="w-1/3" defaultValue="30" />
           <DialogClose asChild className='w-max ml-auto'><Button type="submit">Hozzáadás</Button></DialogClose>
         </form>
       </DialogContent>

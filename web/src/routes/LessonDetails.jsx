@@ -60,14 +60,12 @@ export default function LessonDetails() {
     if (saveLoading || !e.target) return;
     setSaveLoading(true);
     const data = new FormData(e.target);
-    "2025-05-06T15:00.000Z"
-    "2023-10-15T14:30:00.000Z"
     const lessonData = {
-      name: data.get("lessonName") || undefined,
-      start: data.get("dateStart") + "T" + data.get("lessonStart") + ":00.000Z",
-      end: data.get("dateEnd") + "T" + data.get("lessonEnd") + ":00.000Z",
-      location: data.get("lessonLocation"),
-      teachers: data.get("lessonTeachers").split(","),
+      name: data.get("lessonName") == lesson.group.name || !data.get("lessonName") ? undefined : data.get("lessonName"),
+      start: data.get("dateStart"),
+      end: data.get("dateEnd"),
+      location: data.get("lessonLocation") == lesson.group.location.id ? undefined : data.get("lessonLocation"),
+      teachers: data.get("lessonTeachers") == lesson.group.teachers.join(",") ? undefined : data.get("lessonTeachers").split(","),
       group: data.get("lessonGroup"),
     };
     update(auth.token, "lesson", "lesson:" + params.id, lessonData)

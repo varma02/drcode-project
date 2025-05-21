@@ -85,24 +85,31 @@ const router = createBrowserRouter([
       {path: "/calendar", element: <CalendarPage />},
       {path: "/helper", element: <Helper />},
       {path: "/settings", element: <Settings />},
-      {path: "/employee", element: <AdminOnlyRoute><Employee /></AdminOnlyRoute>},
+
+      {path: "/employee", element: <AdminOnlyRoute children={<Employee />} />},
       {path: "/employee/:id", element: <EmployeeDetails />},
       {path: "/calendar/add/event", element: <AddCalendarEvent />},
-      {path: "/groups", element: <AdminOnlyRoute><Groups /></AdminOnlyRoute>},
-      {path: "/groups/add", element: <AdminOnlyRoute><AddCalendarGroup /></AdminOnlyRoute>},
+
+      {path: "/groups", element: <AdminOnlyRoute children={<Groups />} />},
       {path: "/groups/:id", element: <GroupDetails />},
-      {path: "/lessons", element: <AdminOnlyRoute><Lessons /></AdminOnlyRoute>},
+      {path: "/groups/add", element: <AdminOnlyRoute children={<AddCalendarGroup />} />},
+
+      {path: "/lessons", element: <AdminOnlyRoute children={<Lessons />} />},
       {path: "/lessons/:id", element: <LessonDetails />},
-      {path: "/lessons/add", element: <AdminOnlyRoute><AddLesson /></AdminOnlyRoute>},
-      {path: "/locations", element: <AdminOnlyRoute><Locations /></AdminOnlyRoute>},
+      {path: "/lessons/add", element: <AdminOnlyRoute children={<AddLesson />} />},
+
+      {path: "/locations", element: <AdminOnlyRoute children={<Locations />} />},
       {path: "/locations/:id", element: <LocationDetails />},
-      {path: "/locations/add", element: <AdminOnlyRoute><AddNewLocation /></AdminOnlyRoute>},
-      {path: "/subjects", element: <AdminOnlyRoute><Subjects /></AdminOnlyRoute>},
+      {path: "/locations/add", element: <AdminOnlyRoute children={<AddNewLocation />} />},
+
+      {path: "/subjects", element: <AdminOnlyRoute children={<Subjects />} />},
       {path: "/subjects/:id", element: <SubjectDetails />},
-      {path: "/subjects/add", element: <AdminOnlyRoute><AddNewSubject /></AdminOnlyRoute>},
-      {path: "/students", element: <AdminOnlyRoute><Students /></AdminOnlyRoute>},
-      {path: "/students/add", element: <AdminOnlyRoute><AddStudent/></AdminOnlyRoute>},
+      {path: "/subjects/add", element: <AdminOnlyRoute children={<AddNewSubject />} />},
+
+      {path: "/students", element: <AdminOnlyRoute children={<Students />} />},
       {path: "/students/:id", element: <StudentDetails />},
+      {path: "/students/add", element: <AdminOnlyRoute children={<AddStudent/>} />},
+
       {path: "*", element: <NotFound />},
     ]
   },

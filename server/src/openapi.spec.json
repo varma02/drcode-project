@@ -3692,7 +3692,7 @@
             "required": false,
             "description": "Wether to include paid records or not",
             "schema": {
-              "type": "boolean",
+              "type": "string",
               "example": false
             }
           },

@@ -39,6 +39,7 @@ const AddNewSubject = lazy(() => import('@/routes/AddSubject'))
 const AddStudent = lazy(() => import('@/routes/AddStudent'))
 const AddLesson = lazy(() => import('@/routes/AddLesson'))
 const NotFound = lazy(() => import('@/routes/NotFound'))
+const AdminOnlyRoute = lazy(() => import('@/components/AdminOnlyRoute'))
 
 function SidebarWrapper() {
   const navigate = useNavigate();
@@ -79,28 +80,28 @@ const router = createBrowserRouter([
     element: <SidebarWrapper />,
     children: [
       {path: "/", element: <Home />},
-      {path: "/admin", element: <AdminHome />},
+      {path: "/admin", element: <AdminOnlyRoute><AdminHome /></AdminOnlyRoute>},
       {path: "/worksheet", element: <Worksheet />},
       {path: "/calendar", element: <CalendarPage />},
       {path: "/helper", element: <Helper />},
       {path: "/settings", element: <Settings />},
-      {path: "/employee", element: <Employee />},
+      {path: "/employee", element: <AdminOnlyRoute><Employee /></AdminOnlyRoute>},
       {path: "/employee/:id", element: <EmployeeDetails />},
       {path: "/calendar/add/event", element: <AddCalendarEvent />},
-      {path: "/groups", element: <Groups />},
-      {path: "/groups/add", element: <AddCalendarGroup />},
+      {path: "/groups", element: <AdminOnlyRoute><Groups /></AdminOnlyRoute>},
+      {path: "/groups/add", element: <AdminOnlyRoute><AddCalendarGroup /></AdminOnlyRoute>},
       {path: "/groups/:id", element: <GroupDetails />},
-      {path: "/lessons", element: <Lessons />},
+      {path: "/lessons", element: <AdminOnlyRoute><Lessons /></AdminOnlyRoute>},
       {path: "/lessons/:id", element: <LessonDetails />},
-      {path: "/lessons/add", element: <AddLesson />},
-      {path: "/locations", element: <Locations />},
+      {path: "/lessons/add", element: <AdminOnlyRoute><AddLesson /></AdminOnlyRoute>},
+      {path: "/locations", element: <AdminOnlyRoute><Locations /></AdminOnlyRoute>},
       {path: "/locations/:id", element: <LocationDetails />},
-      {path: "/locations/add", element: <AddNewLocation />},
-      {path: "/subjects", element: <Subjects />},
+      {path: "/locations/add", element: <AdminOnlyRoute><AddNewLocation /></AdminOnlyRoute>},
+      {path: "/subjects", element: <AdminOnlyRoute><Subjects /></AdminOnlyRoute>},
       {path: "/subjects/:id", element: <SubjectDetails />},
-      {path: "/subjects/add", element: <AddNewSubject />},
-      {path: "/students", element: <Students />},
-      {path: "/students/add", element: <AddStudent/>},
+      {path: "/subjects/add", element: <AdminOnlyRoute><AddNewSubject /></AdminOnlyRoute>},
+      {path: "/students", element: <AdminOnlyRoute><Students /></AdminOnlyRoute>},
+      {path: "/students/add", element: <AdminOnlyRoute><AddStudent/></AdminOnlyRoute>},
       {path: "/students/:id", element: <StudentDetails />},
       {path: "*", element: <NotFound />},
     ]

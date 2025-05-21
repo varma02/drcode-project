@@ -3,8 +3,6 @@ import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartToo
 import { Bar, BarChart, CartesianGrid, Label, Pie, PieChart, XAxis } from 'recharts'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { getAll } from '@/lib/api/api'
-import { isAdmin } from '@/lib/utils'
-import NotFound from './NotFound'
 
 export default function AdminHome() {
   const auth = useAuth()
@@ -106,8 +104,6 @@ export default function AdminHome() {
   const chartConfig2 = Object.values(teacherGroups).map(e => (
     {[e.name]: {label: e.name, color: "hsl(var(--chart-5))"}}
   ))
-
-  if (!isAdmin(auth.user.roles)) return <NotFound />
 
   return (
     <div className='size-full bg-primary-foreground p-4 rounded-xl flex flex-1 flex-col'>

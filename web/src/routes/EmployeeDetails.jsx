@@ -4,7 +4,7 @@ import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { create, get, remove, update } from "@/lib/api/api"
+import { get, remove, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
@@ -12,8 +12,6 @@ import { LoaderCircle, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { toast } from "sonner"
-import NotFound from "./NotFound"
-import { isAdmin } from "@/lib/utils"
 
 export default function EmployeeDetails() {
   const auth = useAuth()
@@ -47,8 +45,6 @@ export default function EmployeeDetails() {
       )
     )
   }
-
-  if (!isAdmin(auth.user.roles)) return <NotFound />
 
   if (!employee) return (
     <div className='h-screen w-full bg-background flex items-center justify-center'>

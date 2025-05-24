@@ -334,8 +334,8 @@ describe("Subject", async () => {
     });
   });
 
-   // MARK: /subject/update
-   describe("/subject/update", () => {
+  // MARK: /subject/update
+  describe("/subject/update", () => {
     test("200", async () => {
       const createResp = await testRequest({
         method: "post",
@@ -346,9 +346,9 @@ describe("Subject", async () => {
         },
         token: adminAuth.token,
       });
-      
+
       const subjectId = createResp.body?.data?.subject?.id;
-      
+
       const resp = await testRequest({
         method: "post",
         url: "/subject/update",
@@ -360,6 +360,35 @@ describe("Subject", async () => {
         token: adminAuth.token,
       });
       expect(resp.status).toBe(200);
+    });
+  });
+
+  // MARK: /subject/create
+  describe("/subject/create", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/subject/create",
+        body: {
+          name: "Another Subject",
+          description: "Another Description",
+        },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.subject?.name).toBe("Another Subject");
+    });
+    test("As teacher", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/subject/create",
+        body: {
+          name: "Teacher Subject",
+          description: "Description",
+        },
+        token: teacherAuth.token,
+      });
+      expect(resp.status).toBe(400);
     });
   });
 });

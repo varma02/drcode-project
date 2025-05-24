@@ -275,4 +275,34 @@ describe("Subject", async () => {
       expect(resp.status).toBe(401);
     });
   });
+
+  // MARK: /subject/get
+  describe("/subject/get", () => {
+    test("200", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/subject/create",
+        body: {
+          name: "Test Subject",
+          description: "Test Description",
+        },
+        token: adminAuth.token,
+      });
+      expect(createResp.status).toBe(200);
+
+      const subjectId = createResp.body?.data?.subject?.id;
+      expect(subjectId).toBeDefined();
+
+      const resp = await testRequest({
+        method: "get",
+        url: "/subject/get",
+        query: { ids: subjectId },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.subjects?.length).toBe(1);
+      expect(resp.body?.data?.subjects[0]?.name).toBe("Test Subject");
+    });
+  });
+  
 });

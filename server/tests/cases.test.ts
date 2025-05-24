@@ -363,32 +363,30 @@ describe("Subject", async () => {
     });
   });
 
-  // MARK: /subject/create
-  describe("/subject/create", () => {
-    test("200", async () => {
-      const resp = await testRequest({
-        method: "post",
-        url: "/subject/create",
-        body: {
-          name: "Another Subject",
-          description: "Another Description",
-        },
-        token: adminAuth.token,
+  describe("Student", async () => {
+    const adminAuth = await testCreateUser("studentEndpointsAdmin", ["administrator"]);
+    const teacherAuth = await testCreateUser("studentEndpointsTeacher", ["teacher"]);
+
+    // MARK: /student/all
+    describe("/student/all", () => {
+      test("200", async () => {
+        const resp = await testRequest({
+          method: "get",
+          url: "/student/all",
+          token: adminAuth.token,
+        });
+        expect(resp.status).toBe(200);
+        expect(resp.body?.data?.students).toBeDefined();
       });
-      expect(resp.status).toBe(200);
-      expect(resp.body?.data?.subject?.name).toBe("Another Subject");
-    });
-    test("As teacher", async () => {
-      const resp = await testRequest({
-        method: "post",
-        url: "/subject/create",
-        body: {
-          name: "Teacher Subject",
-          description: "Description",
-        },
-        token: teacherAuth.token,
+      test("As teacher", async () => {
+        const resp = await testRequest({
+          method: "get",
+          url: "/student/all",
+          token: teacherAuth.token,
+        });
+        expect(resp.status).toBe(200);
+        expect(resp.body?.data?.students).toBeDefined();
       });
-      expect(resp.status).toBe(400);
     });
   });
 });

@@ -304,5 +304,33 @@ describe("Subject", async () => {
       expect(resp.body?.data?.subjects[0]?.name).toBe("Test Subject");
     });
   });
-  
+
+  // MARK: /subject/create
+  describe("/subject/create", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/subject/create",
+        body: {
+          name: "Another Subject",
+          description: "Another Description",
+        },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.subject?.name).toBe("Another Subject");
+    });
+    test("As teacher", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/subject/create",
+        body: {
+          name: "Teacher Subject",
+          description: "Description",
+        },
+        token: teacherAuth.token,
+      });
+      expect(resp.status).toBe(400);
+    });
+  });
 });

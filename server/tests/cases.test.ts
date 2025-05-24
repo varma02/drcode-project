@@ -389,4 +389,39 @@ describe("Subject", async () => {
       });
     });
   });
+
+   // MARK: /student/create
+   describe("/student/create", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/student/create",
+        body: {
+          name: "Test Student",
+          grade: 9,
+          email: "student@example.com",
+          phone: "+1234567890",
+          parent: {
+            name: "Parent Name",
+            email: "parent@example.com",
+            phone: "+0987654321"
+          }
+        },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.student?.name).toBe("Test Student");
+    });
+    test("Missing required fields", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/student/create",
+        body: {
+          grade: 10
+        },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(400);
+    });
+  });
 });

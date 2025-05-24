@@ -333,4 +333,33 @@ describe("Subject", async () => {
       expect(resp.status).toBe(400);
     });
   });
+
+   // MARK: /subject/update
+   describe("/subject/update", () => {
+    test("200", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/subject/create",
+        body: {
+          name: "Update Test Subject",
+          description: "Original Description",
+        },
+        token: adminAuth.token,
+      });
+      
+      const subjectId = createResp.body?.data?.subject?.id;
+      
+      const resp = await testRequest({
+        method: "post",
+        url: "/subject/update",
+        body: {
+          id: subjectId,
+          name: "Updated Subject",
+          description: "Updated Description",
+        },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+    });
+  });
 });

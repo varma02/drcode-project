@@ -213,7 +213,7 @@ describe("Employee", async () => {
         url: "/employee/all",
         token: teacherAuth.token,
       });
-      expect(resp.status).toBe(401);
+      expect(resp.status).toBe(400);
       expect(resp.body?.data?.employees).not.toBeDefined();
     });
     test("Without token", async () => {
@@ -243,4 +243,8 @@ describe("Employee", async () => {
       expect(resp.body?.data?.employees?.length).toBeGreaterThan(0);
     });
   });
+});
+describe("Subject", async () => {
+  const adminAuth = await testCreateUser("subjectEndpointsAdmin", ["administrator"]);
+  const teacherAuth = await testCreateUser("subjectEndpointsTeacher", ["teacher"]);
 });

@@ -390,8 +390,8 @@ describe("Subject", async () => {
     });
   });
 
-   // MARK: /student/create
-   describe("/student/create", () => {
+  // MARK: /student/create
+  describe("/student/create", () => {
     test("200", async () => {
       const resp = await testRequest({
         method: "post",
@@ -424,4 +424,41 @@ describe("Subject", async () => {
       expect(resp.status).toBe(400);
     });
   });
+
+  // MARK: /student/get
+  describe("/student/get", () => {
+    test("200", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/student/create",
+        body: {
+          name: "Get Test Student",
+          grade: 10,
+          email: "get-test-student@example.com",
+          phone: "+1234567890",
+          parent: {
+            name: "Parent Name",
+            email: "parent@example.com",
+            phone: "+0987654321"
+          }
+        },
+        token: adminAuth.token,
+      });
+
+      const studentId = createResp.body?.data?.student?.id;
+
+      const resp = await testRequest({
+        method: "get",
+        url: "/student/get",
+        query: { ids: studentId },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.students?.length).toBe(1);
+      expect(resp.body?.data?.students[0]?.name).toBe("Get Test Student");
+    });
+  });
+
+  
 });

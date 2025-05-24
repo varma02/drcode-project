@@ -112,7 +112,7 @@ The frontend part is a React application using:
    - [react-router](https://reactrouter.com/home) for routing between pages,
    - [axios](https://axios-http.com/) for making requests to the API,
    - and [lucide](https://lucide.dev/) for the icons.
-
+  
 
 ## Authors
 

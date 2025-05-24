@@ -6,11 +6,13 @@ import { Separator } from '@/components/ui/separator';
 import { update } from '@/lib/api/api';
 import { useAuth } from '@/lib/api/AuthProvider';
 import { Pen } from 'lucide-react';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { toast } from 'sonner';
 
 export default function Settings() {
   const auth = useAuth();
+
+  useEffect(() => {});
 
   const handleSubmit = (e) => {
     e.preventDefault();

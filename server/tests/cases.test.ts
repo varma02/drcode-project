@@ -247,4 +247,32 @@ describe("Employee", async () => {
 describe("Subject", async () => {
   const adminAuth = await testCreateUser("subjectEndpointsAdmin", ["administrator"]);
   const teacherAuth = await testCreateUser("subjectEndpointsTeacher", ["teacher"]);
+
+  // MARK: /subject/all
+  describe("/subject/all", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "get",
+        url: "/subject/all",
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.subjects?.length).toBeGreaterThan(0);
+    });
+    test("As teacher", async () => {
+      const resp = await testRequest({
+        method: "get",
+        url: "/subject/all",
+        token: teacherAuth.token,
+      });
+      expect(resp.status).toBe(400);
+    });
+    test("Without token", async () => {
+      const resp = await testRequest({
+        method: "get",
+        url: "/subject/all",
+      });
+      expect(resp.status).toBe(401);
+    });
+  });
 });

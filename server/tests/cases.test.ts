@@ -530,5 +530,36 @@ describe("Subject", async () => {
     });
   });
 
-
+  describe("Location", async () => {
+    const adminAuth = await testCreateUser("locationEndpointsAdmin", ["administrator"]);
+    const teacherAuth = await testCreateUser("locationEndpointsTeacher", ["teacher"]);
+    
+    // MARK: /location/all
+    describe("/location/all", () => {
+      test("200", async () => {
+        const resp = await testRequest({
+          method: "get",
+          url: "/location/all",
+          token: adminAuth.token,
+        });
+        expect(resp.status).toBe(200);
+        expect(resp.body?.data?.locations).toBeDefined();
+      });
+      test("As teacher", async () => {
+        const resp = await testRequest({
+          method: "get",
+          url: "/location/all",
+          token: teacherAuth.token,
+        });
+        expect(resp.status).toBe(400);
+      });
+      test("Without token", async () => {
+        const resp = await testRequest({
+          method: "get",
+          url: "/location/all",
+        });
+        expect(resp.status).toBe(401);
+      });
+    });
+  });
 });

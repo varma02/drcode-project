@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, it, test } from 'bun:test';
 import { testAuth, testCreateUser, testQuery, testRequest, testSetup } from './utils';
 
 await testSetup();
@@ -196,60 +196,60 @@ describe("Authentication", () => {
 describe("Employee", async () => {
   const adminAuth = await testCreateUser("employeeEndpointsAdmin", ["administrator"]);
   const teacherAuth = await testCreateUser("employeeEndpointsTeacher", ["teacher"]);
-  
- /** 
-  // MARK: /employee/all
-  describe("/employee/all", () => {
-    test("200", async () => {
-      const resp = await testRequest({
-        method: "get",
-        url: "/employee/all",
-        token: adminAuth.token,
-      });
-      expect(resp.status).toBe(200);
-      expect(resp.body?.data?.employees?.length).toBeGreaterThan(0);
-    });
-    test("As teacher", async () => {
-      const resp = await testRequest({
-        method: "get",
-        url: "/employee/all",
-        token: teacherAuth.token,
-      });
-      expect(resp.status).toBe(401);
-      expect(resp.body?.data?.employees).not.toBeDefined();
-    });
-    test("Without token", async () => {
-      const resp = await testRequest({
-        method: "get",
-        url: "/employee/all",
-      });
-      expect(resp.status).toBe(401);
-      expect(resp.body?.data?.employees).not.toBeDefined();
-    });
-  });
-  // MARK: /employee/get
-  describe("/employee/get", () => {
-    test("200", async () => {
-      const resp = await testRequest({
-        method: "get",
-        url: "/employee/get",
-        token: adminAuth.token,
-        query: {
-          ids: [adminAuth.user.id, teacherAuth.user.id].join(","),
-          include: ["groups", "worksheet"].join(","),
-          fetch: ["groups", "worksheet"].join(","),
-        }
-      });
-      console.log(JSON.stringify(resp.body));
-      expect(resp.status).toBe(200);
-      expect(resp.body?.data?.employees?.length).toBeGreaterThan(0);
-    });
-  });
-});
-describe("Subject", async () => {
-  const adminAuth = await testCreateUser("subjectEndpointsAdmin", ["administrator"]);
-  const teacherAuth = await testCreateUser("subjectEndpointsTeacher", ["teacher"]);
-**/
+
+  /*
+   // MARK: /employee/all
+   describe("/employee/all", () => {
+     test("200", async () => {
+       const resp = await testRequest({
+         method: "get",
+         url: "/employee/all",
+         token: adminAuth.token,
+       });
+       expect(resp.status).toBe(200);
+       expect(resp.body?.data?.employees?.length).toBeGreaterThan(0);
+     });
+     test("As teacher", async () => {
+       const resp = await testRequest({
+         method: "get",
+         url: "/employee/all",
+         token: teacherAuth.token,
+       });
+       expect(resp.status).toBe(401);
+       expect(resp.body?.data?.employees).not.toBeDefined();
+     });
+     test("Without token", async () => {
+       const resp = await testRequest({
+         method: "get",
+         url: "/employee/all",
+       });
+       expect(resp.status).toBe(401);
+       expect(resp.body?.data?.employees).not.toBeDefined();
+     });
+   });
+   // MARK: /employee/get
+   describe("/employee/get", () => {
+     test("200", async () => {
+       const resp = await testRequest({
+         method: "get",
+         url: "/employee/get",
+         token: adminAuth.token,
+         query: {
+           ids: [adminAuth.user.id, teacherAuth.user.id].join(","),
+           include: ["groups", "worksheet"].join(","),
+           fetch: ["groups", "worksheet"].join(","),
+         }
+       });
+       console.log(JSON.stringify(resp.body));
+       expect(resp.status).toBe(200);
+       expect(resp.body?.data?.employees?.length).toBeGreaterThan(0);
+     });
+   });
+ });
+ describe("Subject", async () => {
+   const adminAuth = await testCreateUser("subjectEndpointsAdmin", ["administrator"]);
+   const teacherAuth = await testCreateUser("subjectEndpointsTeacher", ["teacher"]);
+ */
 
   // MARK: /subject/all
   describe("/subject/all", () => {
@@ -457,42 +457,42 @@ describe("Subject", async () => {
         expect(resp.status).toBe(400);
       });
     });
-/*
-    // MARK: /student/get
-    describe("/student/get", () => {
-      test("200", async () => {
-        const createResp = await testRequest({
-          method: "post",
-          url: "/student/create",
-          body: {
-            name: "Get Test Student",
-            grade: 10,
-            email: "get-test-student@example.com",
-            phone: "+1234567890",
-            parent: {
-              name: "Parent Name",
-              email: "parent@example.com",
-              phone: "+0987654321"
-            }
-          },
-          token: adminAuth.token,
+    /*
+        // MARK: /student/get
+        describe("/student/get", () => {
+          test("200", async () => {
+            const createResp = await testRequest({
+              method: "post",
+              url: "/student/create",
+              body: {
+                name: "Get Test Student",
+                grade: 10,
+                email: "get-test-student@example.com",
+                phone: "+1234567890",
+                parent: {
+                  name: "Parent Name",
+                  email: "parent@example.com",
+                  phone: "+0987654321"
+                }
+              },
+              token: adminAuth.token,
+            });
+    
+            const studentId = createResp.body?.data?.student?.id;
+    
+            const resp = await testRequest({
+              method: "get",
+              url: "/student/get",
+              query: { ids: studentId },
+              token: adminAuth.token,
+              skipSchemaValidation: true
+            });
+            expect(resp.status).toBe(200);
+            expect(resp.body?.data?.students?.length).toBe(1);
+            expect(resp.body?.data?.students[0]?.name).toBe("Get Test Student");
+          });
         });
-
-        const studentId = createResp.body?.data?.student?.id;
-
-        const resp = await testRequest({
-          method: "get",
-          url: "/student/get",
-          query: { ids: studentId },
-          token: adminAuth.token,
-          skipSchemaValidation: true
-        });
-        expect(resp.status).toBe(200);
-        expect(resp.body?.data?.students?.length).toBe(1);
-        expect(resp.body?.data?.students[0]?.name).toBe("Get Test Student");
-      });
-    });
-*/
+    */
     // MARK: /student/update
     describe("/student/update", () => {
       test("200", async () => {
@@ -533,7 +533,7 @@ describe("Subject", async () => {
   describe("Location", async () => {
     const adminAuth = await testCreateUser("locationEndpointsAdmin", ["administrator"]);
     const teacherAuth = await testCreateUser("locationEndpointsTeacher", ["teacher"]);
-    
+
     // MARK: /location/all
     describe("/location/all", () => {
       test("200", async () => {
@@ -579,6 +579,79 @@ describe("Subject", async () => {
       });
       expect(resp.status).toBe(200);
       expect(resp.body?.data?.location?.name).toBe("Test Location");
+    });
+  });
+
+  /*
+    // MARK: /location/get
+    describe("/location/get", () => {
+      test("200", async () => {
+        const createResp = await testRequest({
+          method: "post",
+          url: "/location/create",
+          body: {
+            name: "Get Test Location",
+            address: "456 Test Avenue",
+            contact_email: "location-get@example.com",
+            contact_phone: "+1234567890"               
+          },
+          token: adminAuth.token,
+        });
+        
+        const locationId = createResp.body?.data?.location?.id;
+        
+        const resp = await testRequest({
+          method: "get",
+          url: "/location/get",
+          query: { ids: locationId },
+          token: adminAuth.token,
+          skipSchemaValidation: true
+        });
+        expect(resp.status).toBe(200);
+        expect(resp.body?.data?.locations?.length).toBe(1);
+        expect(resp.body?.data?.locations[0]?.name).toBe("Get Test Location");
+      });
+    });
+    */
+
+/*    
+  describe("Group", async () => {
+    const adminAuth = await testCreateUser("groupEndpointsAdmin", ["administrator"]);
+    const teacherAuth = await testCreateUser("groupEndpointsTeacher", ["teacher"]);
+    let locationId: string;
+
+    beforeAll(async () => {
+      try {
+        const createResp = await testRequest({
+          method: "post",
+          url: "/location/create",
+          body: {
+            name: "Group Test Location",
+            address: "789 Group Street",
+            contact_email: "group-location@example.com", 
+            contact_phone: "+1234567890"                 
+          },
+          token: adminAuth.token,
+        });
+        locationId = createResp.body?.data?.location?.id;
+        console.log("Created location for Group tests:", locationId);
+      } catch (error) {
+        console.error("Failed to create location for Group tests:", error);
+      }
+    });
+  });
+  */
+
+   // MARK: /group/all
+   describe("/group/all", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "get",
+        url: "/group/all",
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.groups).toBeDefined();
     });
   });
 });

@@ -43,15 +43,17 @@ export default function DataTable({ columns, data, hasFooter = true, className, 
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: rowsPerPage
+      }
+    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination: {
-        pageIndex: 0,
-        pageSize: rowsPerPage
-      }
     },
   })
 

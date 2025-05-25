@@ -543,7 +543,7 @@ describe("Authentication", () => {
         expect(resp.body?.data?.groups).toBeDefined();
       });
     });
-    
+
     // MARK: /group/create
     describe("/group/create", () => {
       test("200", async () => {
@@ -582,6 +582,84 @@ describe("Authentication", () => {
         });
         expect(resp.status).toBe(200);
         expect(resp.body?.data?.group?.name).toBe("Test Group With Lessons");
+      });
+    });
+  });
+
+  describe("Enrolment", async () => {
+    const adminAuth = await testCreateUser("enrolmentEndpointsAdmin", ["administrator"]);
+    let groupId: string;
+    let studentId: string; 
+    let subjectId: string;
+    beforeAll(async () => {
+      const locationResp = await testRequest({
+        method: "post",
+        url: "/location/create",
+        body: {
+          name: "Enrolment Test Location",
+          address: "123 Enrolment Street",
+          contact_email: "enrolment-location@example.com", 
+          contact_phone: "+1234567890"                    
+        },
+        token: adminAuth.token,
+      });
+      const locationId = locationResp.body?.data?.location?.id;
+      const groupResp = await testRequest({
+        method: "post",
+        url: "/group/create",
+        body: {
+          name: "Enrolment Test Group",
+          location: locationId,
+          teachers: [adminAuth.user.id]
+        },
+        token: adminAuth.token,
+      });
+      groupId = groupResp.body?.data?.group?.id;
+      const studentResp = await testRequest({
+        method: "post",
+        url: "/student/create",
+        body: {
+          name: "Enrolment Test Student",
+          grade: 10,
+          email: "enrolment-student@example.com",
+          phone: "+1234567890",                      
+          parent: {                                  
+            name: "Parent Name",
+            email: "parent@example.com",
+            phone: "+0987654321"
+          }
+        },
+        token: adminAuth.token,
+      });
+      studentId = studentResp.body?.data?.student?.id;
+      const subjectResp = await testRequest({
+        method: "post",
+        url: "/subject/create",
+        body: {
+          name: "Enrolment Test Subject",
+          description: "For testing enrolment"
+        },
+        token: adminAuth.token,
+      });
+      subjectId = subjectResp.body?.data?.subject?.id;
+    });
+    
+    // MARK: /enrolment/create
+    describe("/enrolment/create", () => {
+      test("200", async () => {
+        const resp = await testRequest({
+          method: "post",
+          url: "/enrolment/create",
+          body: {
+            student: studentId,
+            group: groupId,
+            subject: subjectId,
+            price: 14000
+          },
+          token: adminAuth.token,
+        });
+        expect(resp.status).toBe(200);
+        expect(resp.body?.data?.enrolment).toBeDefined();
       });
     });
   });

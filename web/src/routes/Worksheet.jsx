@@ -5,12 +5,13 @@ import { DatePicker } from '@/components/DatePicker'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Switch } from '@/components/ui/switch'
 import { create, getAll, getWorksheet, remove } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { isTeacher } from '@/lib/utils'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
-import { LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -19,17 +20,18 @@ export default function Worksheet() {
   const auth = useAuth()
   const [worksheet, setWorksheet] = useState(null)
   const [allLessons, setAllLessons] = useState(null)
+
   const [rowSelection, setRowSelection] = useState({})
+  const [showPaid, setshowPaid] = useState(false)
 
   useEffect(() => {
-    getWorksheet(auth.token, auth.user.id, true, "out,out.group")
+    getWorksheet(auth.token, auth.user.id, showPaid, "out,out.group")
       .then(
         resp => setWorksheet(resp.data.worksheet),
         (error) => {
           switch (error.response?.data?.code) {
             case "not_found":
-              setWorksheet([])
-              return toast.error("Nincs megjeleníthető adat!")
+              return setWorksheet([])
             case "unauthorized":
               return toast.error("Ehhez hincs jogosultsága!")
             default:
@@ -37,7 +39,7 @@ export default function Worksheet() {
           }
         }
       )
-  }, [auth.token])
+  }, [auth.token, showPaid])
 
   function handleDelete() {
     remove(auth.token, 'worksheet', Object.keys(rowSelection).map(e => worksheet[+e].id)).then(resp => {
@@ -128,7 +130,23 @@ export default function Worksheet() {
     {
       displayName: "Dátum",
       accessorKey: "date",
-      header: ({ column }) => column.columnDef.displayName,
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {column.columnDef.displayName}
+            {!column.getIsSorted() ? (
+              <ArrowUpDown />
+            ) : column.getIsSorted() === "asc" ? (
+              <ArrowDown />
+            ) : (
+              <ArrowUp />
+            )}
+          </Button>
+        );
+      },
       cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
     },
     {
@@ -154,6 +172,10 @@ export default function Worksheet() {
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <h1 className='text-4xl py-4'>Jelenléti ív</h1>
+      <div className='flex gap-2 items-center'>
+        <p>Fizetett oszlopok mutatása</p>
+        <Switch checked={showPaid} onCheckedChange={(e) => setshowPaid(e)} />
+      </div>
       <DataTable data={worksheet} columns={workColumns} rowSelection={rowSelection} setRowSelection={setRowSelection}
       headerAfter={
         <>

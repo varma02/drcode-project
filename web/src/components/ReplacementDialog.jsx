@@ -7,14 +7,13 @@ import { Plus } from 'lucide-react'
 import { Combobox } from './ComboBox'
 import { DatePicker } from './DatePicker'
 import { toast } from 'sonner'
+import { Input } from './ui/input'
 
-export default function ReplacementDialog({students, originalLessonId}) {
+export default function ReplacementDialog({students, originalLessonId, setNewStudents}) {
   const auth = useAuth()
   const [allStudents, setAllStudents] = useState(students)
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [lessons, setLessons] = useState([])
-  
-  console.log(lessons)
   
   useEffect(() => {
     setLessons([])
@@ -28,19 +27,22 @@ export default function ReplacementDialog({students, originalLessonId}) {
     const formData = new FormData(e.target)
     console.log(formData)
     create(auth.token, "replacement", {
-      students: formData.get("student"),
-      original_lesson: originalLessonId,
-      replacement_lesson: formData.get("lesson")
+      student: formData.get("student"),
+      original_lesson: formData.get("lesson"),
+      replacement_lesson: originalLessonId,
+      extension: formData.get("extension") + "m",
     }).then(resp => {
-      switch (resp.code) {
-        case "success":
-          return toast.success("Pótlás sikeresen hozzáadva!")
+      setNewStudents && setNewStudents(p => [...p, {...allStudents.find(v => v.id == formData.get("student")), replacement: true}])
+      return toast.success("Pótlás sikeresen hozzáadva!"), 
+      (error) => {
+      console.log("asd: ", error)
+      switch (error.response?.data?.code) {
         case "bad_request":
-          return toast.success("Valamelyik mező üres!")
+          return toast.error("Valamelyik mező üres!")
         default:
           return toast.error("Ismeretlen hiba történt!")
-      }
-    })
+      }}}
+    )
   }
 
   return (
@@ -60,6 +62,8 @@ export default function ReplacementDialog({students, originalLessonId}) {
               getAll(auth.token, "student").then(resp => setAllStudents(resp.data.students))
             } 
             />
+          <p className='text-sm -mb-6 z-10 ml-3'>Hosszabbítás (perc)</p>
+          <Input name={"extension"} className="w-1/3" defaultValue="30" />
           <DialogClose asChild className='w-max ml-auto'><Button type="submit">Hozzáadás</Button></DialogClose>
         </form>
       </DialogContent>

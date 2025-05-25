@@ -1,20 +1,19 @@
 import DataTable from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, Coffee, Plus } from "lucide-react";
+import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, Coffee, Trash, TriangleAlert } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ToggleButton } from "@/components/ToggleButton";
 import { useAuth } from "@/lib/api/AuthProvider";
-import { attendLesson, create, get, getAll, getNextLesson } from "@/lib/api/api";
+import { attendLesson, get, getNextLesson } from "@/lib/api/api";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 import WorkInProgress from "@/components/WorkInProgress";
 import { toast } from "sonner";
 import { isAdmin, isTeacher } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Combobox } from "@/components/ComboBox";
 import ReplacementDialog from "@/components/ReplacementDialog";
+import AreYouSureAlert from "@/components/AreYouSureAlert";
 
 export default function Home() {
   const auth = useAuth();
@@ -23,8 +22,6 @@ export default function Home() {
   const [nextLesson, setNextLesson] = useState(null);
   const [nextLessonStudents, setNextLessonStudents] = useState([]);
   const [attended, setAttended] = useState([]);
-  const [replacement, setReplacement] = useState(null);
-  const [allStudents, setAllStudents] = useState(null)
 
   useEffect(() => {
     if (!isTeacher(auth.user.roles) && isAdmin(auth.user.roles)) navigate("/admin");
@@ -33,7 +30,19 @@ export default function Home() {
         const nl = resp.data.lesson;
         setNextLesson(nl);
         setAttended(nl.attended);
-        get(auth.token, "student", [...nl.enroled.map((e) => e.in)], undefined, "enroled").then((resp) => setNextLessonStudents(resp.data.students));
+        get(auth.token, "student", [...nl.enroled.map((e) => e.in)], undefined, "enroled").then((resp) => {
+          const ls = resp.data.students
+          setNextLessonStudents(ls)
+          get(auth.token, "student", [...nl.replaced], undefined, "enroled").then((resp2) => 
+            setNextLessonStudents(p => [
+              ...p, 
+              ...resp2.data.students.map(student => ({
+                ...student,
+                replacement: true
+              }))
+            ])
+          );
+        });
       },
       (error) => {
         switch (error.response?.data?.code) {
@@ -52,17 +61,6 @@ export default function Home() {
     attendLesson(auth.token, nextLesson.id, attended).then(() =>
       toast.success("Sikeres mentés")
     );
-  }
-
-  function handleAddReplacement(e) {
-    e.preventDefault()
-    const formData = new FormData(e.target)
-    console.log(formData)
-    if (nextLessonStudents.some(l => l.id == formData.get("replacement") && l.replacement)) return
-    console.log(allStudents.find(v => v.id == formData.get("replacement")))
-      setNextLessonStudents(p => [...p, 
-        {...allStudents.find(v => v.id == formData.get("replacement")), replacement: true}
-      ])
   }
 
   const columns = [
@@ -126,17 +124,23 @@ export default function Home() {
       header: "Jelenlét",
       cell: ({ row }) => (
         row.original.replacement ? 
-        <p className="w-full rounded-full px-2 py-0.5 text-center bg-blue-500">Pótol</p>
+        <div className="flex justify-center items-center gap-2">
+          <p className="w-full rounded-full px-2 py-0.5 text-center bg-blue-500">Pótol</p>
+          <AreYouSureAlert trigger={<Trash className="cursor-pointer" />} />
+        </div>
         :
-        <ToggleButton
-          onText={"Jelen"}
-          offText={"Hiányzik"}
-          value={attended.includes(row.original.id)}
-          onch={(e) => {
-            if (!e) setAttended((p) => [...p, row.original.id]);
-            else setAttended((p) => p.filter((v) => v != row.original.id));
-          }}
-        />
+        <div className="flex justify-center items-center gap-2">
+          <ToggleButton
+            onText={"Jelen"}
+            offText={"Hiányzik"}
+            value={attended.includes(row.original.id)}
+            onch={(e) => {
+              if (!e) setAttended((p) => [...p, row.original.id]);
+              else setAttended((p) => p.filter((v) => v != row.original.id));
+            }}
+          />
+          {/* <TriangleAlert /> */}
+        </div>
       ),
     },
   ];
@@ -211,7 +215,7 @@ export default function Home() {
           <h2>Tanulók</h2>
           <DataTable columns={columns} data={nextLessonStudents} 
             hideColumns={["created", "parent_name"]} 
-            headerAfter={<ReplacementDialog originalLessonId={nextLesson.id} />}
+            headerAfter={<ReplacementDialog originalLessonId={nextLesson.id} setNewStudents={setNextLessonStudents} />}
             />
         </>
         }

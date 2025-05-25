@@ -614,36 +614,36 @@ describe("Employee", async () => {
     });
     */
 
-/*    
-  describe("Group", async () => {
-    const adminAuth = await testCreateUser("groupEndpointsAdmin", ["administrator"]);
-    const teacherAuth = await testCreateUser("groupEndpointsTeacher", ["teacher"]);
-    let locationId: string;
-
-    beforeAll(async () => {
-      try {
-        const createResp = await testRequest({
-          method: "post",
-          url: "/location/create",
-          body: {
-            name: "Group Test Location",
-            address: "789 Group Street",
-            contact_email: "group-location@example.com", 
-            contact_phone: "+1234567890"                 
-          },
-          token: adminAuth.token,
-        });
-        locationId = createResp.body?.data?.location?.id;
-        console.log("Created location for Group tests:", locationId);
-      } catch (error) {
-        console.error("Failed to create location for Group tests:", error);
-      }
+  /*    
+    describe("Group", async () => {
+      const adminAuth = await testCreateUser("groupEndpointsAdmin", ["administrator"]);
+      const teacherAuth = await testCreateUser("groupEndpointsTeacher", ["teacher"]);
+      let locationId: string;
+  
+      beforeAll(async () => {
+        try {
+          const createResp = await testRequest({
+            method: "post",
+            url: "/location/create",
+            body: {
+              name: "Group Test Location",
+              address: "789 Group Street",
+              contact_email: "group-location@example.com", 
+              contact_phone: "+1234567890"                 
+            },
+            token: adminAuth.token,
+          });
+          locationId = createResp.body?.data?.location?.id;
+          console.log("Created location for Group tests:", locationId);
+        } catch (error) {
+          console.error("Failed to create location for Group tests:", error);
+        }
+      });
     });
-  });
-  */
+    */
 
-   // MARK: /group/all
-   describe("/group/all", () => {
+  // MARK: /group/all
+  describe("/group/all", () => {
     test("200", async () => {
       const resp = await testRequest({
         method: "get",
@@ -652,6 +652,138 @@ describe("Employee", async () => {
       });
       expect(resp.status).toBe(200);
       expect(resp.body?.data?.groups).toBeDefined();
+    });
+  });
+
+/*
+   // MARK: /group/create
+   describe("/group/create", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/group/create",
+        body: {
+          name: "Test Group",
+          location: locationId,
+          teachers: [adminAuth.user.id]
+        },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.group?.name).toBe("Test Group");
+    });
+    test("With lessons", async () => {
+      const now = new Date();
+      const later = new Date(now.getTime() + 3600000);
+      
+      const resp = await testRequest({
+        method: "post",
+        url: "/group/create",
+        body: {
+          name: "Test Group With Lessons",
+          location: locationId,
+          teachers: [adminAuth.user.id],
+          lessons: [
+            {
+              start: now.toISOString(),
+              end: later.toISOString()
+            }
+          ]
+        },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.group?.name).toBe("Test Group With Lessons");
+    });
+  });
+  */
+/*
+  // MARK: /group/get
+  describe("/group/get", () => {
+    test("200", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/group/create",
+        body: {
+          name: "Get Test Group",
+          location: locationId,
+          teachers: [adminAuth.user.id]
+        },
+        token: adminAuth.token,
+      });
+      
+      const groupId = createResp.body?.data?.group?.id;
+      
+      const resp = await testRequest({
+        method: "get",
+        url: "/group/get",
+        query: { 
+          ids: groupId,
+          fetch: "location,teachers"
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.groups?.length).toBe(1);
+      expect(resp.body?.data?.groups[0]?.name).toBe("Get Test Group");
+    });
+  });
+  */
+
+  /*
+  describe("Lesson", async () => {
+    const adminAuth = await testCreateUser("lessonEndpointsAdmin", ["administrator"]);
+    const teacherAuth = await testCreateUser("lessonEndpointsTeacher", ["teacher"]);
+    let groupId: string;
+    let locationId: string;
+    
+    beforeAll(async () => {
+      try {
+        const locResp = await testRequest({
+          method: "post",
+          url: "/location/create",
+          body: {
+            name: "Lesson Test Location",
+            address: "123 Lesson Street",
+            contact_email: "lesson-location@example.com",
+            contact_phone: "+1234567890"
+          },
+          token: adminAuth.token,
+        });
+        locationId = locResp.body?.data?.location?.id;
+        console.log("Created location for Lesson tests:", locationId);
+  
+        const groupResp = await testRequest({
+          method: "post",
+          url: "/group/create",
+          body: {
+            name: "Lesson Test Group",
+            location: locationId,
+            teachers: [adminAuth.user.id]
+          },
+          token: adminAuth.token,
+        });
+        groupId = groupResp.body?.data?.group?.id;
+        console.log("Created group for Lesson tests:", groupId);
+      } catch (error) {
+        console.error("Failed to setup Lesson tests:", error);
+      }
+    });
+  });
+  */
+
+   // MARK: /lesson/all
+   describe("/lesson/all", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "get",
+        url: "/lesson/all",
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.lessons).toBeDefined();
     });
   });
 });

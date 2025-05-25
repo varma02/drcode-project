@@ -786,4 +786,52 @@ describe("Employee", async () => {
       expect(resp.body?.data?.lessons).toBeDefined();
     });
   });
+
+  /*
+  // MARK: /lesson/create
+  describe("/lesson/create", () => {
+    test("200", async () => {
+      const now = new Date();
+      const later = new Date(now.getTime() + 3600000);
+      
+      const resp = await testRequest({
+        method: "post",
+        url: "/lesson/create",
+        body: {
+          name: "Test Lesson",
+          group: groupId,
+          start: now.toISOString(),
+          end: later.toISOString(),
+          location: locationId,
+          teachers: [adminAuth.user.id]
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true 
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.lesson?.name).toBe("Test Lesson");
+    });
+  });
+  */
+
+   // MARK: /lesson/between_dates
+   describe("/lesson/between_dates", () => {
+    test("200", async () => {
+      const now = new Date();
+      const later = new Date(now.getTime() + 86400000);
+      
+      const resp = await testRequest({
+        method: "get",
+        url: "/lesson/between_dates",
+        query: {
+          from: now.toISOString(),
+          to: later.toISOString()   
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.lessons).toBeDefined();
+    });
+  });
 });

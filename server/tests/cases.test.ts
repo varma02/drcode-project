@@ -562,4 +562,23 @@ describe("Subject", async () => {
       });
     });
   });
+
+  // MARK: /location/create
+  describe("/location/create", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/location/create",
+        body: {
+          name: "Test Location",
+          address: "123 Test Street",
+          contact_email: "location@example.com",
+          contact_phone: "+1234567890"
+        },
+        token: adminAuth.token,
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.location?.name).toBe("Test Location");
+    });
+  });
 });

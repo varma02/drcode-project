@@ -14,6 +14,7 @@ import fileRouter from './routes/file';
 import worksheetRouter from './routes/worksheet';
 import enrolmentRouter from './routes/enrolment';
 import replacementRouter from './routes/replacement';
+import miscRouter from './routes/misc';
 
 export const app = express();
 
@@ -42,13 +43,6 @@ export async function setup(): Promise<string | null> {
     console.log(req.ip, req.method, req.path);
     next();
   });
-
-  app.get('/', async (req, res) => {
-    res.status(200).json({
-      code: "success",
-      message: 'Hello, World!'
-    });
-  });
   
   app.use('/auth', authRouter);
   app.use('/employee', employeesRouter);
@@ -62,6 +56,7 @@ export async function setup(): Promise<string | null> {
   app.use('/worksheet', worksheetRouter);
   app.use('/enrolment', enrolmentRouter);
   app.use('/replacement', replacementRouter);
+  app.use(miscRouter);
   
   app.use((req, res, next) => {
     res.status(404).json({

@@ -595,7 +595,32 @@ describe("Location", async () => {
   });
   
   // MARK: /location/get
-
+  describe("/location/get", () => {
+    test("200", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/location/create",
+        body: {
+          name: "Get Test Location",
+          address: "456 Test Avenue",
+          contact_email: "location-get@example.com",
+          contact_phone: "+1234567890"              
+        },
+        token: adminAuth.token,
+      });
+      const locationId = createResp.body?.data?.location?.id;
+      const resp = await testRequest({
+        method: "get",
+        url: "/location/get",
+        query: { ids: locationId },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.locations?.length).toBe(1);
+      expect(resp.body?.data?.locations[0]?.name).toBe("Get Test Location");
+    });
+  });
 });
 
 describe("Group", async () => {

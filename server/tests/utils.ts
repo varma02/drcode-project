@@ -46,13 +46,14 @@ export async function testCreateUser(slug: string, roles: ("administrator" | "te
 }
 
 export async function testRequest({
-  method, url, body, query, token
+  method, url, body, query, token, skipSchemaValidation = false
 }:{
   method: "get" | "post",
   url: string,
   body?: {[key: string]: any},
   query?: {[key: string]: any},
-  token?: string
+  token?: string,
+  skipSchemaValidation?: boolean
 }) {
   const agent = request(app)[method](url)
     .set('Content-Type', 'application/json')
@@ -60,15 +61,19 @@ export async function testRequest({
     .query(query || {});
   if (token) agent.set('Authorization', `Bearer ${token}`);
   const resp = await agent.send(body);
-  const schema = spec.paths[url]?.[method.toLowerCase()]?.responses[resp.status]?.content["application/json"].schema;
+  const schema = spec.paths[url]?.[method.toLowerCase()]?.responses[resp.status]?.content["application/json"]?.schema;
   if (!schema) {
     console.error("No schema found for", method, url, resp.status);
     return resp;
   }
-  const validate = ajv.compile(schema);
-  const isValid = validate(resp.body);
-  if (!isValid) console.error("Validation errors:\n", validate.errors, "\n", resp.body, "\n");
-  expect(isValid).toBe(true);
+  
+  if (!skipSchemaValidation) {
+    const validate = ajv.compile(schema);
+    const isValid = validate(resp.body);
+    if (!isValid) console.error("Validation errors:\n", validate.errors, "\n", resp.body, "\n");
+    expect(isValid).toBe(true);
+  }
+  
   return resp;
 }
 

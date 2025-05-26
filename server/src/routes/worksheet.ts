@@ -47,7 +47,7 @@ worksheet.router.post('/create', errorHandler(async (req, res) => {
 worksheet.router.get("/get", worksheet.get({
   WHERE: (req) => {console.log(req.user); return`
     in == type::thing($user.id)
-    AND paid == ${req.query?.paid}
+    AND ${req.query?.paid ? "true" : "paid == false"}
   `},
   postProcess: (res) => ({ worksheet: res }),
 }));

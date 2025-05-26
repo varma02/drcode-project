@@ -486,6 +486,27 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "message"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "unauthorized"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You are not authorized to perform this action."
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Unauthorized - The user does not have admin rights to access this endpoint"
           }
         },
         "parameters": [],
@@ -778,6 +799,30 @@
               }
             },
             "description": "The request was successful and locations were retrieved"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "message"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "unauthorized"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You are not authorized to perform this action."
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Unauthorized - The user does not have admin rights to access this endpoint"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
         },
         "parameters": [],
@@ -1167,6 +1212,27 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code", "message"],
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "unauthorized"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You are not authorized to perform this action."
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Unauthorized - The user does not have admin rights to access this endpoint"
           }
         },
         "parameters": [],
@@ -1743,7 +1809,8 @@
                   }
                 }
               }
-            }
+            },
+            "description": "The request was successful, and the student was updated."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -2017,7 +2084,8 @@
                   }
                 }
               }
-            }
+            },
+            "description": "The request was successful and the requested lessons were retrieved."
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -2834,7 +2902,8 @@
                   }
                 }
               }
-            }
+            },
+            "description": "The request was successful and the requested groups were retrieved."
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -3692,7 +3761,7 @@
             "required": false,
             "description": "Wether to include paid records or not",
             "schema": {
-              "type": "string",
+              "type": "boolean",
               "example": false
             }
           },

@@ -975,3 +975,118 @@ describe("Enrolment", async () => {
     });
   });
 });
+
+describe("Replacement", async () => {
+  const adminAuth = await testCreateUser("replacementEndpointsAdmin", ["administrator"]);
+  let studentId: string;
+  let originalLessonId: string;
+  let replacementLessonId: string;
+  beforeAll(async () => {
+    const locationResp = await testRequest({
+      method: "post",
+      url: "/location/create",
+      body: {
+        name: "Replacement Test Location",
+        address: "123 Replacement Street",
+        contact_email: "replacement-location@example.com", 
+        contact_phone: "+1234567890"                      
+      },
+      token: adminAuth.token,
+    });
+    const locationId = locationResp.body?.data?.location?.id;
+    const groupResp = await testRequest({
+      method: "post",
+      url: "/group/create",
+      body: {
+        name: "Replacement Test Group",
+        location: locationId,
+        teachers: [adminAuth.user.id]
+      },
+      token: adminAuth.token,
+    });
+    const groupId = groupResp.body?.data?.group?.id;
+    const studentResp = await testRequest({
+      method: "post",
+      url: "/student/create",
+      body: {
+        name: "Replacement Test Student",
+        grade: 10,
+        email: "replacement-student@example.com",
+        phone: "+1234567890",
+        parent: {
+          name: "Parent Name",
+          email: "parent@example.com",
+          phone: "+0987654321"
+        }
+      },
+      token: adminAuth.token,
+    });
+    studentId = studentResp.body?.data?.student?.id;
+    const now = new Date();
+    const later = new Date(now.getTime() + 3600000);
+    const originalLessonResp = await testRequest({
+      method: "post",
+      url: "/lesson/create",
+      body: {
+        name: "Original Lesson",
+        group: groupId,
+        start: now.toISOString(),
+        end: later.toISOString(),
+        location: locationId,
+        teachers: [adminAuth.user.id]
+      },
+      query: {
+        include: "location,teachers,group",
+        fetch: "location,teachers,group"
+      },
+      token: adminAuth.token,
+      skipSchemaValidation: true
+    });
+    originalLessonId = originalLessonResp.body?.data?.lesson?.id;
+    const tomorrow = new Date(now.getTime() + 86400000);
+    const tomorrowLater = new Date(tomorrow.getTime() + 3600000);
+    const replacementLessonResp = await testRequest({
+      method: "post",
+      url: "/lesson/create",
+      body: {
+        name: "Replacement Lesson",
+        group: groupId,
+        start: tomorrow.toISOString(),
+        end: tomorrowLater.toISOString(),
+        location: locationId,
+        teachers: [adminAuth.user.id]
+      },
+      query: {
+        include: "location,teachers,group",
+        fetch: "location,teachers,group"
+      },
+      token: adminAuth.token,
+      skipSchemaValidation: true
+    });
+    replacementLessonId = replacementLessonResp.body?.data?.lesson?.id;
+  });
+  
+  // MARK: /replacement/create
+  describe("/replacement/create", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "post",
+        url: "/replacement/create",
+        body: {
+          student: studentId,
+          original_lesson: originalLessonId,
+          replacement_lesson: replacementLessonId,
+          extension: "1h"
+        },
+        query: {
+          include: ["student", "original_lesson", "replacement_lesson", "group", "location", "teachers"].join(","),
+          fetch: ["student", "original_lesson", "replacement_lesson", "group", "location", "teachers"].join(",")
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.replacement).toBeDefined();
+    });
+  });
+});

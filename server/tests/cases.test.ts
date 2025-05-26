@@ -1205,3 +1205,111 @@ describe("Replacement", async () => {
     });
   });
 });
+
+describe("Worksheet", async () => {
+  const adminAuth = await testCreateUser("worksheetEndpointsAdmin", ["administrator"]);
+  const teacherAuth = await testCreateUser("worksheetEndpointsTeacher", ["teacher"]);
+  let locationId: string;
+  let groupId: string;
+  beforeAll(async () => {
+    try {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/location/create",
+        body: {
+          name: "Worksheet Test Location",
+          address: "123 Worksheet Street",
+          contact_email: "worksheet-location@example.com",
+          contact_phone: "+1234567890"
+        },
+        token: adminAuth.token,
+      });
+      locationId = createResp.body?.data?.location?.id;
+      const groupResp = await testRequest({
+        method: "post",
+        url: "/group/create",
+        body: {
+          name: "Worksheet Test Group",
+          location: locationId,
+          teachers: [teacherAuth.user.id]
+        },
+        token: adminAuth.token,
+      });
+      groupId = groupResp.body?.data?.group?.id;
+      console.log("Created location and group for Worksheet tests:", { locationId, groupId });
+    } catch (error) {
+      console.error("Failed to create location for Worksheet tests:", error);
+    }
+  });
+  
+  // MARK: /worksheet/create
+  describe("/worksheet/create", () => {
+    test("200", async () => {
+      const now = new Date();
+      const later = new Date(now.getTime() + 3600000);
+      const lessonResp = await testRequest({
+        method: "post",
+        url: "/lesson/create",
+        body: {
+          name: "Worksheet Out Lesson",
+          group: groupId,
+          start: now.toISOString(),
+          end: later.toISOString(),
+          location: locationId,
+          teachers: [teacherAuth.user.id]
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      const lessonId = lessonResp.body?.data?.lesson?.id;
+      console.log("Created lesson for worksheet out:", lessonId);
+      const resp = await testRequest({
+        method: "post",
+        url: "/worksheet/create",
+        body: {
+          out: lessonId,
+          start: now.toISOString(),
+          end: later.toISOString()
+        },
+        token: teacherAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.worksheet).toBeDefined();
+    });
+    test("Admin creating for another employee", async () => {
+      const now = new Date();
+      const later = new Date(now.getTime() + 3600000);
+      const lessonResp = await testRequest({
+        method: "post",
+        url: "/lesson/create",
+        body: {
+          name: "Admin Worksheet Out Lesson",
+          group: groupId,
+          start: now.toISOString(),
+          end: later.toISOString(),
+          location: locationId,
+          teachers: [teacherAuth.user.id]
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      const lessonId = lessonResp.body?.data?.lesson?.id;
+      console.log("Created lesson for admin worksheet out:", lessonId);
+      const resp = await testRequest({
+        method: "post",
+        url: "/worksheet/create",
+        body: {
+          employee: teacherAuth.user.id,
+          out: lessonId,
+          start: now.toISOString(),
+          end: later.toISOString()
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.worksheet).toBeDefined();
+    });
+  });
+});

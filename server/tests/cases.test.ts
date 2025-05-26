@@ -1089,4 +1089,79 @@ describe("Replacement", async () => {
       expect(resp.body?.data?.replacement).toBeDefined();
     });
   });
+
+   // MARK: /replacement/get
+   describe("/replacement/get", () => {
+    test("200", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/replacement/create",
+        body: {
+          student: studentId,
+          original_lesson: originalLessonId,
+          replacement_lesson: replacementLessonId,
+          extension: "1h"
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      const replacementId = createResp.body?.data?.replacement?.id;
+      console.log("Created replacement with ID:", replacementId);
+      expect(replacementId).toBeDefined();
+      const resp = await testRequest({
+        method: "get",
+        url: "/replacement/get",
+        query: {
+          ids: replacementId,
+          include: "student,original_lesson,replacement_lesson",
+          fetch: "student,original_lesson,replacement_lesson"
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      console.log("Replacement get response:", JSON.stringify(resp.body, null, 2));
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.replacements).toBeDefined();
+      expect(resp.body?.data?.replacements?.length).toBe(1);
+    });
+    test("Multiple replacements", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/replacement/create",
+        body: {
+          student: studentId,
+          original_lesson: originalLessonId,
+          replacement_lesson: replacementLessonId,
+          extension: "2h"
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(createResp.status).toBe(200);
+      const resp = await testRequest({
+        method: "get",
+        url: "/replacement/get",
+        query: {
+          student: studentId,
+          include: "student,original_lesson,replacement_lesson",
+          fetch: "student,original_lesson,replacement_lesson"
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.replacements).toBeDefined();
+      expect(resp.body?.data?.replacements?.length).toBeGreaterThanOrEqual(2);
+    });
+    test("Without token", async () => {
+      const resp = await testRequest({
+        method: "get",
+        url: "/replacement/get",
+        query: {
+        },
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(401);
+    });
+  });
 });

@@ -1164,4 +1164,44 @@ describe("Replacement", async () => {
       expect(resp.status).toBe(401);
     });
   });
+
+  // MARK: /replacement/remove
+  describe("/replacement/remove", () => {
+    test("200", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/replacement/create",
+        body: {
+          student: studentId,
+          original_lesson: originalLessonId,
+          replacement_lesson: replacementLessonId,
+          extension: "30m"
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      const replacementId = createResp.body?.data?.replacement?.id;
+      expect(replacementId).toBeDefined();
+      const resp = await testRequest({
+        method: "post",
+        url: "/replacement/remove",
+        body: {
+          ids: [replacementId]
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      const verifyResp = await testRequest({
+        method: "get",
+        url: "/replacement/get",
+        query: {
+          ids: replacementId
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(verifyResp.body?.data?.replacements?.length).toBe(0);
+    });
+  });
 });

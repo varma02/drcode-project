@@ -676,7 +676,34 @@ describe("Group", async () => {
   });
 
   // MARK: /group/get
-
+  describe("/group/get", () => {
+    test("200", async () => {
+      const createResp = await testRequest({
+        method: "post",
+        url: "/group/create",
+        body: {
+          name: "Get Test Group",
+          location: locationId,
+          teachers: [adminAuth.user.id]
+        },
+        token: adminAuth.token,
+      });
+      const groupId = createResp.body?.data?.group?.id;
+      const resp = await testRequest({
+        method: "get",
+        url: "/group/get",
+        query: { 
+          ids: groupId,
+          fetch: "location,teachers"
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.groups?.length).toBe(1);
+      expect(resp.body?.data?.groups[0]?.name).toBe("Get Test Group");
+    });
+  });
 });
 
 describe("Lesson", async () => {

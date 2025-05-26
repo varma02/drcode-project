@@ -803,9 +803,75 @@ describe("Lesson", async () => {
   });
 
   // MARK: /lesson/attendance
-
+  describe("/lesson/attendance", () => {
+    test("200", async () => {
+      const now = new Date();
+      const later = new Date(now.getTime() + 3600000);
+      const freshGroupResp = await testRequest({
+        method: "post",
+        url: "/group/create",
+        body: {
+          name: "Attendance Test Group",
+          location: locationId,
+          teachers: [adminAuth.user.id]
+        },
+        token: adminAuth.token,
+      });
+      const freshGroupId = freshGroupResp.body?.data?.group?.id;
+      const lessonResp = await testRequest({
+        method: "post",
+        url: "/lesson/create",
+        body: {
+          name: "Attendance Test Lesson",
+          group: freshGroupId,
+          start: now.toISOString(),
+          end: later.toISOString(),
+          location: locationId,
+          teachers: [adminAuth.user.id]
+        },
+        query: {
+          include: "location,teachers,students,group",
+          fetch: "location,teachers,students,group"
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      const lessonId = lessonResp.body?.data?.lesson?.id;
+      const studentResp = await testRequest({
+        method: "post",
+        url: "/student/create",
+        body: {
+          name: "Attendance Test Student",
+          grade: 10,
+          email: "attendance-student@example.com",
+          phone: "+1234567890",
+          parent: {
+            name: "Parent Name",
+            email: "parent@example.com",
+            phone: "+0987654321"
+          }
+        },
+        token: adminAuth.token,
+      });
+      const studentId = studentResp.body?.data?.student?.id;
+      const resp = await testRequest({
+        method: "post",
+        url: "/lesson/attendance",
+        body: {
+          id: lessonId,
+          students: [studentId]
+        },
+        query: {
+          include: "location,teachers,students,group",  
+          fetch: "location,teachers,students,group"   
+        },
+        token: adminAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+    });
+  });
 });
-
 
 describe("Enrolment", async () => {
   const adminAuth = await testCreateUser("enrolmentEndpointsAdmin", ["administrator"]);

@@ -1312,4 +1312,22 @@ describe("Worksheet", async () => {
       expect(resp.body?.data?.worksheet).toBeDefined();
     });
   });
+
+   // MARK: /worksheet/get
+   describe("/worksheet/get", () => {
+    test("200", async () => {
+      const resp = await testRequest({
+        method: "get",
+        url: "/worksheet/get",
+        query: { 
+          id: teacherAuth.user.id, 
+          fetch: "out"              
+        },
+        token: teacherAuth.token,
+        skipSchemaValidation: true
+      });
+      expect(resp.status).toBe(200);
+      expect(resp.body?.data?.worksheet).toBeDefined();
+    });
+  });
 });

@@ -1,14 +1,19 @@
 import AreYouSureAlert from "@/components/AreYouSureAlert"
+import { Combobox } from "@/components/ComboBox"
 import DataTable from "@/components/DataTable"
+import { DatePicker } from "@/components/DatePicker"
 import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { get, remove, update } from "@/lib/api/api"
+import { Switch } from "@/components/ui/switch"
+import { create, get, getAllLessonsBetweenDates, remove, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
+import { Dialog } from "@radix-ui/react-dialog"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
-import { LoaderCircle, SquareArrowOutUpRight } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown, LoaderCircle, Plus, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { toast } from "sonner"
@@ -21,6 +26,9 @@ export default function EmployeeDetails() {
   const [worksheet, setWorksheet] = useState(null)
 
   const [rowSelection, setRowSelection] = useState({})
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [selectedDateLessons, setSelectedDateLessons] = useState([])
+  const [groups, setGroups] = useState([])
 
   useEffect(() => {
     get(auth.token, 'employee', ["employee:" + params.id], "groups,worksheet.out", "groups,worksheet")
@@ -28,8 +36,12 @@ export default function EmployeeDetails() {
       const emp = data.data.employees[0]
       setEmployee(emp)
       setWorksheet(data.data.employees[0].worksheet)
+      get(auth.token, "group", emp.worksheet.filter(w => Object.keys(w).includes("out")).map(w => w.out.group)).then(r => setGroups(r.data.groups))
     })
   }, [auth.token, params.id])
+
+  console.log("E: ", employee)
+  console.log("G: ",groups)
 
   function handleDelete() {
     remove(auth.token, 'worksheet', Object.keys(rowSelection).map(e => worksheet[+e].id)).then(resp => {
@@ -38,12 +50,47 @@ export default function EmployeeDetails() {
     })
   }
 
+  useEffect(() => {
+    setSelectedDateLessons([])
+    const startOfDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 0, 0, 0)
+    const endOfDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 23, 59, 59)
+    getAllLessonsBetweenDates(auth.token, startOfDay, endOfDay, "group").then(resp => setSelectedDateLessons(resp.data.lessons))
+  }, [selectedDate])
+
   function setWorksheetPaid(id, newPaidValue) {
     setWorksheet(p =>
       p.map((worksheet) =>
         worksheet.id == id ? { ...worksheet, paid: newPaidValue } : worksheet
       )
     )
+  }
+
+  function handleAddWorksheet(e) {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    const data = {
+      employee: "employee:"+params.id,
+      start: formData.get("start"),
+      end: formData.get("end"),
+      out: formData.get("lesson") != "" ? formData.get("lesson") : "lesson:none"
+    }
+    create(auth.token, "worksheet", data)
+      .then(resp => {
+        toast.success("Sikeres hozzádás")
+        get(auth.token, 'employee', ["employee:" + params.id], "groups,worksheet.out", "groups,worksheet")
+          .then(data => {
+            const emp = data.data.employees[0]
+            setEmployee(emp)
+            setWorksheet(data.data.employees[0].worksheet)
+            get(auth.token, "group", emp.worksheet.filter(w => Object.keys(w).includes("out")).map(w => w.out.group)).then(r => setGroups(r.data.groups))
+          })
+      }, (error) => {
+        switch (error.response?.data?.code) {
+          case "unauthorized" : return toast.error("Ehhez hincs jogosultsága!");
+          case "bad_request": return toast.error("Valamelyik mező üres!")
+          default: return toast.error("Ismeretlen hiba történt!")
+        }})
+    console.log(data)
   }
 
   if (!employee) return (
@@ -83,14 +130,32 @@ export default function EmployeeDetails() {
       accessorKey: "group",
       header: ({ column }) => column.columnDef.displayName,
       cell: ({ row }) => {
-        const group = employee.groups.find(e => e.id == row.original.out.group)
-        return <Link to={"/groups/"+group.id.replace("group:", "")}><Button variant="outline">{group.name} <SquareArrowOutUpRight /></Button></Link>
+        if (!row.original.out) return <p>Megbízás</p>
+        const group = [...employee.groups, ...groups].find(e => e.id == row.original.out.group)
+        if (group) return <Link to={"/groups/"+group.id.replace("group:", "")}><Button variant="outline">{group.name} <SquareArrowOutUpRight /></Button></Link>
+        return <p>Megbízás</p>
       },
     },
     {
       displayName: "Dátum",
       accessorKey: "date",
-      header: ({ column }) => column.columnDef.displayName,
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {column.columnDef.displayName}
+            {!column.getIsSorted() ? (
+              <ArrowUpDown />
+            ) : column.getIsSorted() === "asc" ? (
+              <ArrowDown />
+            ) : (
+              <ArrowUp />
+            )}
+          </Button>
+        );
+      },
       cell: ({ row }) => format(new Date(row.getValue("start")), "P", {locale: hu}),
     },
     {
@@ -149,7 +214,30 @@ export default function EmployeeDetails() {
         <DataTable className="-mt-4" columns={workColumns} data={worksheet || []} 
           rowSelection={rowSelection} setRowSelection={setRowSelection} 
           headerAfter={
+            <>
             <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />
+            <Dialog>
+              <DialogTrigger asChild><Button variant="outline"><Plus /> Hozzáadás</Button></DialogTrigger>
+              <DialogContent aria-describedby={undefined}>
+                <DialogTitle>Jelenléti ív</DialogTitle>
+                <form className="flex flex-col gap-2" onSubmit={handleAddWorksheet}>
+                  <p>Óra</p>
+                  <div className="flex flex-col gap-2">
+                    <DatePicker date={selectedDate} setDate={setSelectedDate} />
+                    <Combobox data={selectedDateLessons} displayName={"group.name"} placeholder="Válassz órát" name="lesson" />
+                  </div>
+                  <p>Érkezés*</p>
+                  <DatePicker showTimePicker includeTime required dateFormat="PPPp" name={"start"} />
+                  <p>Távozás*</p>
+                  <DatePicker showTimePicker includeTime required dateFormat="PPPp" name={"end"} />
+                  <div className="flex justify-end gap-4">
+                    <DialogClose asChild><Button variant="outline">Mégse</Button></DialogClose>
+                    <DialogClose asChild><Button type="submit">Hozzáadás</Button></DialogClose>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+            </>
           }
           />
       </div>

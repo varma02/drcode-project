@@ -11,6 +11,7 @@ export const DatePicker = ({numberOfMonths = 1, date = new Date(), setDate, date
   const [value, setValue] = useState(date)
 
   function changeDate(newDate) {
+    if (newDate == date) return
     if (setDate) setDate(newDate)
     setValue(newDate)
   }

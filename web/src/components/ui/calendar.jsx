@@ -23,11 +23,11 @@ function Calendar({ className, classNames, showOutsideDays = true, showTimePicke
     setTimeValue(time)
   }
 
-  const handleDaySelect = (date) => {
-    if (!timeValue || !date) return
+  const handleDaySelect = (newDate) => {
+    if (!timeValue || !newDate || newDate == date) return
     const [hours, minutes] = timeValue.split(":").map((str) => parseInt(str, 10))
-    const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes)
-    setDate(newDate)
+    const finalDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), hours, minutes)
+    setDate(finalDate)
   }
 
   return (

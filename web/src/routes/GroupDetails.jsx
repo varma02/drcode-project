@@ -24,13 +24,6 @@ export default function GroupDetails() {
   const [allTeachers, setAllTeachers] = useState(null)
   const [allLocations, setAllLocations] = useState(null)
 
-  const [enrolment, setEnrolment] = useState({
-    group: "group:" + params.id,
-    student: undefined,
-    subject: undefined,
-    price: 14000
-  })
-
   const [editName, setEditName] = useState(false)
   const [editTeachers, setEditTeachers] = useState(false)
   const [editLocation, setEditLocation] = useState(false)
@@ -51,9 +44,7 @@ export default function GroupDetails() {
   }, [editLocation])
 
   function handleAddStudent(data) {
-    const enr = {...enrolment, ...data}
-    setEnrolment(enr)
-    create(auth.token, "enrolment", enr)
+    create(auth.token, "enrolment", data)
       .then(
         () => {
           get(auth.token, 'group', ["group:" + params.id], "location,lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
@@ -295,7 +286,7 @@ export default function GroupDetails() {
           columns={studentColumns} 
           data={group.enroled}
           headerAfter={
-            <CreateEnrolment enrolment={enrolment} setEnrolment={setEnrolment} handleAddStudent={handleAddStudent} />  
+            <CreateEnrolment defaultGroupId={"group:"+params.id} disableFields={["group"]} handleAddEnrolment={handleAddStudent} />  
           } />
       ) : (
         <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>

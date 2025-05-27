@@ -1,7 +1,8 @@
+import { CreateEnrolment } from "@/components/CreateEnrolment"
 import DataTable from "@/components/DataTable"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { get, update } from "@/lib/api/api"
+import { create, get, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
@@ -58,7 +59,6 @@ export default function StudentDetails() {
         phone: data.get("parentPhone") == student.parent.phone ? undefined : data.get("parentPhone"),
       },
     };
-    console.log(studentData)
     if (Object.values(studentData).every(v => typeof v == "object" ? Object.values(v).every(v2 => !v2) : !v)) {
       setSaveLoading(false)
       return toast.message("Nincs változott adat.")
@@ -69,6 +69,27 @@ export default function StudentDetails() {
       toast.success("Tanuló mentve");
     }).catch(() => toast.error("Hiba történt mentés közben!"))
     .finally(() => setSaveLoading(false))
+  }
+
+  function handleAddEnrolment(enr) {
+    create(auth.token, "enrolment", enr)
+      .then(
+        () => {
+          get(auth.token, 'student', ["student:" + params.id], "enroled.out,enroled.subject", "enroled")
+            .then(data => {setStudent(data.data.students[0])})
+          toast.success("Sikeres hozzáadás")
+        },
+        (error) => {
+          switch (error.response?.data?.code) {
+            case "bad_request":
+              return toast.error("Valamelyik mező helytelen!")
+            case "unauthorized":
+              return toast.error("Ehhez hincs jogosultsága!")
+            default:
+              return toast.error("Ismeretlen hiba történt!")
+          }
+        }
+      )
   }
 
   const [editName, setEditName] = useState(false);
@@ -132,60 +153,63 @@ export default function StudentDetails() {
   ]
 
   return (
-    <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
-      <div className="group flex gap-2 my-4">
-        <Input defaultValue={student.name} type="text" name="studentName"
-        placeholder="tanuló neve" className={editName ? "w-max" : "hidden"}/>
-        <h1 className={editName ? "hidden" : "text-4xl"}>{student.name}</h1>
-        <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-        onClick={() => setEditName((o) => !o)} type="button">
-          <Edit />
-        </Button>
+    <div className='max-w-screen-xl md:w-full mx-auto p-4'>
+      <form onChange={handleChange} onSubmit={handleSave}>
+        <div className="group flex gap-2 my-4">
+          <Input defaultValue={student.name} type="text" name="studentName"
+          placeholder="tanuló neve" className={editName ? "w-max" : "hidden"}/>
+          <h1 className={editName ? "hidden" : "text-4xl"}>{student.name}</h1>
+          <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+          onClick={() => setEditName((o) => !o)} type="button">
+            <Edit />
+          </Button>
 
-        <Button size="icon" className="ml-auto" type="submit" disabled={saveLoading}>
-          {saveLoading ? <LoaderCircle className="animate-spin" /> : <Save />}
-        </Button>
-      </div>
-      
-      <div className="flex flex-wrap gap-12 py-4">
-        <div>
-          <h3 className='font-bold'>Évfolyam</h3>
-          <Input defaultValue={student.grade} placeholder="nincs megadva" type="number" name="studentGrade" />
+          <Button size="icon" className="ml-auto" type="submit" disabled={saveLoading}>
+            {saveLoading ? <LoaderCircle className="animate-spin" /> : <Save />}
+          </Button>
         </div>
-        <div>
-          <h3 className='font-bold'>E-mail cím</h3>
-          <Input defaultValue={student.email} placeholder="nincs megadva" type="email" name="studentEmail" />
+        
+        <div className="flex flex-wrap gap-12 py-4">
+          <div>
+            <h3 className='font-bold'>Évfolyam</h3>
+            <Input defaultValue={student.grade} placeholder="nincs megadva" type="number" name="studentGrade" />
+          </div>
+          <div>
+            <h3 className='font-bold'>E-mail cím</h3>
+            <Input defaultValue={student.email} placeholder="nincs megadva" type="email" name="studentEmail" />
+          </div>
+          <div>
+            <h3 className='font-bold'>Telefonszám</h3>
+            <Input defaultValue={student.phone} placeholder="nincs megadva" type="text" name="studentPhone" />
+          </div>
         </div>
-        <div>
-          <h3 className='font-bold'>Telefonszám</h3>
-          <Input defaultValue={student.phone} placeholder="nincs megadva" type="text" name="studentPhone" />
+        
+        <div className="flex flex-wrap gap-12 py-4">
+          <div>
+            <h3 className='font-bold'>Szülő neve</h3>
+            <Input defaultValue={student.parent?.name} placeholder="nincs megadva" type="text" name="parentName" />
+          </div>
+          <div>
+            <h3 className='font-bold'>Szülő E-mail címe</h3>
+            <Input defaultValue={student.parent?.email} placeholder="nincs megadva" type="email" name="parentEmail" />
+          </div>
+          <div>
+            <h3 className='font-bold'>Szülő Telefonszáma</h3>
+            <Input defaultValue={student.parent?.phone} placeholder="nincs megadva" type="text" name="parentPhone" />
+          </div>
         </div>
-      </div>
-      
-      <div className="flex flex-wrap gap-12 py-4">
-        <div>
-          <h3 className='font-bold'>Szülő neve</h3>
-          <Input defaultValue={student.parent?.name} placeholder="nincs megadva" type="text" name="parentName" />
-        </div>
-        <div>
-          <h3 className='font-bold'>Szülő E-mail címe</h3>
-          <Input defaultValue={student.parent?.email} placeholder="nincs megadva" type="email" name="parentEmail" />
-        </div>
-        <div>
-          <h3 className='font-bold'>Szülő Telefonszáma</h3>
-          <Input defaultValue={student.parent?.phone} placeholder="nincs megadva" type="text" name="parentPhone" />
-        </div>
-      </div>
+      </form>
 
       <div className="flex flex-col gap-2 py-4">
         <h3 className='font-bold'>Csoportok</h3>
         {student.enroled.length > 0 ? (
           <DataTable data={student.enroled} columns={columns}
+          headerAfter={<CreateEnrolment defaultStudentId={"student:"+params.id} handleAddEnrolment={handleAddEnrolment} disableFields={["student"]} />}
           className="-mt-14" />
         ) : (
           <p>Ez a tanuló még nem tagja egy csoportnak sem</p>
         )}
       </div>
-    </form>
+    </div>
   )
 }

@@ -8,7 +8,7 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTr
 import { Switch } from '@/components/ui/switch'
 import { create, getAll, getWorksheet, remove } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
-import { isTeacher } from '@/lib/utils'
+import { isAdmin } from '@/lib/utils'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
 import { ArrowDown, ArrowUp, ArrowUpDown, LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react'
@@ -25,7 +25,7 @@ export default function Worksheet() {
   const [showPaid, setshowPaid] = useState(false)
 
   useEffect(() => {
-    getWorksheet(auth.token, auth.user.id, showPaid, "out,out.group")
+    getWorksheet(auth.token, auth.user.id, showPaid, "out,out.group,in")
       .then(
         resp => setWorksheet(resp.data.worksheet),
         (error) => {
@@ -83,12 +83,6 @@ export default function Worksheet() {
     })
   }
 
-  if (!isTeacher(auth.user.roles)) return (
-    <div className='size-full bg-background flex items-center justify-center'>
-      <p>Nincs megjeleníthető adat</p>
-    </div>
-  )
-
   if (!worksheet) return (
     <div className='size-full bg-background flex items-center justify-center'>
       <LoaderCircle className='animate-spin ' />
@@ -120,6 +114,12 @@ export default function Worksheet() {
       ),
       enableSorting: false,
       enableHiding: false,
+    },
+    {
+      displayName: "Alkalmazott",
+      accessorKey: "employee",
+      header: ({ column }) => column.columnDef.displayName,
+      cell: ({ row }) => <Link to={"/employee/"+row.original.in.id.replace("employee:", "")}><Button variant="outline">{row.original.in.name} <SquareArrowOutUpRight /></Button></Link>,
     },
     {
       displayName: "Csoport",
@@ -177,6 +177,7 @@ export default function Worksheet() {
         <Switch checked={showPaid} onCheckedChange={(e) => setshowPaid(e)} />
       </div>
       <DataTable data={worksheet} columns={workColumns} rowSelection={rowSelection} setRowSelection={setRowSelection}
+      hideColumns={["created", !isAdmin(auth.user.roles) ? "employee" : ""]}
       headerAfter={
         <>
           <AreYouSureAlert onConfirm={handleDelete} disabled={Object.keys(rowSelection).length == 0} />

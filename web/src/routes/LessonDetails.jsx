@@ -1,9 +1,9 @@
+import AreYouSureAlert from "@/components/AreYouSureAlert"
 import { Combobox } from "@/components/ComboBox"
 import DataTable from "@/components/DataTable"
 import { DatePicker } from "@/components/DatePicker"
 import { MultiSelect } from "@/components/MultiSelect"
 import ReplacementDialog from "@/components/ReplacementDialog"
-import { TimePicker } from "@/components/TimePicker"
 import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,7 +12,7 @@ import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
 import { hu } from "date-fns/locale"
-import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save, SquareArrowOutUpRight, Trash } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { toast } from "sonner"
@@ -26,12 +26,14 @@ export default function LessonDetails() {
   const [allLocations, setAllLocations] = useState(null)
   const [allGroups, setAllGroups] = useState(null)
   const [attended, setAttended] = useState([])
+  const [replaced, setReplaced] = useState([])
 
   useEffect(() => {
-    get(auth.token, 'lesson', ["lesson:" + params.id], "group,group.teachers,group.location,enroled.in,enroled.subject", "enroled,attended").then(data => {
+    get(auth.token, 'lesson', ["lesson:" + params.id], "group,group.teachers,group.location,enroled.in,enroled.subject,replaced.in", "enroled,attended,replaced").then(data => {
       const less = data.data.lessons[0]
       setLesson(less)
-      setAttended(less.attended)
+      setAttended(less.attended.map(a => a.in))
+      setReplaced(less.replaced)
     })
   }, [auth.token, params.id])
 
@@ -62,12 +64,19 @@ export default function LessonDetails() {
     const data = new FormData(e.target);
     const lessonData = {
       name: data.get("lessonName") == lesson.group.name || !data.get("lessonName") ? undefined : data.get("lessonName"),
-      start: data.get("dateStart"),
-      end: data.get("dateEnd"),
+      start: data.get("dateStart") == lesson.start ? undefined : data.get("dateStart"),
+      end: data.get("dateEnd") == lesson.end ? undefined : data.get("dateEnd"),
       location: data.get("lessonLocation") == lesson.group.location.id ? undefined : data.get("lessonLocation"),
-      teachers: data.get("lessonTeachers") == lesson.group.teachers.join(",") ? undefined : data.get("lessonTeachers").split(","),
-      group: data.get("lessonGroup"),
+      teachers: data.get("lessonTeachers") == lesson.group.teachers.map(t => t.id).join(",") ? undefined : data.get("lessonTeachers").split(","),
+      group: data.get("lessonGroup") == lesson.group.id ? undefined : data.get("lessonGroup"),
+      attended: attended.join(",") == lesson.attended.map(a => a.in).join(",") ? undefined : attended,
     };
+
+    if (Object.values(lessonData).every(v => !v)) {
+      setSaveLoading(false)
+      return toast.message("Nincs változott adat.")
+    }
+
     update(auth.token, "lesson", "lesson:" + params.id, lessonData)
     .then((v) => {
       delete v.data.lesson.group
@@ -130,7 +139,7 @@ export default function LessonDetails() {
     {
       displayName: "Tanult tárgy",
       accessorKey: "subject",
-      cell: ({ row }) => row.getValue("subject").name,
+      cell: ({ row }) => row.getValue("subject")?.name || "",
       header: ({ column }) => {
         return (
           <Button
@@ -163,6 +172,12 @@ export default function LessonDetails() {
       accessorKey: "status",
       header: "Jelenlét",
       cell: ({ row }) => (
+        row.original.extension ? 
+        <div className="flex justify-center items-center gap-2">
+          <p className="w-full rounded-full px-2 py-0.5 text-center bg-blue-500">Pótol</p>
+          <AreYouSureAlert trigger={<Trash className="cursor-pointer" />} />
+        </div>
+        :
         <ToggleButton onText={"Jelen"} offText={"Hiányzik"} value={attended.includes(row.original.in.id)} onch={(e) => {
           if (!e) setAttended(p => [...p, row.original.in.id])
           else setAttended(p => p.filter(v => v != row.original.in.id))
@@ -172,99 +187,97 @@ export default function LessonDetails() {
   ]
 
   return (
-    <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
-      <div className="group flex gap-2 my-4 items-center">
-        <Input defaultValue={lesson.group.name} type="text" name="lessonName"
-        placeholder="tanuló neve" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} disabled={!editName} />
-        <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-        onClick={() => setEditName((o) => !o)} type="button">
-          <Edit />
-        </Button>
-
-        <Button size="icon" className="ml-auto" type="submit" disabled={saveLoading}>
-          {saveLoading ? <LoaderCircle className="animate-spin" /> : <Save />}
-        </Button>
-      </div>
-
-      <div className="flex gap-4 py-4">
-        <div className="flex flex-col gap-2">
-          <h3 className='font-bold'>Oktatók</h3>
-          <div className="flex gap-2 group">
-            <MultiSelect
-              name={"lessonTeachers"}
-              options={convertToMultiSelectData(allTeachers || [], "name")}
-              defaultValue={lesson.group?.teachers.map(e => e.id)}
-              className={`${editTeachers ? "block" : "hidden"}`} />
-            {
-              lesson.group.teachers.map(e =>
-                <Link to={`/employee/${e.id.replace("employee:", "")}`} key={e} className={`${!editTeachers ? "block" : "hidden"}`} >
-                  <Button variant='outline' className='flex items-center gap-2'>
-                    {e.name} <SquareArrowOutUpRight />
-                  </Button>
-                </Link>
-              )
-            }
-            <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-            onClick={() => setEditTeachers((o) => {!o && !allTeachers && getAll(auth.token, "employee").then(resp => setAllTeachers(resp.data.employees)); return !o})} type="button">
-              <Edit />
-            </Button>
-          </div>
+    <div className='max-w-screen-xl md:w-full mx-auto p-4'>
+      <form onChange={handleChange} onSubmit={handleSave}>
+        <div className="group flex gap-2 my-4 items-center">
+          <Input defaultValue={lesson.group.name} type="text" name="lessonName"
+          placeholder="tanuló neve" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} disabled={!editName} />
+          <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+          onClick={() => setEditName((o) => !o)} type="button">
+            <Edit />
+          </Button>
+          <Button size="icon" className="ml-auto" type="submit" disabled={saveLoading}>
+            {saveLoading ? <LoaderCircle className="animate-spin" /> : <Save />}
+          </Button>
         </div>
-        <div className="flex flex-col gap-2">
-          <h3 className='font-bold'>Csoport</h3>
-          <div className="flex gap-4 items-center group">
-            <Combobox
-              data={allGroups || []}
-              name={"lessonGroup"}
-              displayName={"name"}
-              defaultValue={lesson.group.id}
-              className={`${editGroups ? "flex" : "hidden"}`} />
-            <Link to={`/groups/${lesson.group.id.replace("group:", "")}`} key={lesson.group.id} className={`${!editGroups ? "block" : "hidden"}`}>
-              <Button variant='outline' className='flex items-center gap-2'>
-                {lesson.group.name} <SquareArrowOutUpRight />
+        <div className="flex gap-4 py-4">
+          <div className="flex flex-col gap-2">
+            <h3 className='font-bold'>Oktatók</h3>
+            <div className="flex gap-2 group">
+              <MultiSelect
+                name={"lessonTeachers"}
+                options={convertToMultiSelectData(allTeachers || [], "name")}
+                defaultValue={lesson.group?.teachers.map(e => e.id)}
+                className={`${editTeachers ? "block" : "hidden"}`} />
+              {
+                lesson.group.teachers.map(e =>
+                  <Link to={`/employee/${e.id.replace("employee:", "")}`} key={e.id} className={`${!editTeachers ? "block" : "hidden"}`} >
+                    <Button variant='outline' className='flex items-center gap-2'>
+                      {e.name} <SquareArrowOutUpRight />
+                    </Button>
+                  </Link>
+                )
+              }
+              <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+              onClick={() => setEditTeachers((o) => {!o && !allTeachers && getAll(auth.token, "employee").then(resp => setAllTeachers(resp.data.employees)); return !o})} type="button">
+                <Edit />
               </Button>
-            </Link>
-            <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-            onClick={() => setEditGroups((o) => {!o && !allGroups && getAll(auth.token, "group").then(resp => setAllGroups(resp.data.groups)); return !o})} type="button">
-              <Edit />
-            </Button>
+            </div>
           </div>
-        </div>
-        <div>
-          <h3 className='font-bold mb-2'>Helyszín</h3>
-          <div className="flex gap-4 items-center group">
-            <Combobox 
-              data={allLocations || []} 
-              name={"lessonLocation"} 
-              displayName={"name"}
-              defaultValue={lesson.group.location.id} 
-              className={`${editLocation ? "flex" : "hidden"}`} />
-            <Link to={`/locations/${lesson.group.location.id.replace("location:", "")}`} key={lesson.group.location.id} className={`${!editLocation ? "block" : "hidden"}`} >
-              <Button variant='outline' className='flex items-center gap-2'>
-                {lesson.group.location.name} <SquareArrowOutUpRight />
+          <div className="flex flex-col gap-2">
+            <h3 className='font-bold'>Csoport</h3>
+            <div className="flex gap-4 items-center group">
+              <Combobox
+                data={allGroups || []}
+                name={"lessonGroup"}
+                displayName={"name"}
+                defaultValue={lesson.group.id}
+                className={`${editGroups ? "flex" : "hidden"}`} />
+              <Link to={`/groups/${lesson.group.id.replace("group:", "")}`} key={lesson.group.id} className={`${!editGroups ? "block" : "hidden"}`}>
+                <Button variant='outline' className='flex items-center gap-2'>
+                  {lesson.group.name} <SquareArrowOutUpRight />
+                </Button>
+              </Link>
+              <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+              onClick={() => setEditGroups((o) => {!o && !allGroups && getAll(auth.token, "group").then(resp => setAllGroups(resp.data.groups)); return !o})} type="button">
+                <Edit />
               </Button>
-            </Link>
-            <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-            onClick={() => setEditLocation((o) => {!o && !allLocations && getAll(auth.token, "location").then(resp => setAllLocations(resp.data.locations)); return !o})} type="button">
-              <Edit />
-            </Button>
+            </div>
+          </div>
+          <div>
+            <h3 className='font-bold mb-2'>Helyszín</h3>
+            <div className="flex gap-4 items-center group">
+              <Combobox
+                data={allLocations || []}
+                name={"lessonLocation"}
+                displayName={"name"}
+                defaultValue={lesson.group.location.id}
+                className={`${editLocation ? "flex" : "hidden"}`} />
+              <Link to={`/locations/${lesson.group.location.id.replace("location:", "")}`} key={lesson.group.location.id} className={`${!editLocation ? "block" : "hidden"}`} >
+                <Button variant='outline' className='flex items-center gap-2'>
+                  {lesson.group.location.name} <SquareArrowOutUpRight />
+                </Button>
+              </Link>
+              <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+              onClick={() => setEditLocation((o) => {!o && !allLocations && getAll(auth.token, "location").then(resp => setAllLocations(resp.data.locations)); return !o})} type="button">
+                <Edit />
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <div className="flex flex-wrap gap-4 items-end">
-        <div>
-          <h3 className='font-bold mb-2'>Kezdés</h3>
-          <DatePicker date={new Date(lesson.start)} includeTime showTimePicker dateFormat="Pp" name={"dateStart"} />
+
+        <div className="flex flex-wrap gap-12 items-end mb-2">
+          <div>
+            <h3 className='font-bold mb-2'>Kezdés</h3>
+            <DatePicker date={new Date(lesson.start)} includeTime showTimePicker dateFormat="PPPp" name={"dateStart"} />
+          </div>
+          <div>
+            <h3 className='font-bold mb-2'>Befejezés</h3>
+            <DatePicker date={new Date(lesson.end)} includeTime showTimePicker dateFormat="PPPp" name={"dateEnd"} />
+          </div>
         </div>
-      </div>
-      <div className="flex flex-wrap gap-4 items-end">
-        <div>
-          <h3 className='font-bold mb-2'>Befejezés</h3>
-          <DatePicker date={new Date(lesson.end)} includeTime showTimePicker dateFormat="Pp" name={"dateEnd"} />
-        </div>
-      </div>
-      <DataTable data={lesson.enroled} columns={columns} hideColumns={["created", "price"]} headerAfter={<ReplacementDialog originalLessonId={lesson.id} />} />
-    </form>
+      </form>
+      <DataTable data={[...lesson.enroled, ...lesson.replaced]} columns={columns} hideColumns={["created", "price"]} headerAfter={<ReplacementDialog originalLessonId={lesson.id} />} />
+    </div>
   )
 }

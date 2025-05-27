@@ -35,7 +35,6 @@ export default function ReplacementDialog({students, originalLessonId, setNewStu
       setNewStudents && setNewStudents(p => [...p, {...allStudents.find(v => v.id == formData.get("student")), replacement: true}])
       return toast.success("Pótlás sikeresen hozzáadva!"), 
       (error) => {
-      console.log("asd: ", error)
       switch (error.response?.data?.code) {
         case "bad_request":
           return toast.error("Valamelyik mező üres!")

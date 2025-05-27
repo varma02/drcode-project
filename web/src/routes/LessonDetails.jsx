@@ -7,7 +7,7 @@ import ReplacementDialog from "@/components/ReplacementDialog"
 import { ToggleButton } from "@/components/ToggleButton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { attendLesson, get, getAll, update } from "@/lib/api/api"
+import { attendLesson, get, getAll, remove, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
@@ -26,14 +26,14 @@ export default function LessonDetails() {
   const [allLocations, setAllLocations] = useState(null)
   const [allGroups, setAllGroups] = useState(null)
   const [attended, setAttended] = useState([])
-  const [replaced, setReplaced] = useState([])
+  const [tableData, setTableData] = useState([])
 
   useEffect(() => {
     get(auth.token, 'lesson', ["lesson:" + params.id], "group,group.teachers,group.location,enroled.in,enroled.subject,replaced.in", "enroled,attended,replaced").then(data => {
       const less = data.data.lessons[0]
       setLesson(less)
       setAttended(less.attended.map(a => a.in))
-      setReplaced(less.replaced)
+      setTableData([...less.enroled, ...less.replaced])
     })
   }, [auth.token, params.id])
 
@@ -93,12 +93,31 @@ export default function LessonDetails() {
   const [editLocation, setEditLocation] = useState(false)
   const [editGroups, setEditGroups] = useState(false)
 
+  
+  function removeReplacement(e, id) {
+    e.preventDefault()
+    remove(auth.token, "replacement", [id])
+    .then(resp => {
+      setTableData(p => p.filter(s => s.id != id))
+      toast.success("Pótlás sikeresen törölve")
+    }, (error) => {
+      switch (error.response?.data?.code) {
+        case "unauthorized":
+          return toast.error("Ehhez hincs jogosultsága!");
+          default:
+            return toast.error("Ismeretlen hiba történt!");
+      }})
+    }
+      
   if (!lesson) return (
     <div className='h-screen w-full bg-background flex items-center justify-center'>
       <LoaderCircle className='animate-spin ' />
     </div>
   )
-
+  
+  
+  console.log(tableData)
+  
   const columns = [
     {
       displayName: "Diák neve",
@@ -175,7 +194,7 @@ export default function LessonDetails() {
         row.original.extension ? 
         <div className="flex justify-center items-center gap-2">
           <p className="w-full rounded-full px-2 py-0.5 text-center bg-blue-500">Pótol</p>
-          <AreYouSureAlert trigger={<Trash className="cursor-pointer" />} />
+          <AreYouSureAlert trigger={<Trash className="cursor-pointer" />} onConfirm={e => removeReplacement(e, row.original.id)} />
         </div>
         :
         <ToggleButton onText={"Jelen"} offText={"Hiányzik"} value={attended.includes(row.original.in.id)} onch={(e) => {
@@ -277,7 +296,7 @@ export default function LessonDetails() {
           </div>
         </div>
       </form>
-      <DataTable data={[...lesson.enroled, ...lesson.replaced]} columns={columns} hideColumns={["created", "price"]} headerAfter={<ReplacementDialog originalLessonId={lesson.id} />} />
+      <DataTable data={tableData} columns={columns} hideColumns={["created", "price"]} headerAfter={<ReplacementDialog originalLessonId={lesson.id} />} />
     </div>
   )
 }

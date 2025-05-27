@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ToggleButton } from "@/components/ToggleButton";
 import { useAuth } from "@/lib/api/AuthProvider";
-import { attendLesson, get, getNextLesson } from "@/lib/api/api";
+import { attendLesson, get, getNextLesson, remove } from "@/lib/api/api";
 import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 import WorkInProgress from "@/components/WorkInProgress";
@@ -29,19 +29,21 @@ export default function Home() {
       (resp) => {
         const nl = resp.data.lesson;
         setNextLesson(nl);
-        setAttended(nl.attended);
+        setAttended(nl.attended.map(a => a.in));
         get(auth.token, "student", [...nl.enroled.map((e) => e.in)], undefined, "enroled").then((resp) => {
           const ls = resp.data.students
           setNextLessonStudents(ls)
-          get(auth.token, "student", [...nl.replaced], undefined, "enroled").then((resp2) => 
-            setNextLessonStudents(p => [
-              ...p, 
-              ...resp2.data.students.map(student => ({
-                ...student,
-                replacement: true
-              }))
-            ])
-          );
+          if (nl.replaced.length != 0)
+            get(auth.token, "student", nl.replaced.map(e => e.in), undefined, "enroled").then((resp2) => 
+              // console.log(resp2.data)
+              setNextLessonStudents(p => [
+                ...p, 
+                ...resp2.data.students.map(student => ({
+                  ...student,
+                  replacement: nl.replaced.find(r => r.in == student.id).id
+                }))
+              ])
+            );
         });
       },
       (error) => {
@@ -59,8 +61,34 @@ export default function Home() {
 
   function endLesson() {
     attendLesson(auth.token, nextLesson.id, attended).then(() =>
-      toast.success("Sikeres mentés")
+      toast.success("Óra mentve"),
+      (error) => {
+          switch (error.response?.data?.code) {
+            case "not_found":
+              return null;
+            case "unauthorized":
+              return toast.error("Ehhez hincs jogosultsága!");
+            default:
+              return toast.error("Ismeretlen hiba történt!");
+          }
+        }
     );
+  }
+
+  function removeReplacement(e, id) {
+    e.preventDefault()
+    remove(auth.token, "replacement", [id])
+      .then(resp => {
+        setNextLessonStudents(p => p.filter(s => s.replacement != id))
+        toast.success("Pótlás sikeresen törölve")
+      }, (error) => {
+        switch (error.response?.data?.code) {
+          case "unauthorized":
+            return toast.error("Ehhez hincs jogosultsága!");
+          default:
+            return toast.error("Ismeretlen hiba történt!");
+        }
+      })
   }
 
   const columns = [
@@ -126,7 +154,7 @@ export default function Home() {
         row.original.replacement ? 
         <div className="flex justify-center items-center gap-2">
           <p className="w-full rounded-full px-2 py-0.5 text-center bg-blue-500">Pótol</p>
-          <AreYouSureAlert trigger={<Trash className="cursor-pointer" />} />
+          <AreYouSureAlert trigger={<Trash className="cursor-pointer" />} onConfirm={e => removeReplacement(e, row.original.replacement)} />
         </div>
         :
         <div className="flex justify-center items-center gap-2">

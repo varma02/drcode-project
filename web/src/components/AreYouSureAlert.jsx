@@ -15,7 +15,7 @@ export default function AreYouSureAlert({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title || "Biztosan tötölni szeretnéd?"}</AlertDialogTitle>
+          <AlertDialogTitle>{title || "Biztosan törölni szeretnéd?"}</AlertDialogTitle>
           <AlertDialogDescription>
             {description || "A kiválasztott elemek és a velük kapcsolatos minden adat törlődik. Ezt a műveletet nem lehet visszavonni!"}
           </AlertDialogDescription>

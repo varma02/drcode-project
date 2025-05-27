@@ -26,6 +26,7 @@ export function CreateEnrolment({
   const [allSubjects, setAllSubjects] = useState(null)
   
   function handleCreateEnrolment(e) {
+    e.preventDefault()
     const formData = new FormData(e.target);
     const enr = {
       student: formData.get("student") || undefined,

@@ -97,16 +97,31 @@ export default function GroupDetails() {
     if (saveLoading || !e.target) return;
     setSaveLoading(true);
     const data = new FormData(e.target);
+    console.log(data.get("groupName"), group.name)
     const groupData = {
-      name: data.get("groupName") || group.name,
-      location: data.get("groupLocation"),
-      teachers: data.get("groupTeachers").split(",")
+      name: data.get("groupName") == group.name ? undefined : data.get("groupName"),
+      location: data.get("groupLocation") == group.location.id ? undefined : data.get("groupLocation"),
+      teachers: data.get("groupTeachers") == group.teachers.map(t => t.id).join(",") ? undefined : data.get("groupTeachers").split(",")
     };
+    console.log(groupData)
+    if (Object.values(groupData).every(v => !v)) {
+      setSaveLoading(false)
+      return toast.message("Nincs változott adat.")
+    }
+
     update(auth.token, "group", "group:" + params.id, groupData)
     .then((v) => {
-      setLesson((o) => ({...o, ...v.data.group}));
       toast.success("Csoport mentve");
-    }).catch(() => toast.error("Hiba történt mentés közben!"))
+    }, (error) => { 
+      switch (error.response?.data?.code) {
+        case "fields_required":
+          return toast.error("Valamelyik mező üres!")
+        case "unauthorized":
+          return toast.error("Ehhez hincs jogosultsága!")
+        default:
+          return toast.error("Ismeretlen hiba történt!")
+      }
+    })
     .finally(() => setSaveLoading(false))
 
     setSaveLoading(false)
@@ -174,115 +189,117 @@ export default function GroupDetails() {
   ]
 
   return (
-    <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={(e) => handleSave(e)}>
-      <div className="flex gap-2 group items-center">
-        <Input defaultValue={group.name} name="groupName" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} disabled={!editName} />
-        <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-        onClick={() => setEditName((o) => !o)} type="button">
-          <Edit />
-        </Button>
+    <div className='max-w-screen-xl md:w-full mx-auto p-4'>
+      <form onChange={handleChange} onSubmit={(e) => handleSave(e)}>
+        <div className="flex gap-2 group items-center">
+          <Input defaultValue={group.name} name="groupName" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} />
+          <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+          onClick={() => setEditName((o) => !o)} type="button">
+            <Edit />
+          </Button>
 
-        <Button size="icon" className="ml-auto" type="submit" disabled={saveLoading}>
-          {saveLoading ? <LoaderCircle className="animate-spin" /> : <Save />}
-        </Button>
-      </div>
-      <div className="flex flex-col lg:flex-row lg:gap-10 flex-wrap">
-        <div className="flex flex-col gap-2 py-4 group">
-          <h3 className='font-bold'>Oktatók</h3>
-          <div className="flex gap-2">
-            <MultiSelect 
-              options={convertToMultiSelectData(allTeachers || [])} 
-              defaultValue={[...group.teachers?.map(e => e.id)]} 
-              name="groupTeachers" className={`${!editTeachers ? "hidden" : "block"}`} />
-            {group.teachers?.length > 0 ? (
-              <ScrollArea className={`pb-2 overflow-x-auto ${editTeachers ? "hidden" : "block"}`}>
-                <div className='flex w-max gap-4 pb-1'>
-                  {group.teachers.map(teacher => (
-                    <Link to={`/employee/${teacher.id.replace("employee:", "")}`} key={teacher.id}>
+          <Button size="icon" className="ml-auto" type="submit" disabled={saveLoading}>
+            {saveLoading ? <LoaderCircle className="animate-spin" /> : <Save />}
+          </Button>
+        </div>
+        <div className="flex flex-col lg:flex-row lg:gap-10 flex-wrap">
+          <div className="flex flex-col gap-2 py-4 group">
+            <h3 className='font-bold'>Oktatók</h3>
+            <div className="flex gap-2">
+              <MultiSelect 
+                options={convertToMultiSelectData(allTeachers || [])} 
+                defaultValue={[...group.teachers?.map(e => e.id)]} 
+                name="groupTeachers" className={`${!editTeachers ? "hidden" : "block"}`} />
+              {group.teachers?.length > 0 ? (
+                <ScrollArea className={`pb-2 overflow-x-auto ${editTeachers ? "hidden" : "block"}`}>
+                  <div className='flex w-max gap-4 pb-1'>
+                    {group.teachers.map(teacher => (
+                      <Link to={`/employee/${teacher.id.replace("employee:", "")}`} key={teacher.id}>
+                        <Button variant='outline' className='flex items-center gap-2'>
+                          {teacher.name} <SquareArrowOutUpRight />
+                        </Button>
+                      </Link>
+                    ))}
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              ) : (
+                <p>Ehhez a csoporthoz még nem tartoznak oktatók.</p>
+              )}
+              <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+              onClick={() => setEditTeachers((o) => !o)} type="button">
+                <Edit />
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 py-4 group">
+            <h3 className='font-bold'>Helyszín</h3>
+            <div className="flex gap-2">
+              <Combobox 
+                data={allLocations || []}
+                displayName={"name"}
+                defaultValue={group.location.id} 
+                name="groupLocation" className={`${!editLocation ? "hidden" : "flex"}`} />
+              {group.location ? (
+                <ScrollArea className={`pb-2 overflow-x-auto ${editLocation ? "hidden" : "block"}`}>
+                  <div className='flex w-max gap-4 pb-1'>
+                    <Link to={`/location/${group.location.id.replace("location:", "")}`} key={group.location.id}>
                       <Button variant='outline' className='flex items-center gap-2'>
-                        {teacher.name} <SquareArrowOutUpRight />
+                        {group.location.name} <SquareArrowOutUpRight />
                       </Button>
                     </Link>
-                  ))}
-                </div>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-            ) : (
-              <p>Ehhez a csoporthoz még nem tartoznak oktatók.</p>
-            )}
-            <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-            onClick={() => setEditTeachers((o) => !o)} type="button">
-              <Edit />
-            </Button>
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              ) : (
+                <p>Ehhez a csoporthoz még nem tartozik helyszín.</p>
+              )}
+              <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
+              onClick={() => setEditLocation((o) => !o)} type="button">
+                <Edit />
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 py-4 group">
+            <h3 className='font-bold'>Kurzusok</h3>
+            <div className="flex gap-2">
+              {group.subjects?.length > 0 ? (
+                <ScrollArea className='pb-2 overflow-x-auto'>
+                  <div className='flex w-max gap-4 pb-1'>
+                    {group.subjects.map(subject => (
+                      <Link to={`/subjects/${subject.id.replace("subject:", "")}`} key={subject.id}>
+                        <Button variant='outline' className='flex items-center gap-2'>
+                          {subject.name} <SquareArrowOutUpRight />
+                        </Button>
+                      </Link>
+                    ))} 
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              ) : (
+                <p>Ehhez a csoporthoz még nem tartoznak kurzusok.</p>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 py-4 group">
-          <h3 className='font-bold'>Helyszín</h3>
-          <div className="flex gap-2">
-            <Combobox 
-              data={allLocations || []}
-              displayName={"name"}
-              defaultValue={group.location.id} 
-              name="groupLocation" className={`${!editLocation ? "hidden" : "flex"}`} />
-            {group.location ? (
-              <ScrollArea className={`pb-2 overflow-x-auto ${editLocation ? "hidden" : "block"}`}>
-                <div className='flex w-max gap-4 pb-1'>
-                  <Link to={`/location/${group.location.id.replace("location:", "")}`} key={group.location.id}>
-                    <Button variant='outline' className='flex items-center gap-2'>
-                      {group.location.name} <SquareArrowOutUpRight />
-                    </Button>
-                  </Link>
-                </div>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-            ) : (
-              <p>Ehhez a csoporthoz még nem tartozik helyszín.</p>
-            )}
-            <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
-            onClick={() => setEditLocation((o) => !o)} type="button">
-              <Edit />
-            </Button>
-          </div>
+        <div className="flex flex-col gap-2 py-4">
+          <h3 className='font-bold'>Tanulók</h3>
         </div>
-
-        <div className="flex flex-col gap-2 py-4 group">
-          <h3 className='font-bold'>Kurzusok</h3>
-          <div className="flex gap-2">
-            {group.subjects?.length > 0 ? (
-              <ScrollArea className='pb-2 overflow-x-auto'>
-                <div className='flex w-max gap-4 pb-1'>
-                  {group.subjects.map(subject => (
-                    <Link to={`/subjects/${subject.id.replace("subject:", "")}`} key={subject.id}>
-                      <Button variant='outline' className='flex items-center gap-2'>
-                        {subject.name} <SquareArrowOutUpRight />
-                      </Button>
-                    </Link>
-                  ))} 
-                </div>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-            ) : (
-              <p>Ehhez a csoporthoz még nem tartoznak kurzusok.</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2 py-4">
-        <h3 className='font-bold'>Tanulók</h3>
-        {group.enroled?.length > 0 ? (
-          <DataTable 
-            className="-mt-4" 
-            columns={studentColumns} 
-            data={group.enroled}
-            headerAfter={
-              <CreateEnrolment enrolment={enrolment} setEnrolment={setEnrolment} handleAddStudent={handleAddStudent} />  
-            } />
-        ) : (
-          <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>
-        )}
-      </div>
-    </form>
+      </form>
+      {group.enroled?.length > 0 ? (
+        <DataTable 
+          className="-mt-4" 
+          columns={studentColumns} 
+          data={group.enroled}
+          headerAfter={
+            <CreateEnrolment enrolment={enrolment} setEnrolment={setEnrolment} handleAddStudent={handleAddStudent} />  
+          } />
+      ) : (
+        <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>
+      )}
+    </div>
   )
 }

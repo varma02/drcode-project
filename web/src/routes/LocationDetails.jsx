@@ -42,11 +42,15 @@ export default function LocationDetails() {
     setSaveLoading(true);
     const data = new FormData(e.target);
     const locationData = {
-      name: data.get("locationName"),
-      address: data.get("locationAddress"),
-      contact_email: data.get("locationEmail"),
-      contact_phone: data.get("locationPhone"),
+      name: data.get("locationName") == location.name ? undefined : data.get("locationName"),
+      address: data.get("locationAddress") == location.address ? undefined : data.get("locationAddress"),
+      contact_email: data.get("locationEmail") == location.contact_email ? undefined : data.get("locationEmail"),
+      contact_phone: data.get("locationPhone") == location.contact_phone ? undefined : data.get("locationPhone"),
     };
+    if (Object.values(locationData).every(v => !v)) {
+      setSaveLoading(false)
+      return toast.message("Nincs változott adat.")
+    }
     update(auth.token, "location", "location:" + params.id, locationData)
     .then((v) => {
       setLocation((o) => ({...o, ...v.data.location}));
@@ -66,7 +70,7 @@ export default function LocationDetails() {
   return (
     <form className='max-w-screen-xl md:w-full mx-auto p-4' onChange={handleChange} onSubmit={handleSave}>
       <div className="group flex gap-2 my-4 items-center">
-        <Input defaultValue={location.name} name="locationName" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} disabled={!editName} onInput={(e) => e.target.style.width = e.target.value.length * 2.5 + "rem"} />
+        <Input defaultValue={location.name} name="locationName" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} />
         <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
         onClick={() => setEditName((o) => !o)} type="button">
           <Edit />

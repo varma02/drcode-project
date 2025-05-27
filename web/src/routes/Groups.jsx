@@ -17,8 +17,8 @@ export default function Groups() {
   const [rowSelection, setRowSelection] = useState({})
 
   useEffect(() => {
-    getAll(auth.token, 'group', "teachers").then(data => setGroups(data.data.groups))
-  }, [])
+    getAll(auth.token, 'group', "teachers,location").then(data => setGroups(data.data.groups))
+  }, [auth.token])
 
   function handleDelete() {
     remove(auth.token, 'group', Object.keys(rowSelection).map(e => groups[+e].id)).then(resp => {

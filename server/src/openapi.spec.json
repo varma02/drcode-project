@@ -1928,11 +1928,6 @@
                   "parent": {
                     "type": "object",
                     "description": "The name of the parent or guardian",
-                    "required": [
-                      "name",
-                      "email",
-                      "phone"
-                    ],
                     "properties": {
                       "name": {
                         "type": "string",

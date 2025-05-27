@@ -39,6 +39,8 @@ export default function StudentDetails() {
     setSaveTimer(1);
   }
 
+  console.log(student)
+
   const [saveLoading, setSaveLoading] = useState(false);
   function handleSave(e) {
     e.preventDefault();
@@ -46,16 +48,21 @@ export default function StudentDetails() {
     setSaveLoading(true);
     const data = new FormData(e.target);
     const studentData = {
-      name: data.get("studentName"),
-      grade: data.get("studentGrade"),
-      email: data.get("studentEmail"),
-      phone: data.get("studentPhone"),
+      name: data.get("studentName") == student.name ? undefined : data.get("studentName"),
+      grade: data.get("studentGrade") == student.grade ? undefined : data.get("studentGrade"),
+      email: data.get("studentEmail") == student.email || !student.email ? undefined : data.get("studentGrade"),
+      phone: data.get("studentPhone") == student.phone || !student.phone ? undefined : data.get("studentPhone"),
       parent: {
-        name: data.get("parentName"),
-        email: data.get("parentEmail"),
-        phone: data.get("parentPhone"),
+        name: data.get("parentName") == student.parent.name ? undefined : data.get("parentName"),
+        email: data.get("parentEmail") == student.parent.email ? undefined : data.get("parentEmail"),
+        phone: data.get("parentPhone") == student.parent.phone ? undefined : data.get("parentPhone"),
       },
     };
+    console.log(studentData)
+    if (Object.values(studentData).every(v => typeof v == "object" ? Object.values(v).every(v2 => !v2) : !v)) {
+      setSaveLoading(false)
+      return toast.message("Nincs változott adat.")
+    }
     update(auth.token, "student", "student:" + params.id, studentData)
     .then((v) => {
       setStudent((o) => ({...o, ...v.data.student}));

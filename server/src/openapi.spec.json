@@ -1925,6 +1925,9 @@
                     "type": "string",
                     "example": "John Doe"
                   },
+                  "grade": {
+                    "$ref": "#/components/schemas/Student/properties/grade"
+                  },
                   "parent": {
                     "type": "object",
                     "description": "The name of the parent or guardian",
@@ -2022,6 +2025,9 @@
                   "name": {
                     "type": "string",
                     "example": "John Doe"
+                  },
+                  "grade": {
+                    "$ref": "#/components/schemas/Student/properties/grade"
                   },
                   "parent": {
                     "type": "object",

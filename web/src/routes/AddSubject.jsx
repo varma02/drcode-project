@@ -4,17 +4,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { create } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 export default function AddNewSubject() {
   const auth = useAuth()
+  const navigate = useNavigate()
 
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
     create(auth.token, 'subject', { name: formData.get("name"), description: formData.get("description") }).then(
       () => { 
+        navigate("/subjects")
         toast.success("Kurzus sikeresen létrehozva!")
       },
       (error) => { 

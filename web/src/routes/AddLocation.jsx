@@ -3,17 +3,19 @@ import { Input } from '@/components/ui/input'
 import { create } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 export default function AddNewLocation() {
   const auth = useAuth()
+  const navigate = useNavigate()
 
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
     create(auth.token, 'location', {name: formData.get("name"), address: formData.get("address"), contact_email: formData.get("contact_email"), contact_phone: formData.get("contact_phone")}).then(
       () => { 
+        navigate("/locations")
         toast.success("Helyszín sikeresen létrehozva!")
       },
       (error) => { 

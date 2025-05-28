@@ -162,3 +162,16 @@ export async function getWorksheet(token: string, id: string, paid?: boolean, fe
     )
   ).data;
 }
+
+// MARK: stats
+export async function getStats(token: string) {
+  return (
+    await axios.get(
+      API_URL + "/stats",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: defaultTimeout
+      }
+    )
+  ).data;
+}

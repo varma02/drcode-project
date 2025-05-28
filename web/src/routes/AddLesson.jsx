@@ -8,15 +8,14 @@ import { create, getAll } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import { convertToMultiSelectData, generateLessons } from '@/lib/utils'
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 export default function AddNewSubject() {
   const auth = useAuth()
-  const [startDate, setStartDate] = useState(new Date())
-  const [endDate, setEndDate] = useState(new Date())
+  const navigate = useNavigate()
+
   const [teachers, setTeachers] = useState([])
-  const [selectedTeachers, setSelectedTeachers] = useState([])
   const [locations, setLocations] = useState([])
   const [groups, setGroups] = useState([])
 
@@ -34,13 +33,12 @@ export default function AddNewSubject() {
       name: formData.get("name"),
       group: formData.get("group"),
       location: formData.get("location"),
-      teachers: [
-        "employee:abc123"
-      ],
+      teachers: formData.get("teachers").split(","),
       ...lessonTime
     }
     create(auth.token, 'lesson', lessondata).then(
       () => { 
+        navigate("/lessons")
         toast.success("Óra sikeresen létrehozva!")
       },
       (error) => { 

@@ -115,9 +115,6 @@ export default function LessonDetails() {
     </div>
   )
   
-  
-  console.log(tableData)
-  
   const columns = [
     {
       displayName: "Diák neve",

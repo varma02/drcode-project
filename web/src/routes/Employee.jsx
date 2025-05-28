@@ -10,8 +10,7 @@ import { hu } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, ArrowUpDown, Copy, LoaderCircle, Plus, SquareArrowOutUpRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { convertToMultiSelectData, getMonogram, getTopRole, role_map } from '@/lib/utils';
-import { GroupComboBox } from '@/components/GroupComboBox';
+import { getMonogram, getTopRole, role_map } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -49,6 +48,7 @@ export default function Employee() {
         />
       ),
       cell: ({ row }) => (
+        // row.original.id != auth.user.id &&
         <Checkbox
           checked={row.getIsSelected()}
           className="float-left"

@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Bar, BarChart, CartesianGrid, Label, Pie, PieChart, XAxis } from 'recharts'
 import { useAuth } from '@/lib/api/AuthProvider'
-import { getAll } from '@/lib/api/api'
+import { getAll, getStats } from '@/lib/api/api'
 
 export default function AdminHome() {
   const auth = useAuth()
 
   const [teacherGroups, setTeacherGroups] = useState([])
+  const [stats, setStats] = useState(null)
 
   const mapGroupsToTeachers = (groups) => {
     const map = {}
@@ -32,8 +33,11 @@ export default function AdminHome() {
       const groups = resp.data.groups
       setTeacherGroups(mapGroupsToTeachers(groups))
     })
+    
+    getStats(auth.token).then(resp => setStats(resp.data))
+  }, [auth.token])
 
-  }, [])
+  console.log(stats)
 
   const chartData = [
     { year: "2020", wedo: 186, scratch: 80, web: 90, unity: 100 },

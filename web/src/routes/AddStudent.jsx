@@ -3,26 +3,28 @@ import { Input } from '@/components/ui/input'
 import { create } from '@/lib/api/api'
 import { useAuth } from '@/lib/api/AuthProvider'
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 export default function AddStudent() {
   const auth = useAuth()
+  const navigate = useNavigate()
 
   function handleSubmit(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
     const parent = { name: formData.get("parentName") || undefined, email: formData.get("parentEmail") || undefined, phone: formData.get("parentPhone") || undefined }
-    
     const studentData = {
       name: formData.get("name"),
-      grade: +formData.get("grade"),
+      grade: +formData.get("grade") == 0 ? undefined : +formData.get("grade"),
       email: formData.get("email") || undefined,
       phone: formData.get("phone") || undefined,
-      parent
+      parent: Object.values(parent).every(p => p == undefined) ? undefined : parent
     }
+    
     create(auth.token, 'student', studentData).then(
       () => {
+        navigate("/students")
         toast.success("Tanuló sikeresen létrehozva!")
       },
       (error) => {

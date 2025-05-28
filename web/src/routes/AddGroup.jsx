@@ -10,11 +10,12 @@ import { useAuth } from '@/lib/api/AuthProvider'
 import { convertToMultiSelectData, generateLessons } from '@/lib/utils'
 import { Label } from '@radix-ui/react-dropdown-menu'
 import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 export default function AddCalendarGroup() {
   const auth = useAuth()
+  const navigate = useNavigate()
 
   const [employees, setEmployees] = useState([])
   const [startDate, setStartDate] = useState(new Date())
@@ -41,6 +42,7 @@ export default function AddCalendarGroup() {
     create(auth.token, 'group', groupData).then(
       () => { 
         toast.success("Csoport sikeresen létrehozva!")
+        navigate("/groups")
       },
       (error) => { 
         switch (error.response?.data?.code) {

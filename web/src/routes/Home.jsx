@@ -24,7 +24,7 @@ export default function Home() {
   const [attended, setAttended] = useState([]);
 
   useEffect(() => {
-    if (!isTeacher(auth.user.roles) && isAdmin(auth.user.roles)) navigate("/admin");
+    // if (!isTeacher(auth.user.roles) && isAdmin(auth.user.roles)) navigate("/admin");
     getNextLesson(auth.token, "group,group.location", "enroled,attended,replaced").then(
       (resp) => {
         const nl = resp.data.lesson;
@@ -90,6 +90,12 @@ export default function Home() {
         }
       })
   }
+
+  if (!isTeacher(auth.user.roles)) return (
+    <div className="size-full flex justify-center items-center">
+      <p>Ezt az oldal csak oktatóknak van</p>
+    </div>
+  )
 
   const columns = [
     {

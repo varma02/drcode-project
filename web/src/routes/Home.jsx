@@ -11,7 +11,7 @@ import { hu } from "date-fns/locale";
 import WorkInProgress from "@/components/WorkInProgress";
 import { toast } from "sonner";
 import { isTeacher } from "@/lib/utils";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ReplacementDialog from "@/components/ReplacementDialog";
 import AreYouSureAlert from "@/components/AreYouSureAlert";
 

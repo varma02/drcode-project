@@ -3,11 +3,12 @@ import { useAuth } from '@/lib/api/AuthProvider'
 import React, { useEffect, useState } from 'react'
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from './ui/dialog'
 import { Button } from './ui/button'
-import { Plus } from 'lucide-react'
+import { CircleHelp, Plus } from 'lucide-react'
 import { Combobox } from './ComboBox'
 import { DatePicker } from './DatePicker'
 import { toast } from 'sonner'
 import { Input } from './ui/input'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 
 export default function ReplacementDialog({students, originalLessonId, setNewStudents}) {
   const auth = useAuth()
@@ -50,18 +51,29 @@ export default function ReplacementDialog({students, originalLessonId, setNewStu
       <DialogContent>
         <DialogTitle>Pótlás hozzáadása</DialogTitle>
         <form onSubmit={handleAddReplacement} className='flex flex-col gap-4'>
+          <h4>Tanuló *</h4>
           <Combobox data={allStudents || []} displayName={"name"} name={"student"} placeholder='Válassz tanulót...'
             onOpenChange={e => e && !allStudents &&
               getAll(auth.token, "student").then(resp => setAllStudents(resp.data.students))
             } 
             />
+          <h4>Nap * <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger><CircleHelp size={16} /></TooltipTrigger>
+              <TooltipContent>
+                <p>Melyik napot pótolja</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider></h4>
           <DatePicker date={selectedDate} setDate={setSelectedDate} name={"date"} dateFormat='PPPP' />
+          <h4>Csoport *</h4>
           <Combobox data={lessons} displayName={"group.name"} name={"lesson"} placeholder='Válassz órát...'
             onOpenChange={e => e && !allStudents &&
               getAll(auth.token, "student").then(resp => setAllStudents(resp.data.students))
             } 
             />
-          <p className='text-sm -mb-6 z-10 ml-3'>Hosszabbítás (perc)</p>
+          {/* <p className='text-sm -mb-6 z-10 ml-3'>Hosszabbítás (perc)</p> */}
+          <h4>Hosszabbítás (perc) *</h4>
           <Input name={"extension"} className="w-1/3" defaultValue="30" />
           <DialogClose asChild className='w-max ml-auto'><Button type="submit">Hozzáadás</Button></DialogClose>
         </form>

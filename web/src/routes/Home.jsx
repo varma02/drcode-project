@@ -1,6 +1,6 @@
 import DataTable from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, Coffee, Trash, TriangleAlert } from "lucide-react";
+import { ArrowUpDown, Clock, MapPin, User2, ArrowUp, ArrowDown, X, Coffee, Trash, ArrowRight, Ban } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ToggleButton } from "@/components/ToggleButton";
@@ -10,21 +10,19 @@ import { format } from "date-fns";
 import { hu } from "date-fns/locale";
 import WorkInProgress from "@/components/WorkInProgress";
 import { toast } from "sonner";
-import { isAdmin, isTeacher } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
+import { isTeacher } from "@/lib/utils";
+import { Link, useNavigate } from "react-router-dom";
 import ReplacementDialog from "@/components/ReplacementDialog";
 import AreYouSureAlert from "@/components/AreYouSureAlert";
 
 export default function Home() {
   const auth = useAuth();
-  const navigate = useNavigate();
 
   const [nextLesson, setNextLesson] = useState(null);
   const [nextLessonStudents, setNextLessonStudents] = useState([]);
   const [attended, setAttended] = useState([]);
 
   useEffect(() => {
-    // if (!isTeacher(auth.user.roles) && isAdmin(auth.user.roles)) navigate("/admin");
     getNextLesson(auth.token, "group,group.location", "enroled,attended,replaced").then(
       (resp) => {
         const nl = resp.data.lesson;
@@ -92,8 +90,10 @@ export default function Home() {
   }
 
   if (!isTeacher(auth.user.roles)) return (
-    <div className="size-full flex justify-center items-center">
+    <div className='flex flex-col flex-1 justify-center items-center gap-4 size-full'>
+      <Ban size={128} />
       <p>Ezt az oldal csak oktatóknak van</p>
+      <Link to={"/admin"} viewTransition><Button variant={"outline"}>Vissza az admin oldalra <ArrowRight /></Button></Link>
     </div>
   )
 

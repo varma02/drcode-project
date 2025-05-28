@@ -17,6 +17,7 @@ const AdminHome = lazy(() => import('@/routes/AdminHome'))
 const Helper = lazy(() => import('@/routes/Helper'))
 const CalendarPage = lazy(() => import('@/routes/CalendarPage'))
 const Settings = lazy(() => import('@/routes/Settings'))
+const Invites = lazy(() => import('@/routes/Invites'))
 const Worksheet = lazy(() => import('@/routes/Worksheet'))
 const Employee = lazy(() => import('@/routes/Employee'))
 const EmployeeDetails = lazy(() => import('@/routes/EmployeeDetails'))
@@ -85,6 +86,7 @@ const router = createBrowserRouter([
       {path: "/calendar", element: <CalendarPage />},
       {path: "/helper", element: <Helper />},
       {path: "/settings", element: <Settings />},
+      {path: "/invites", element: <Invites />},
 
       {path: "/employees", element: <AdminOnlyRoute children={<Employee />} />},
       {path: "/employees/:id", element: <EmployeeDetails />},

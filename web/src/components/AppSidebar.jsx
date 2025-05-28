@@ -1,4 +1,4 @@
-import { Album, BriefcaseBusiness, Calendar, ChevronsUpDown, Clock, Component, GraduationCap, Home, LogOut, MapPinned, Settings, Users } from "lucide-react"
+import { Album, BriefcaseBusiness, Calendar, ChevronsUpDown, Clock, Component, GraduationCap, Home, LogOut, Mail, MapPinned, Settings, Users } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -80,6 +80,11 @@ export function AppSidebar() {
         title: "Kurzusok",
         url: "/subjects",
         icon: Album,
+      },
+      {
+        title: "Meghívók",
+        url: "/invites",
+        icon: Mail,
       },
     ]
   }

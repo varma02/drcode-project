@@ -21,7 +21,6 @@ export default function AddStudent() {
       phone: formData.get("phone") || undefined,
       parent: Object.values(parent).every(p => p == undefined) ? undefined : parent
     }
-    
     create(auth.token, 'student', studentData).then(
       () => {
         navigate("/students")

@@ -24,24 +24,23 @@ export default function StudentDetails() {
 
   const [saveTimer, setSaveTimer] = useState(0);
   function handleChange(e) {
-    if (saveTimer == 0) {
-      const interval = setInterval(() => {
-        setSaveTimer((o) => {
-          if (o >= 50) {
-            clearInterval(interval);
-            handleSave({preventDefault: e.preventDefault, target: e.target.form});
-            return 0;
-          } else {
-            return o + 1;
-          }
-        })
-      }, 50);
-    }
-    setSaveTimer(1);
+    // if (saveTimer == 0) {
+    //   const interval = setInterval(() => {
+    //     setSaveTimer((o) => {
+    //       if (o >= 50) {
+    //         clearInterval(interval);
+    //         handleSave({preventDefault: e.preventDefault, target: e.target.form});
+    //         return 0;
+    //       } else {
+    //         return o + 1;
+    //       }
+    //     })
+    //   }, 50);
+    // }
+    // setSaveTimer(1);
   }
 
-  console.log(student)
-
+  
   const [saveLoading, setSaveLoading] = useState(false);
   function handleSave(e) {
     e.preventDefault();
@@ -50,16 +49,17 @@ export default function StudentDetails() {
     const data = new FormData(e.target);
     const studentData = {
       name: data.get("studentName") == student.name ? undefined : data.get("studentName"),
-      grade: data.get("studentGrade") == student.grade ? undefined : data.get("studentGrade"),
+      grade: +data.get("studentGrade") == 0 || data.get("studentGrade") == student.grade ? undefined : +data.get("studentGrade"),
       email: data.get("studentEmail") == student.email || !student.email ? undefined : data.get("studentGrade"),
       phone: data.get("studentPhone") == student.phone || !student.phone ? undefined : data.get("studentPhone"),
       parent: {
-        name: data.get("parentName") == student.parent.name ? undefined : data.get("parentName"),
-        email: data.get("parentEmail") == student.parent.email ? undefined : data.get("parentEmail"),
-        phone: data.get("parentPhone") == student.parent.phone ? undefined : data.get("parentPhone"),
+        name:  data.get("parentName") == "" || data.get("parentName") == student.parent?.name ? undefined : data.get("parentName"),
+        email:  data.get("parentEmail") == "" || data.get("parentEmail") == student.parent?.email ? undefined : data.get("parentEmail"),
+        phone:  data.get("parentPhone") == "" || data.get("parentPhone") == student.parent?.phone ? undefined : data.get("parentPhone"),
       },
     };
-    if (Object.values(studentData).every(v => typeof v == "object" ? Object.values(v).every(v2 => !v2) : !v)) {
+    if (Object.values(studentData.parent).every(v => !v)) delete studentData.parent
+    if (Object.values(studentData).every(v => !v)) {
       setSaveLoading(false)
       return toast.message("Nincs változott adat.")
     }
@@ -155,10 +155,9 @@ export default function StudentDetails() {
   return (
     <div className='max-w-screen-xl md:w-full mx-auto p-4'>
       <form onChange={handleChange} onSubmit={handleSave}>
-        <div className="group flex gap-2 my-4">
-          <Input defaultValue={student.name} type="text" name="studentName"
-          placeholder="tanuló neve" className={editName ? "w-max" : "hidden"}/>
-          <h1 className={editName ? "hidden" : "text-4xl"}>{student.name}</h1>
+        <div className="group flex gap-2 my-4 items-center">
+          <Input defaultValue={student.name} name="studentName" className={`w-max !text-4xl ${!editName ? "border-transparent" : ""} h-max disabled:opacity-100 !cursor-text transition-colors`} />
+          {/* <h1 className={editName ? "hidden" : "text-4xl"}>{student.name}</h1> */}
           <Button variant="ghost" size="icon" className="group-hover:opacity-100 opacity-0"
           onClick={() => setEditName((o) => !o)} type="button">
             <Edit />

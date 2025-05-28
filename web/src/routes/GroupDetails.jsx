@@ -57,7 +57,11 @@ export default function GroupDetails() {
       .then(
         () => {
           get(auth.token, 'group', ["group:" + params.id], "location,lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
-            .then(data => {setGroup(data.data.groups[0])});
+            .then(data => {
+              const g = data.data.groups[0]
+              setGroup(g)
+              setTableData(g.enroled)
+            });
           toast.success("Sikeres hozzáadás")
         },
         (error) => {
@@ -298,23 +302,19 @@ export default function GroupDetails() {
           <h3 className='font-bold'>Tanulók</h3>
         </div>
       </form>
-      {group.enroled?.length > 0 ? (
-        <DataTable 
-          className="-mt-4" 
-          columns={studentColumns} 
-          data={tableData}
-          rowSelection={rowSelection}
-          setRowSelection={setRowSelection}
-          rowOnClick={(e) => navigate("/students/" + e.original.in.id.replace("student:", ""))}
-          headerAfter={
-            <>
-            <AreYouSureAlert onConfirm={handleDeleteStudent} disabled={Object.keys(rowSelection).length == 0} />
-            <CreateEnrolment defaultGroupId={"group:"+params.id} disableFields={["group"]} handleAddEnrolment={handleAddStudent} />  
-            </>
-          } />
-      ) : (
-        <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>
-      )}
+      <DataTable 
+        className="-mt-4" 
+        columns={studentColumns} 
+        data={tableData}
+        rowSelection={rowSelection}
+        setRowSelection={setRowSelection}
+        rowOnClick={(e) => navigate("/students/" + e.original.in.id.replace("student:", ""))}
+        headerAfter={
+          <>
+          <AreYouSureAlert onConfirm={handleDeleteStudent} disabled={Object.keys(rowSelection).length == 0} />
+          <CreateEnrolment defaultGroupId={"group:"+params.id} disableFields={["group"]} handleAddEnrolment={handleAddStudent} />  
+          </>
+        } />
     </div>
   )
 }

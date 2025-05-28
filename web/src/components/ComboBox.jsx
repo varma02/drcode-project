@@ -20,7 +20,9 @@ export function Combobox({data, displayName, placeholder = "Válassz...", value,
           aria-expanded={open}
           className={`w-[200px] justify-between overflow-x-hidden text-ellipsis ${className}`}
         >
-          { ivalue ? getNestedValue(data.find(e => e.id === ivalue), displayName) : placeholder }
+          <p className="w-full overflow-hidden overflow-ellipsis">
+            { ivalue ? getNestedValue(data.find(e => e.id === ivalue), displayName) : placeholder }
+          </p>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

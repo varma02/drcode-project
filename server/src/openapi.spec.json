@@ -3442,11 +3442,14 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "id"
+                  "ids"
                 ],
                 "properties": {
-                  "id": {
-                    "$ref": "#/components/schemas/EnroledRelation/properties/id"
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/EnroledRelation/properties/id"
+                    }
                   }
                 }
               }

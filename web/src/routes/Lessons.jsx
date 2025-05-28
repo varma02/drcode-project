@@ -69,7 +69,7 @@ export default function Lessons() {
       accessorKey: "name",
       displayName: "Név",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => groups.find((v) => v.id == row.original.group)?.name || row.original.name,
+      cell: ({ row }) => row.original.name || groups.find((v) => v.id == row.original.group)?.name,
     },
     {
       id: "date",

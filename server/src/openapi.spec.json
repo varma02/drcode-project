@@ -69,16 +69,25 @@
                     "data": {
                       "type": "object",
                       "required": [
-                        "number_of"
+                        "number_of",
+                        "income",
+                        "worked_hours",
+                        "group_per_employee"
                       ],
                       "properties": {
+                        "group_per_employee": {
+                          "type": "object"
+                        },
                         "number_of": {
                           "type": "object",
                           "required": [
                             "employees",
                             "locations",
-                            "roles",
-                            "invitations"
+                            "invites",
+                            "groups",
+                            "students",
+                            "subjects",
+                            "lessons"
                           ],
                           "properties": {
                             "employees": {

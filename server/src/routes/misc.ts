@@ -29,6 +29,7 @@ router.get('/stats', ensureAuth, ensureAdmin, async (req, res) => {
         "students": count(SELECT id FROM student),
         "subjects": count(SELECT id FROM subject),
       },
+      "group_per_employee": array::flatten(SELECT VALUE teachers FROM group),
       "income": {
         "total": 0,
         "today": 0,
@@ -43,7 +44,16 @@ router.get('/stats', ensureAuth, ensureAdmin, async (req, res) => {
       },
     }
   `)
-  respond200(res, "GET /stats", stats[0]);
+  const group_per_employee = stats[0].group_per_employee
+  .reduce((a: any, c: any) => {
+    c = `${c}`;
+    if (Object.keys(a).includes(c)) { a[c] += 1; } else { a[c] = 1; }
+    return a;
+  }, {});
+  respond200(res, "GET /stats", {
+    ...stats[0],
+    group_per_employee
+  });
 });
 
 export default router;

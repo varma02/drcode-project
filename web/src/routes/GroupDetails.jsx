@@ -1,3 +1,4 @@
+import AreYouSureAlert from "@/components/AreYouSureAlert"
 import { Combobox } from "@/components/ComboBox"
 import { CreateEnrolment } from "@/components/CreateEnrolment"
 import DataTable from "@/components/DataTable"
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { create, get, getAll, update } from "@/lib/api/api"
+import { create, get, getAll, remove, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { convertToMultiSelectData } from "@/lib/utils"
 import { format } from "date-fns"
@@ -20,6 +21,9 @@ export default function GroupDetails() {
   const auth = useAuth()
   const params = useParams()
 
+  const [tableData, setTableData] = useState([])
+  const [rowSelection, setRowSelection] = useState({})
+
   const [group, setGroup] = useState(null)
   const [allTeachers, setAllTeachers] = useState(null)
   const [allLocations, setAllLocations] = useState(null)
@@ -30,7 +34,11 @@ export default function GroupDetails() {
 
   useEffect(() => {
     get(auth.token, 'group', ["group:" + params.id], "location,lessons,subjects,teachers,enroled.in,enroled.subject", "lessons,subjects,enroled")
-      .then(data => {setGroup(data.data.groups[0])});
+      .then(data => {
+        const g = data.data.groups[0]
+        setGroup(g)
+        setTableData(g.enroled)
+      });
   }, [auth.token, params.id])
 
   useEffect(() => {
@@ -62,6 +70,15 @@ export default function GroupDetails() {
           }
         }
       )
+  }
+
+  function handleDeleteStudent(e) {
+    e.preventDefault()
+    const ids = Object.keys(rowSelection).map(e => group.enroled[+e].id)
+    remove(auth.token, "enrolment", ids).then(resp => {
+      setTableData(p => p.filter(e => !ids.includes(e.id)))
+      setRowSelection({})
+    })
   }
   
   const [saveTimer, setSaveTimer] = useState(0)
@@ -284,9 +301,14 @@ export default function GroupDetails() {
         <DataTable 
           className="-mt-4" 
           columns={studentColumns} 
-          data={group.enroled}
+          data={tableData}
+          rowSelection={rowSelection}
+          setRowSelection={setRowSelection}
           headerAfter={
+            <>
+            <AreYouSureAlert onConfirm={handleDeleteStudent} disabled={Object.keys(rowSelection).length == 0} />
             <CreateEnrolment defaultGroupId={"group:"+params.id} disableFields={["group"]} handleAddEnrolment={handleAddStudent} />  
+            </>
           } />
       ) : (
         <p>Ehhez a csoporthoz még nem tartoznak kurzusok</p>

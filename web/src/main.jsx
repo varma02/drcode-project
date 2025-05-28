@@ -86,8 +86,8 @@ const router = createBrowserRouter([
       {path: "/helper", element: <Helper />},
       {path: "/settings", element: <Settings />},
 
-      {path: "/employee", element: <AdminOnlyRoute children={<Employee />} />},
-      {path: "/employee/:id", element: <EmployeeDetails />},
+      {path: "/employees", element: <AdminOnlyRoute children={<Employee />} />},
+      {path: "/employees/:id", element: <EmployeeDetails />},
       {path: "/calendar/add/event", element: <AddCalendarEvent />},
 
       {path: "/groups", element: <AdminOnlyRoute children={<Groups />} />},

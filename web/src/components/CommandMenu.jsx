@@ -46,7 +46,7 @@ export default function CommandMenu() {
       },
       {
         title: "Alkalmazottak",
-        func: (value) => navigate("/employee"),
+        func: (value) => navigate("/employees"),
       },
       {
         title: "Csoportok",

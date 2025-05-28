@@ -133,7 +133,7 @@ export default function Worksheet() {
       displayName: "Alkalmazott",
       accessorKey: "employee",
       header: ({ column }) => column.columnDef.displayName,
-      cell: ({ row }) => <Link to={"/employee/"+row.original.in.id.replace("employee:", "")}><Button variant="outline">{row.original.in.name} <SquareArrowOutUpRight /></Button></Link>,
+      cell: ({ row }) => <Link to={"/employees/"+row.original.in.id.replace("employee:", "")}><Button variant="outline">{row.original.in.name} <SquareArrowOutUpRight /></Button></Link>,
     },
     {
       displayName: "Csoport",

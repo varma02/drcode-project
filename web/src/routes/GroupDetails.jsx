@@ -222,7 +222,7 @@ export default function GroupDetails() {
                 <ScrollArea className={`pb-2 overflow-x-auto ${editTeachers ? "hidden" : "block"}`}>
                   <div className='flex w-max gap-4 pb-1'>
                     {group.teachers.map(teacher => (
-                      <Link to={`/employee/${teacher.id.replace("employee:", "")}`} key={teacher.id}>
+                      <Link to={`/employees/${teacher.id.replace("employee:", "")}`} key={teacher.id}>
                         <Button variant='outline' className='flex items-center gap-2'>
                           {teacher.name} <SquareArrowOutUpRight />
                         </Button>

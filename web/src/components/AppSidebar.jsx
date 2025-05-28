@@ -53,7 +53,7 @@ export function AppSidebar() {
       },
       {
         title: "Alkalmazottak",
-        url: "/employee",
+        url: "/employees",
         icon: Users,
       },
       {

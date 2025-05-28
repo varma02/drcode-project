@@ -227,7 +227,7 @@ export default function LessonDetails() {
                 className={`${editTeachers ? "block" : "hidden"}`} />
               {
                 lesson.group.teachers.map(e =>
-                  <Link to={`/employee/${e.id.replace("employee:", "")}`} key={e.id} className={`${!editTeachers ? "block" : "hidden"}`} >
+                  <Link to={`/employees/${e.id.replace("employee:", "")}`} key={e.id} className={`${!editTeachers ? "block" : "hidden"}`} >
                     <Button variant='outline' className='flex items-center gap-2'>
                       {e.name} <SquareArrowOutUpRight />
                     </Button>

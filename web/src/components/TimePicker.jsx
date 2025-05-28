@@ -1,7 +1,8 @@
-import * as React from "react"
+import React from "react"
 import { useState } from "react"
 import { format, setHours, setMinutes } from "date-fns"
 import { Input } from "./ui/input"
+import { useEffect } from "react"
 
 export const TimePicker = ({date, setDate, className, label, name}) => {
   const [timeValue, setTimeValue] = useState(`${format((date ? date : new Date()), "kk")}:${format((date ? date : new Date()), "mm")}`)

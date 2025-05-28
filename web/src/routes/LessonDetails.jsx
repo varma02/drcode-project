@@ -14,12 +14,13 @@ import { format } from "date-fns"
 import { hu } from "date-fns/locale"
 import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save, SquareArrowOutUpRight, Trash } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
 
 export default function LessonDetails() {
   const auth = useAuth()
   const params = useParams()
+  const navigate = useNavigate()
 
   const [lesson, setLesson] = useState(null)
   const [allTeachers, setAllTeachers] = useState(null)
@@ -187,6 +188,7 @@ export default function LessonDetails() {
       displayName: "Jelenlét",
       accessorKey: "status",
       header: "Jelenlét",
+      ignoreClickEvent: true,
       cell: ({ row }) => (
         row.original.extension ? 
         <div className="flex justify-center items-center gap-2">
@@ -293,7 +295,9 @@ export default function LessonDetails() {
           </div>
         </div>
       </form>
-      <DataTable data={tableData} columns={columns} hideColumns={["created", "price"]} headerAfter={<ReplacementDialog originalLessonId={lesson.id} />} />
+      <DataTable data={tableData} columns={columns} hideColumns={["created", "price"]} 
+        rowOnClick={(e) => navigate("/students/" + e.original.in.id.replace("student:", ""))}
+        headerAfter={<ReplacementDialog originalLessonId={lesson.id} />} />
     </div>
   )
 }

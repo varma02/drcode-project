@@ -11,12 +11,13 @@ import { hu } from "date-fns/locale";
 import WorkInProgress from "@/components/WorkInProgress";
 import { toast } from "sonner";
 import { isTeacher } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ReplacementDialog from "@/components/ReplacementDialog";
 import AreYouSureAlert from "@/components/AreYouSureAlert";
 
 export default function Home() {
   const auth = useAuth();
+  const navigate = useNavigate()
 
   const [nextLesson, setNextLesson] = useState(null);
   const [nextLessonStudents, setNextLessonStudents] = useState([]);
@@ -156,6 +157,7 @@ export default function Home() {
       displayName: "Jelenlét",
       accessorKey: "status",
       header: "Jelenlét",
+      ignoreClickEvent: true,
       cell: ({ row }) => (
         row.original.replacement ? 
         <div className="flex justify-center items-center gap-2">
@@ -249,6 +251,7 @@ export default function Home() {
           <h2>Tanulók</h2>
           <DataTable columns={columns} data={nextLessonStudents} 
             hideColumns={["created", "parent_name"]} 
+            rowOnClick={(e) => navigate("/students/" + e.original.id.replace("student:", ""))}
             headerAfter={<ReplacementDialog originalLessonId={nextLesson.id} setNewStudents={setNextLessonStudents} />}
             />
         </>

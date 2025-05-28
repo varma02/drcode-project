@@ -8,12 +8,13 @@ import { format } from "date-fns"
 import { hu } from "date-fns/locale"
 import { ArrowDown, ArrowUp, ArrowUpDown, Edit, LoaderCircle, Save } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
 
 export default function StudentDetails() {
   const auth = useAuth()
   const params = useParams()
+  const navigate = useNavigate()
 
   const [student, setStudent] = useState(null)
 
@@ -203,6 +204,7 @@ export default function StudentDetails() {
         <h3 className='font-bold'>Csoportok</h3>
         {student.enroled.length > 0 ? (
           <DataTable data={student.enroled} columns={columns}
+          rowOnClick={(e) => navigate("/groups/" + e.original.out.id.replace("group:", ""))}
           headerAfter={<CreateEnrolment defaultStudentId={"student:"+params.id} handleAddEnrolment={handleAddEnrolment} disableFields={["student"]} />}
           className="-mt-14" />
         ) : (

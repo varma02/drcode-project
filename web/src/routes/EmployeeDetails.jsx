@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Switch } from "@/components/ui/switch"
 import { create, get, getAllLessonsBetweenDates, remove, update } from "@/lib/api/api"
 import { useAuth } from "@/lib/api/AuthProvider"
 import { Dialog } from "@radix-ui/react-dialog"
@@ -15,7 +14,7 @@ import { format } from "date-fns"
 import { hu } from "date-fns/locale"
 import { ArrowDown, ArrowUp, ArrowUpDown, LoaderCircle, Plus, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
 
 export default function EmployeeDetails() {
@@ -173,6 +172,7 @@ export default function EmployeeDetails() {
     {
       displayName: "Fizetett",
       accessorKey: "paid",
+      ignoreClickEvent: true,
       header: ({ column }) => column.columnDef.displayName,
       cell: ({ row }) => <ToggleButton onText={"Igen"} offText={"Nem"} value={row.getValue("paid")} onch={e => {
         update(auth.token, "worksheet", row.original.id, {paid: !e})

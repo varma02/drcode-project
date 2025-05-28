@@ -14,12 +14,13 @@ import { format } from "date-fns"
 import { hu } from "date-fns/locale"
 import { Edit, LoaderCircle, Save, SquareArrowOutUpRight } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
 
 export default function GroupDetails() {
   const auth = useAuth()
   const params = useParams()
+  const navigate = useNavigate()
 
   const [tableData, setTableData] = useState([])
   const [rowSelection, setRowSelection] = useState({})
@@ -304,6 +305,7 @@ export default function GroupDetails() {
           data={tableData}
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
+          rowOnClick={(e) => navigate("/students/" + e.original.in.id.replace("student:", ""))}
           headerAfter={
             <>
             <AreYouSureAlert onConfirm={handleDeleteStudent} disabled={Object.keys(rowSelection).length == 0} />

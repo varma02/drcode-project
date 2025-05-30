@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/lib/api/AuthProvider";
+import { Lock, LockKeyhole } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -40,12 +41,23 @@ export default function LoginPage() {
   return (
     <form className="flex justify-center items-center min-h-screen"
     onSubmit={handleLogin}>
-      <Card>
-        <CardHeader className="font-bold text-xl text-center">Bejelentkezés</CardHeader>
+      <Card className="max-w-80 w-full">
+        <CardHeader className="font-bold text-xl flex flex-col items-center gap-2">
+          <div className="bg-primary-foreground p-2 rounded-full">
+            <LockKeyhole />
+          </div>
+          Bejelentkezés
+        </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Input name="email" type="email" placeholder="Email" />
-          <Input name="password" type="password" placeholder="Password" />
-          <div className="flex gap-2 justify-center">
+          <div className="space-y-1">
+            <p>Email</p>
+            <Input name="email" type="email" placeholder="email@example.com" />
+          </div>
+          <div className="space-y-1">
+            <p>Jelszó</p>
+            <Input name="password" type="password" placeholder="********" />
+          </div>
+          <div className="flex gap-2">
             <Switch name={"remember"} />
             Maradjak bejelentkezve
           </div>

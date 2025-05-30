@@ -98,7 +98,7 @@ export async function create_migration() {
   const content = `
     -- Migration name: ${migration_name}
     -- Created at: ${new Date().toISOString()}
-    -- Put "-- REQUIRES RESET" in the first line to require a reset for this migration
+    -- Put "-- REQUIRES RESET" in the first line to require a full reset of the database for this migration to apply
     
     BEGIN TRANSACTION;
     DEFINE PARAM OVERWRITE $db_version VALUE ${max_migration+1};
@@ -111,17 +111,46 @@ export async function create_migration() {
   console.log(`Created new migration file: ${filename}`);
 }
 
+async function status() {
+  const db_version = (await db.query<number[]>('RETURN $db_version;'))[0] || 0;
+  const migrationsDir = path.join(__dirname, './migrations');
+  const filenames = fs.readdirSync(migrationsDir);
+  const migrations = filenames.map(file => {
+    const migrationNumber = parseInt(file.match(/^\d+/)?.[0] || '0');
+    return {
+      name: file,
+      number: migrationNumber,
+    };
+  }).filter(v => v.number > db_version).sort((a, b) => a.number - b.number);
+  console.log(`Current database version: ${db_version}`);
+  console.log("Available migrations:");
+  if (migrations.length === 0) {
+    console.log(" No migrations available.");
+    return;
+  } else {
+    migrations.forEach(migration => {
+      console.log(` - ${migration.name}`);
+    });
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
   await db_connect();
   switch (command) {
+    case 'status': 
+      await status();
+      break;
+    case 'migrate':
+      await migrate();
+      break;
     case 'reset':
       await reset();
       if (!args.includes('--no-seed')) await apply_seed();
       break;
-    case 'migrate':
-      await migrate();
+    case 'seed':
+      await apply_seed();
       break;
     case 'create_migration':
       await create_migration();

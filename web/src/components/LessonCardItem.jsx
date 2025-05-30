@@ -12,7 +12,7 @@ export const LessonCardItem = ({lesson}) => {
 
   return (
     <div variant="outline" className='w-max flex gap-2 border rounded-lg p-2 cursor-pointer hover:bg-[#2a2a30] transition-all relative' onClick={() => navigate("/lessons/"+lesson.id.replace("lesson:", ""))}>
-      <div className='flex flex-col'>
+      <div className='flex flex-col gap-1'>
         <CircleHelp />
       </div>
       <div className='flex gap-2'>

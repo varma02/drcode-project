@@ -11,9 +11,15 @@ The source code is written in TypeScript and uses the following notable technolo
 ## Table of Contents
 
 - [The devcontainer](#the-devcontainer)
+- [Running the server](#running-the-server)
 - [Code Structure](#code-structure)
 - [Environment](#environment)
 - [Database CLI](#database-cli)
+- [Testing](#testing)
+- [How to](#how-to)
+  - [Create a new endpoint](#create-a-new-endpoint)
+  - [Add a new migration](#add-a-new-migration)
+
 
 ## The devcontainer
 
@@ -25,6 +31,11 @@ Setting up the devcontainer is explained in the README file in the root of the p
 ## Running the server
 
 You need the [devcontainer](#the-devcontainer) or some other surrealdb instance to run the server.
+After that follow these steps get setup and run:
+- Create a `.env` file in the server directory based on the `.env.template` file. [More details here](#environment)
+- Run `bun install` to install the dependencies.
+- Optionally run `bun db reset` to reset and seed the database. [More details here](#database-cli)
+- Start the server with `bun dev`.
 
 ## Code Structure
 
@@ -86,6 +97,13 @@ Here are a list of the available commands and their descriptions
 | `seed`    | Seeds the database with initial data.                                            |
 | `create_migration` | Creates a new migration file in the approperiate directory.             |
 
+## Testing
+
+The server uses Bun.js's built in test framework which is similar to Jest. The tests are located in the `/tests/` directory ([as described here](#code-structure)) and are organized into within describe blocks labelled via VSCode marker comments to make navigation easier.
+
+Use `bun test` to run the tests. This will automatically create a test database and run all tests outputting the results to the console.
+You can also use `bun test --watch` to run the tests in watch mode, which will automatically re-run when you make changes to the code. Or `bun test --coverage` to generate a code coverage report.
+
 ## How to
 
 This section looks at some common tasks and explains how to do them.
@@ -97,6 +115,25 @@ This section looks at some common tasks and explains how to do them.
   - If you create a new file make sure to name it according to the base path of the endpoint, e.g. `auth.ts` for `/auth`.
   - The file must export an `express.Router` instance that contains the route handlers for the endpoint.
   - You will also need to import it in `/src/index.ts` so that it is registered with the express application.
-- Implement the route handlers in the file. You can use functions and helpers from the `/lib/`, `/middleware/` and `/database/` directories.
+- Now you can implement the route handlers in the file. Use any functions and helpers nessesary from the `/lib/`, `/middleware/` and `/database/` directories.
 - Lastly, make sure to add tests for the endpoint in the `/tests/cases.test.ts` file. This is important to ensure that the endpoint works as expected and to prevent regressions in the future. [More details here.](#testing)
 
+### Add a new migration
+
+- As the first step you will need to create a new migration file. You can do this easily with the [database CLI](#database-cli) by running `bun db create_migration`. It will ask for the name of the migration and create a new file based on what you input in the `/src/database/migrations/` directory.
+- The contents of the file should look like this at first:
+```surql
+-- Migration name: some_migration_name
+-- Created at: 2025-05-30T14:55:29.767Z
+-- Put "-- REQUIRES RESET" in the first line to require a full reset of the database for this migration to apply
+
+BEGIN TRANSACTION;
+DEFINE PARAM OVERWRITE $db_version VALUE 2;
+
+-- Your migration code here
+
+COMMIT TRANSACTION;
+```
+- The `-- REQUIRES RESET` comment is optional and can be used to indicate that this migration requires a full reset of the database to apply. IN MOST CASES YOU WILL NOT NEED THIS.
+- The `BEGIN TRANSACTION;` and `COMMIT TRANSACTION;` lines are used to wrap the migration code in a transaction, which ensures that if the migration fails the database rolls back to it's original, working state.
+- Now you can add your migration code in place of the `-- Your migration code here` line.
